@@ -23,7 +23,7 @@
 #' 
 #' 
 #+ include = TRUE, echo = FALSE, results = 'hide', warning = FALSE, message = FALSE
-library(XLConnect)
+#library(XLConect)
 library(tidyverse)
 library(sf)
 library(readxl)
@@ -33,6 +33,7 @@ library(here)
 library(knitr)
 library(kableExtra)
 library(DT)
+library(mapview)
 
 #' 
 #' 
@@ -154,7 +155,9 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A1a, total.1A1a, d
   datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
-  
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1A1a, zcol = 'PM10', layer.name = "Sources 1A1a", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+
 #'
 #'
 #'
@@ -205,6 +208,10 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A1b, total.1A1b, d
   datatable(., caption = 'Table 4: Summary differences',
             options = list(pageLength = 5)
   )
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1A1b, zcol = 'PM10', layer.name = "Sources 1A1b", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
 
 #'
 #'
@@ -255,6 +262,9 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2aiv, total.1B2ai
   datatable(., caption = 'Table 6: Summary differences',
             options = list(pageLength = 5)
   )
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1B2aiv, zcol = 'PM10', layer.name = "Sources 1B2aiv", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+
 #'
 #'
 #'
@@ -311,6 +321,11 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2c, total.1B2c, d
   )
 #'
 #'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1B2c, zcol = 'SO2', layer.name = "Sources 1B2c", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+
+#'
+#'
 #'
 #' ## 1A1c - Manufacturing of solid fuels
 #'
@@ -361,6 +376,10 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A1c, total.1A1c, d
   datatable(., caption = 'Table 8: Summary differences',
             options = list(pageLength = 5)
   )
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1A1c, zcol = 'PM10', layer.name = "Sources 1A1c", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
 #'
 #'
 #'
@@ -416,12 +435,17 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B1b, total.1B1b, d
   )
 #'
 #'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1B1b, layer.name = "Sources 1B1b", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+
+#'
+#'
 #'
 #'
 #'
 #'
 #'
 #+ include = FALSE 
-  # rmarkdown::render(here::here("/1A1-Energy_rmd.r"), output_dir = here::here("/Reports"))
-  
+# rmarkdown::render(here::here("/1A1-Energy_rmd.r"), output_dir = here::here("/Reports"))
+
 
