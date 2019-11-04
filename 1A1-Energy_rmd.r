@@ -1,8 +1,6 @@
 #' ---
 #' title: "Pollutant inventory spatialization"
-#' author: 
-#' - "Milutin Pejovic"
-#' - "Petar Bursac"
+#' author: GILAB team
 #' date: "`r format(Sys.time(), '%d %B %Y')`"
 #' output:   
 #'    html_document:
