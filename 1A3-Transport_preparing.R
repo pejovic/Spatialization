@@ -99,30 +99,94 @@ unique(sf_putevi$Kategorija)
 unique(sf_brojaci$Kategorija)
 
 pIA <- subset(sf_putevi, Kategorija == "IA") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634") # Transformation to UTM projection and zone 34N
 pIIA <- subset(sf_putevi, Kategorija == "IIA") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
 pIB <- subset(sf_putevi, Kategorija == "IB") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
 pIIB <- subset(sf_putevi, Kategorija == "IIB") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
 
 bIA <- subset(sf_brojaci, Kategorija == "IA") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
 bIIA <- subset(sf_brojaci, Kategorija == "IIA") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
 bIB <- subset(sf_brojaci, Kategorija == "IB") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
 bIIB <- subset(sf_brojaci, Kategorija == "IIB") %>%
-  st_transform(crs = "+init=epsg:3857")
+  st_transform(crs = "+init=epsg:32634")
+bostalo <- subset(sf_brojaci, Kategorija == "nije u mrezi" | Kategorija == "-") %>%
+  st_transform(crs = "+init=epsg:32634")
+
+buf_bIA <- st_buffer(bIA$geometry, dist = 5000)
+buf_bIIA <- st_buffer(bIIA$geometry, dist = 5000)
+buf_bIB <- st_buffer(bIB$geometry, dist = 5000)
+buf_bIIB <- st_buffer(bIIB$geometry, dist = 5000)
+buf_bostalo <- st_buffer(bostalo$geometry, dist = 5000)
 
 
-buf_bIA <- st_buffer(bIA$geometry, dist = 1000)
-buf_bIIA <- st_buffer(bIIA$geometry, dist = 1000)
-buf_bIB <- st_buffer(bIB$geometry, dist = 1000)
-buf_bIIB <- st_buffer(bIIB$geometry, dist = 1000)
+mapview(pIA, zcol = "Kategorija") + 
+  mapview(bIA, zcol = "Kategorija") + 
+  mapview(buf_bIA, col.regions = "red")
 
-mapview(pIIA, zcol = "Kategorija") + mapview(bIIA, zcol = "Kategorija") + mapview(buf_bIIA, col.regions = "red")
+mapview(pIIA, zcol = "Kategorija") + 
+  mapview(bIIA, zcol = "Kategorija") + 
+  mapview(buf_bIIA, col.regions = "red")
+
+mapview(pIB, zcol = "Kategorija") + 
+  mapview(bIB, zcol = "Kategorija") + 
+  mapview(buf_bIB, col.regions = "red")
+
+mapview(pIIB, zcol = "Kategorija") + 
+  mapview(bIIB, zcol = "Kategorija") + 
+  mapview(buf_bIIB, col.regions = "red") + 
+  mapview(bostalo, zcol = "Kategorija") + 
+  mapview(buf_bostalo, col.regions = "orange")
+
+
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# CLC i urbana podrucja
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+
+clc_12 <- readOGR("Data/clc/CLC12_RS.shp")
+sf_clc12 <- st_as_sf(clc_12)
+
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+
+sf_clc12_urb <- subset(sf_clc12, CODE_12 == "111" | CODE_12 == "112")
+
+sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112")
+
+mapview(sf_clc12_urb, zcol = "CODE_12")
+
+
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# GRID_5km
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+
+grid <- readOGR("Grid/Polygons_5km_4326.shp")
+sf_grid <- st_as_sf(grid)
+
+mapview(sf_grid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
