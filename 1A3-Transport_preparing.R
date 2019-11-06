@@ -168,8 +168,7 @@ mapview(sf_clc12_urb, zcol = "CODE_12")
 grid <- readOGR("Grid/Polygons_5km_4326.shp")
 sf_grid <- st_as_sf(grid)
 
-mapview(sf_grid)
-
+mapview(sf_grid, col.regions = "red", legend = F)
 
 
 
