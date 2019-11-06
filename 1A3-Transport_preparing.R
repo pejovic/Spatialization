@@ -98,6 +98,7 @@ mapview(sf_putevi, zcol = "Kategorija") + mapview(sf_brojaci, zcol = "Kategorija
 unique(sf_putevi$Kategorija)
 unique(sf_brojaci$Kategorija)
 
+# Putevi
 pIA <- subset(sf_putevi, Kategorija == "IA") %>%
   st_transform(crs = "+init=epsg:32634") # Transformation to UTM projection and zone 34N
 pIIA <- subset(sf_putevi, Kategorija == "IIA") %>%
@@ -107,6 +108,7 @@ pIB <- subset(sf_putevi, Kategorija == "IB") %>%
 pIIB <- subset(sf_putevi, Kategorija == "IIB") %>%
   st_transform(crs = "+init=epsg:32634")
 
+# Brojaci
 bIA <- subset(sf_brojaci, Kategorija == "IA") %>%
   st_transform(crs = "+init=epsg:32634")
 bIIA <- subset(sf_brojaci, Kategorija == "IIA") %>%
@@ -118,11 +120,12 @@ bIIB <- subset(sf_brojaci, Kategorija == "IIB") %>%
 bostalo <- subset(sf_brojaci, Kategorija == "nije u mrezi" | Kategorija == "-") %>%
   st_transform(crs = "+init=epsg:32634")
 
-buf_bIA <- st_buffer(bIA$geometry, dist = 5000)
-buf_bIIA <- st_buffer(bIIA$geometry, dist = 5000)
-buf_bIB <- st_buffer(bIB$geometry, dist = 5000)
-buf_bIIB <- st_buffer(bIIB$geometry, dist = 5000)
-buf_bostalo <- st_buffer(bostalo$geometry, dist = 5000)
+# Buffer-i
+buf_bIA <- st_buffer(bIA$geometry, dist = 100)
+buf_bIIA <- st_buffer(bIIA$geometry, dist = 100)
+buf_bIB <- st_buffer(bIB$geometry, dist = 100)
+buf_bIIB <- st_buffer(bIIB$geometry, dist = 100)
+buf_bostalo <- st_buffer(bostalo$geometry, dist = 100)
 
 
 mapview(pIA, zcol = "Kategorija") + 
@@ -130,6 +133,7 @@ mapview(pIA, zcol = "Kategorija") +
   mapview(buf_bIA, col.regions = "red")
 
 mapview(pIIA, zcol = "Kategorija") + 
+  mapview(sf_grid, col.regions = "red", legend = F)+
   mapview(bIIA, zcol = "Kategorija") + 
   mapview(buf_bIIA, col.regions = "red")
 
@@ -171,19 +175,32 @@ sf_grid <- st_as_sf(grid)
 mapview(sf_grid, col.regions = "red", legend = F)
 
 
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# Mid_points deoinca
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+buf_bIA <- st_sf(buf_bIA) 
+buf_bIA$id <- seq.int(nrow(buf_bIA))
 
+buf_bIIA <- st_sf(buf_bIIA) 
+buf_bIIA$id = seq.int(nrow(buf_bIIA))
 
+buf_bIB <- st_sf(buf_bIB) 
+buf_bIB$id = seq.int(nrow(buf_bIB))
 
+buf_bIIB <- st_sf(buf_bIIB) 
+buf_bIIB$id = seq.int(nrow(buf_bIIB))
 
+buf_bIA <- st_join(buf_bIA, bIA, join = st_intersects)
+buf_bIIA <- st_join(buf_bIIA, bIIA, join = st_intersects)
+buf_bIB <- st_join(buf_bIB, bIB, join = st_intersects)
+buf_bIIB <- st_join(buf_bIIB, bIIB, join = st_intersects)
 
+pIA <- st_join(pIA, buf_bIA, join = st_intersects)
+pIIA <- st_join(pIIA, buf_bIIA, join = st_intersects)
+pIB <- st_join(pIB, buf_bIB, join = st_intersects)
+pIIB <- st_join(pIIB, buf_bIIB, join = st_intersects)
 
-
-
-
-
-
-
-
+# Mid points
 
 
 
