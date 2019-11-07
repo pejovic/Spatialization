@@ -58,6 +58,7 @@ reg_vozila <- reg_vozila %>%
          `Radna vozila` = as.numeric(`Radna vozila`),
          `Drumski tegljači` = as.numeric(`Drumski tegljači`),
          `Priključna vozila` = as.numeric(`Priključna vozila`))
+
 # Replace Na with 0
 reg_vozila <- reg_vozila %>%
   mutate_all(~replace_na(., 0))
@@ -161,8 +162,9 @@ sf_clc18 <- st_as_sf(clc_18)
 sf_clc12_urb <- subset(sf_clc12, CODE_12 == "111" | CODE_12 == "112")
 
 sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112")
+clc121 <- subset(sf_clc18, CODE_18 == "121")
 
-mapview(sf_clc12_urb, zcol = "CODE_12")
+mapview(clc121, zcol = "CODE_18")
 
 
 # ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
