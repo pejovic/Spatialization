@@ -441,6 +441,28 @@ mapview(sf.1A2f, layer.name = "Sources 1A2f", map.types = c("OpenStreetMap", "Es
 #'
 #'
 #'
+#' ## 1A2g - Other industries
+#'
+#+ include = FALSE
+source.1A2g <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A2g$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D202:I202", sheet = source.sheet, col_names = vars)
+source.1A2g$total$inventory <- readxl::read_xlsx(path = source.file, range = "D209:I209", sheet = source.sheet, col_names = vars)
+
+#+ include = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+clc121 <- subset(sf_clc18, CODE_18 == "121") %>%
+  st_set_crs(32634)
+
+# Combine all known points into one sf object
+points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
+  subset(is.na(NOx) | is.na(SO2) | is.na(PM10) | is.na(PM2.5) | is.na(NMVOC) | is.na(NH3))
+
+mapview(clc121.otherIndustries)
 #'
 #'
 #+ include = FALSE 
