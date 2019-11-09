@@ -162,6 +162,7 @@ sf_clc18 <- st_as_sf(clc_18)
 sf_clc12_urb <- subset(sf_clc12, CODE_12 == "111" | CODE_12 == "112")
 
 sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112")
+
 clc121 <- subset(sf_clc18, CODE_18 == "121")
 
 mapview(clc121, zcol = "CODE_18")
@@ -204,7 +205,44 @@ pIIB <- st_join(pIIB, buf_bIIB, join = st_intersects)
 
 # Mid points
 
+st_line_midpoints <- function(sf_lines = NULL) {
+  
+  g <- st_geometry(sf_lines)
+  
+  g_mids <- lapply(g, function(x) {
+    
+    coords <- as.matrix(x)
+    
+    get_mids <- function (coords) {
+      dist <- sqrt((diff(coords[, 1])^2 + (diff(coords[, 2]))^2))
+      dist_mid <- sum(dist)/2
+      dist_cum <- c(0, cumsum(dist))
+      end_index <- which(dist_cum > dist_mid)[1]
+      start_index <- end_index - 1
+      start <- coords[start_index, ]
+      end <- coords[end_index, ]
+      dist_remaining <- dist_mid - dist_cum[start_index]
+      mid <- start + (end - start) * (dist_remaining/dist[start_index])
+      return(mid)
+    }
+    
+    mids <- st_point(get_mids(coords))
+  })
+  
+  out <- st_sfc(g_mids, crs = st_crs(sf_lines))
+  out <- st_sf(out)
+}
 
 
+pIA_midp <- st_line_midpoints(pIA) %>%
+  st_join(., pIA, dist = 1, join = st_is_within_distance)
 
+pIIA_midp <- st_line_midpoints(pIIA) %>% 
+  st_join(., pIIA, dist = 1, join = st_is_within_distance)
+
+pIB_midp <- st_line_midpoints(pIB) %>% 
+  st_join(., pIB, dist = 1, join = st_is_within_distance)
+
+pIIB_midp <- st_line_midpoints(pIIB) %>% 
+  st_join(., pIIB, dist = 1, join = st_is_within_distance)
 
