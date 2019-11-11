@@ -1,6 +1,8 @@
 #' ---
 #' title: "Pollutant inventory spatialization"
-#' author: GILAB team
+#' author:
+#'    - "Milan Kilibarda"
+#'    - "Dragutin Protic"
 #' date: "`r format(Sys.time(), '%d %B %Y')`"
 #' output:   
 #'    html_document:
