@@ -1,6 +1,8 @@
 #' ---
 #' title: "Pollutant inventory spatialization"
-#' author: GILAB team
+#' author:
+#'    - "Milan Kilibarda"
+#'    - "Dragutin Protic"
 #' date: "`r format(Sys.time(), '%d %B %Y')`"
 #' output:   
 #'    html_document:
@@ -32,7 +34,7 @@ library(knitr)
 library(kableExtra)
 library(DT)
 library(mapview)
-
+library(rgdal)
 #' 
 #' 
 #+ include = FALSE
@@ -99,7 +101,9 @@ corsum2sf <- function(source.list){
 source.file = "Pollutant inventory spatialized-d30102019.xlsx"
 source.sheet =  "1A2-2-Industry"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
-vars <- header[1:6] 
+vars <- header[1:6]
+grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
+sf.grid.5km <- st_as_sf(grid.5km)   
 #'
 #'
 #' ## 1A2a / 2C1 - Iron and Steel
@@ -114,7 +118,8 @@ source.1A2a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D
 source.1A2a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D34:I34", sheet = source.sheet, col_names = vars)
 
 
-sf.1A2a <- corsum2sf(source.1A2a)
+sf.1A2a <- corsum2sf(source.1A2a) %>%
+  st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -153,8 +158,35 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2a, total.1A2a, d
   datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2a <- sf.grid.5km %>%
+  st_join(sf.1A2a) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2a, zcol = 'PM10', layer.name = "Sources 1A2a", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+mapview(sf.1A2a, layer.name = "Sources 1A2a", col.regions = "red") + mapview(p.1A2a, layer.name = "Spatialised 1A2a")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2a <- p.1A2a %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2a, total.1A2a, data.frame(sum.p.1A2a == total.1A2a)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2a, dsn="Products/1A2 - Industry/1A2a.gpkg", layer='1A2a')
 
 #'
 #'
@@ -167,7 +199,8 @@ source.1A2b$sources$points <- readxl::read_xlsx(path = source.file, range = "D35
 source.1A2b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D49:I49", sheet = source.sheet, col_names = vars)
 source.1A2b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D54:I54", sheet = source.sheet, col_names = vars)
 
-sf.1A2b <- corsum2sf(source.1A2b)
+sf.1A2b <- corsum2sf(source.1A2b) %>%
+  st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #'
@@ -175,7 +208,7 @@ sf.1A2b <- corsum2sf(source.1A2b)
 sf.1A2b %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 3: sf.1A2b',
+  datatable(., caption = 'Table 4: sf.1A2b',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -203,13 +236,38 @@ total.1A2b <- source.1A2b[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2b, total.1A2b, data.frame(sum.1A2b == total.1A2b)-1)) %>%
-  datatable(., caption = 'Table 4: Summary differences',
+  datatable(., caption = 'Table 5: Summary differences',
             options = list(pageLength = 5)
   )
-#'
-#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2b <- sf.grid.5km %>%
+  st_join(sf.1A2b) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2b, zcol = 'PM10', layer.name = "Sources 1A2b", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+mapview(sf.1A2b, layer.name = "Sources 1A2b", col.regions = "red") + mapview(p.1A2b, layer.name = "Spatialised 1A2b")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2b <- p.1A2b %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2b, total.1A2b, data.frame(sum.p.1A2b == total.1A2b)-1)) %>%
+  datatable(., caption = 'Table 6: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2b, dsn="Products/1A2 - Industry/1A2b.gpkg", layer='1A2b')
 
 #'
 #'
@@ -223,13 +281,14 @@ source.1A2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D55
 source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
 source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
 
-sf.1A2c <- corsum2sf(source.1A2c)
+sf.1A2c <- corsum2sf(source.1A2c) %>%
+  st_transform(crs = "+init=epsg:32634")
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sf.1A2c %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 5: sf.1A2aiv',
+  datatable(., caption = 'Table 7: sf.1A2aiv',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -257,11 +316,38 @@ total.1A2c <- source.1A2c[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2c, total.1A2c, data.frame(sum.1A2c == total.1A2c)-1)) %>%
-  datatable(., caption = 'Table 6: Summary differences',
+  datatable(., caption = 'Table 8: Summary differences',
             options = list(pageLength = 5)
   )
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2c <- sf.grid.5km %>%
+  st_join(sf.1A2c) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2c, zcol = 'PM10', layer.name = "Sources 1A2c", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+mapview(sf.1A2c, layer.name = "Sources 1A2c", col.regions = "red") + mapview(p.1A2c, layer.name = "Spatialised 1A2c")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2c <- p.1A2c %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2c, total.1A2c, data.frame(sum.p.1A2c == total.1A2c)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2c, dsn="Products/1A2 - Industry/1A2c.gpkg", layer='1A2c')
 
 #'
 #'
@@ -278,7 +364,8 @@ source.1A2d$sources$points <- readxl::read_xlsx(path = source.file, range = "D87
 source.1A2d$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D103:I103", sheet = source.sheet, col_names = vars)
 source.1A2d$total$inventory <- readxl::read_xlsx(path = source.file, range = "D109:I109", sheet = source.sheet, col_names = vars)
 
-sf.1A2d <- corsum2sf(source.1A2d)
+sf.1A2d <- corsum2sf(source.1A2d) %>%
+  st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #'
@@ -286,7 +373,7 @@ sf.1A2d <- corsum2sf(source.1A2d)
 sf.1A2d %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 5: sf.1A2d',
+  datatable(., caption = 'Table 10: sf.1A2d',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -314,13 +401,40 @@ total.1A2d <- source.1A2d[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2d, total.1A2d, data.frame(sum.1A2d == total.1A2d)-1)) %>%
-  datatable(., caption = 'Table 6: Summary differences',
+  datatable(., caption = 'Table 11: Summary differences',
             options = list(pageLength = 5)
   )
 #'
 #'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2d <- sf.grid.5km %>%
+  st_join(sf.1A2d) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2d, zcol = 'SO2', layer.name = "Sources 1A2d", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+mapview(sf.1A2d, layer.name = "Sources 1A2d", col.regions = "red") + mapview(p.1A2d, layer.name = "Spatialised 1A2d")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2d <- p.1A2d %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2d, total.1A2d, data.frame(sum.p.1A2d == total.1A2d)-1)) %>%
+  datatable(., caption = 'Table 12: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2d, dsn="Products/1A2 - Industry/1A2d.gpkg", layer='1A2d')
 
 #'
 #'
@@ -334,7 +448,8 @@ source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D11
 source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D137:I137", sheet = source.sheet, col_names = vars)
 source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "D151:I151", sheet = source.sheet, col_names = vars)
 
-sf.1A2e <- corsum2sf(source.1A2e)
+sf.1A2e <- corsum2sf(source.1A2e) %>%
+  st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -343,7 +458,7 @@ sf.1A2e <- corsum2sf(source.1A2e)
 sf.1A2e %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.1A2e',
+  datatable(., caption = 'Table 13: sf.1A2e',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -371,13 +486,41 @@ total.1A2e <- source.1A2e[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2e, total.1A2e, data.frame(sum.1A2e == total.1A2e)-1)) %>%
-  datatable(., caption = 'Table 8: Summary differences',
+  datatable(., caption = 'Table 14: Summary differences',
             options = list(pageLength = 5)
   )
 #'
 #'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2e <- sf.grid.5km %>%
+  st_join(sf.1A2e) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2e, zcol = 'PM10', layer.name = "Sources 1A2e", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+mapview(sf.1A2e, layer.name = "Sources 1A2e", col.regions = "red") + mapview(p.1A2e, layer.name = "Spatialised 1A2e")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2e <- p.1A2e %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e, total.1A2e, data.frame(sum.p.1A2e == total.1A2e)-1)) %>%
+  datatable(., caption = 'Table 15: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2e, dsn="Products/1A2 - Industry/1A2e.gpkg", layer='1A2e')
+
 #'
 #'
 #'
@@ -393,14 +536,15 @@ source.1A2f$sources$points <- readxl::read_xlsx(path = source.file, range = "D15
 source.1A2f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D182:I182", sheet = source.sheet, col_names = vars)
 source.1A2f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D189:I189", sheet = source.sheet, col_names = vars)
 
-sf.1A2f <- corsum2sf(source.1A2f)
+sf.1A2f <- corsum2sf(source.1A2f) %>%
+  st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sf.1A2f %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 9: sf.1A2f',
+  datatable(., caption = 'Table 16: sf.1A2f',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -428,22 +572,70 @@ total.1A2f <- source.1A2f[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2f, total.1A2f, data.frame(sum.1A2f == total.1A2f)-1)) %>%
-  datatable(., caption = 'Table 10: Summary differences',
+  datatable(., caption = 'Table 17: Summary differences',
             options = list(pageLength = 5)
   )
 #'
 #'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2f <- sf.grid.5km %>%
+  st_join(sf.1A2f) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2f, layer.name = "Sources 1A2f", map.types = c("OpenStreetMap", "Esri.WorldImagery"))
+mapview(sf.1A2f, layer.name = "Sources 1A2f", col.regions = "red") + mapview(p.1A2f, layer.name = "Spatialised 1A2f")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2f <- p.1A2f %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2f, total.1A2f, data.frame(sum.p.1A2f == total.1A2f)-1)) %>%
+  datatable(., caption = 'Table 18: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2f, dsn="Products/1A2 - Industry/1A2f.gpkg", layer='1A2f')
 
 #'
 #'
 #'
 #'
 #'
+#' ## 1A2g - Other industries
+#'
+#+ include = FALSE
+source.1A2g <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A2g$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D202:I202", sheet = source.sheet, col_names = vars)
+source.1A2g$total$inventory <- readxl::read_xlsx(path = source.file, range = "D209:I209", sheet = source.sheet, col_names = vars)
+
+#+ include = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+clc121 <- subset(sf_clc18, CODE_18 == "121") %>%
+  st_set_crs(32634)
+
+# Combine all known points into one sf object
+points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
+  subset(is.na(NOx) | is.na(SO2) | is.na(PM10) | is.na(PM2.5) | is.na(NMVOC) | is.na(NH3))
+
+mapview(clc121.otherIndustries)
 #'
 #'
 #+ include = FALSE 
 # rmarkdown::render(here::here("/1A2 - Industry.r"), output_dir = here::here("/Reports"))
-
 
