@@ -235,14 +235,36 @@ st_line_midpoints <- function(sf_lines = NULL) {
 
 
 pIA_midp <- st_line_midpoints(pIA) %>%
-  st_join(., pIA, dist = 1, join = st_is_within_distance)
+  st_join(., pIA, dist = 1, join = st_is_within_distance) %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_) %>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
 
 pIIA_midp <- st_line_midpoints(pIIA) %>% 
-  st_join(., pIIA, dist = 1, join = st_is_within_distance)
+  st_join(., pIIA, dist = 1, join = st_is_within_distance) %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_)%>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
 
 pIB_midp <- st_line_midpoints(pIB) %>% 
-  st_join(., pIB, dist = 1, join = st_is_within_distance)
+  st_join(., pIB, dist = 1, join = st_is_within_distance)  %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_) %>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
 
 pIIB_midp <- st_line_midpoints(pIIB) %>% 
-  st_join(., pIIB, dist = 1, join = st_is_within_distance)
+  st_join(., pIIB, dist = 1, join = st_is_within_distance) %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_)%>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
+
+
+
+
+
+
 
