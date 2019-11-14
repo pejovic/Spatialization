@@ -64,7 +64,9 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #' 
 #+ include = FALSE, echo = FALSE
 # source.list = source.1A2a
-corsum2sf <- function(source.list){
+# Parameters:
+#  - distribute - TRUE or FALSE, depend on that if someone want to distribute total inventory emissions to sources, when difference exists
+corsum2sf <- function(source.list, distribute = FALSE){
   source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
   
@@ -79,7 +81,7 @@ corsum2sf <- function(source.list){
     dplyr::mutate_if(is.numeric, round, 2) %>%
     as.data.frame()
   
-  if(!identical(points.sum, points.total)){
+  if(!identical(points.sum, points.total) & distribute == TRUE){
     d <- (points.total - points.sum)[1, ]
     zero.ind <- source.list$sources$points[, vars] == 0
     w <- replace(source.list$sources$points[, vars], zero.ind, NA) %>% 
@@ -617,23 +619,157 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2f, total.1A2f
 #+ include = FALSE
 source.1A2g <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
+source.1A2g$sources$points <- readxl::read_xlsx(path = source.file, range = "D190:S194", sheet = source.sheet, col_names = header)
 source.1A2g$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D202:I202", sheet = source.sheet, col_names = vars)
 source.1A2g$total$inventory <- readxl::read_xlsx(path = source.file, range = "D209:I209", sheet = source.sheet, col_names = vars)
+
+sf.1A2g <- corsum2sf(source.1A2g, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A2g %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 19: sf.1A2g',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A2g <- sf.1A2g %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A2g <- source.1A2g[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2g, total.1A2g, data.frame(total.1A2g-sum.1A2g))) %>%
+  datatable(., caption = 'Table 20: Summary differences',
+            options = list(pageLength = 5)
+  )
+
 
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
 clc121 <- subset(sf_clc18, CODE_18 == "121") %>%
   st_set_crs(32634)
-
+#+ include = FALSE
 # Combine all known points into one sf object
-points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f) %>%
+points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f, sf.1A2g) %>%
   st_transform(crs = "+init=epsg:32634")
-
 clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
   subset(is.na(NOx) | is.na(SO2) | is.na(PM10) | is.na(PM2.5) | is.na(NMVOC) | is.na(NH3))
 
-mapview(clc121.otherIndustries)
+#+ include = FALSE
+# Polygon Centroid
+clc121.oI.cen <- st_centroid(clc121.otherIndustries) %>%
+  select(ID, Area_Ha, SHAPE_Area, NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  rename(ID_CLC = ID)
+clc121.oI.cen <- st_join(clc121.oI.cen, sf.grid.5km) %>%
+  subset(!is.na(ID))
+
+#+ include = FALSE
+# Distribute values based on area of each polygon and add it to centroids
+sum_Area <- sum(clc121.oI.cen$SHAPE_Area)
+diff.1A2g <- data.frame(total.1A2g - sum.1A2g)
+clc121.oI.cen <- clc121.oI.cen %>%
+  mutate(NOx = ((diff.1A2g$NOx/sum_Area)*SHAPE_Area),
+         SO2 = ((diff.1A2g$SO2/sum_Area)*SHAPE_Area),
+         PM10 = ((diff.1A2g$PM10/sum_Area)*SHAPE_Area),
+         PM2.5 = ((diff.1A2g$PM2.5/sum_Area)*SHAPE_Area),
+         NMVOC = ((diff.1A2g$NMVOC/sum_Area)*SHAPE_Area),
+         NH3 = ((diff.1A2g$NH3/sum_Area)*SHAPE_Area))
+sf.1A2g %<>% select(vars)
+clc121.oI.cen %<>% select(vars)
+sf.1A2g <- rbind(sf.1A2g, clc121.oI.cen)
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A2g %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 21: sf.1A2g',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A2g <- sf.1A2g %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A2g <- source.1A2g[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2g, total.1A2g, data.frame(total.1A2g-sum.1A2g))) %>%
+  datatable(., caption = 'Table 22: Summary differences',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2g <- sf.grid.5km %>%
+  st_join(sf.1A2g) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+mapview(sf.1A2g, layer.name = "Sources 1A2g", col.regions = "red") + mapview(p.1A2g, layer.name = "Spatialised 1A2g")
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2g <- p.1A2g %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g, data.frame(sum.p.1A2g == total.1A2g)-1)) %>%
+  datatable(., caption = 'Table 23: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+#st_write(p.1A2g, dsn="Products/1A2 - Industry/1A2g.gpkg", layer='1A2g')
+
+
 #'
 #'
 #+ include = FALSE 

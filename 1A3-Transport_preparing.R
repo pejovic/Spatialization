@@ -161,7 +161,8 @@ sf_clc18 <- st_as_sf(clc_18)
 
 sf_clc12_urb <- subset(sf_clc12, CODE_12 == "111" | CODE_12 == "112")
 
-sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112")
+sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>%
+  st_transform(crs = "+init=epsg:32634")
 
 clc121 <- subset(sf_clc18, CODE_18 == "121")
 
@@ -235,14 +236,79 @@ st_line_midpoints <- function(sf_lines = NULL) {
 
 
 pIA_midp <- st_line_midpoints(pIA) %>%
-  st_join(., pIA, dist = 1, join = st_is_within_distance)
+  st_join(., pIA, dist = 1, join = st_is_within_distance) %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_) %>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
 
 pIIA_midp <- st_line_midpoints(pIIA) %>% 
-  st_join(., pIIA, dist = 1, join = st_is_within_distance)
+  st_join(., pIIA, dist = 1, join = st_is_within_distance) %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_)%>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
 
 pIB_midp <- st_line_midpoints(pIB) %>% 
-  st_join(., pIB, dist = 1, join = st_is_within_distance)
+  st_join(., pIB, dist = 1, join = st_is_within_distance)  %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_) %>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
 
 pIIB_midp <- st_line_midpoints(pIIB) %>% 
-  st_join(., pIIB, dist = 1, join = st_is_within_distance)
+  st_join(., pIIB, dist = 1, join = st_is_within_distance) %>%
+  select(PGDS_2015_) %>%
+  rename(PGDS_2015 = PGDS_2015_)%>%
+  mutate(PGDS_2015 = as.numeric(PGDS_2015)) %>%
+  mutate_all(~replace_na(., 0))
+
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# PGDS deonica puteva
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+lcl(loc = "C")
+
+pgds.deonica.pIA <- readxl::read_xls(path = "Data/PGDS_deonica_puteva_2015.xls", sheet = "IA") %>%
+  cyr_lat()
+pgds.deonica.pIIA <- readxl::read_xls(path = "Data/PGDS_deonica_puteva_2015.xls", sheet = "IIA") %>%
+  cyr_lat()
+pgds.deonica.pIB <- readxl::read_xls(path = "Data/PGDS_deonica_puteva_2015.xls", sheet = "IB") %>%
+  cyr_lat()
+pgds.deonica.pIIB <- readxl::read_xls(path = "Data/PGDS_deonica_puteva_2015.xls", sheet = "IIB") %>%
+  cyr_lat()
+
+names(pgds.deonica.pIA) <- cyr_lat(names(pgds.deonica.pIA)) 
+names(pgds.deonica.pIIA) <- cyr_lat(names(pgds.deonica.pIIA)) 
+names(pgds.deonica.pIB) <- cyr_lat(names(pgds.deonica.pIB)) 
+names(pgds.deonica.pIIB) <- cyr_lat(names(pgds.deonica.pIIB)) 
+
+pIA$PGDS_2015_deonica <- pgds.deonica.pIA$PGDS[match(pIA$Oznaka_deo, pgds.deonica.pIA$`Oznaka deonice`)]
+pIIA$PGDS_2015_deonica <- pgds.deonica.pIIA$PGDS[match(pIIA$Oznaka_deo, pgds.deonica.pIIA$`Oznaka deonice`)]
+pIB$PGDS_2015_deonica <- pgds.deonica.pIB$PGDS[match(pIB$Oznaka_deo, pgds.deonica.pIB$`Oznaka deonice`)]
+pIIB$PGDS_2015_deonica <- pgds.deonica.pIIB$PGDS[match(pIIB$Oznaka_deo, pgds.deonica.pIIB$`Oznaka deonice`)]
+
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# Saobracajni cvorovi
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+cvorovi <- readOGR("Data/cvorovi/Saobracajni_cvorovi.shp", 
+                   use_iconv=TRUE,  
+                   encoding = "UTF-8")
+sf_cvorovi <- st_as_sf(cvorovi) %>%
+  st_transform(crs = "+init=epsg:32634") 
+
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# OSM putevi unutar urbanih podrucja
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+
+#osm_roads <- readOGR("d:/Projekti/Spatialisation/Transport/Data/osm_roads_Serbia_epsg4326.shp", 
+#                   use_iconv=TRUE,  
+#                   encoding = "UTF-8")
+#sf_osm <- st_as_sf(osm_roads) %>%
+#  st_transform(crs = "+init=epsg:32634")
+#
+#sf_osm_urb <- st_intersection(sf_osm, sf_clc18_urb)
+#st_write(sf_osm_urb, dsn="Data/putevi/OSM_putevi_urbana_podrucja.gpkg", layer='osm_urb')
+
+osm_urb <- st_read("Data/putevi/OSM_putevi_urbana_podrucja.gpkg")
+mapview(osm_urb)
 
