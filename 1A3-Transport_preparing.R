@@ -10,6 +10,7 @@ library(DT)
 library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
+library(nngeo)
 # devtools::install_github("basarabam/SerbianCyrLat")
 
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -90,7 +91,8 @@ sf_brojaci <- st_as_sf(brojaci)
 
 putevi <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
                        use_iconv=TRUE,  
-                       encoding = "UTF-8")
+                       encoding = "UTF-8",
+                       stringsAsFactors = FALSE)
 sf_putevi <- st_as_sf(putevi)
 
 mapview(sf_putevi, zcol = "Kategorija") + mapview(sf_brojaci, zcol = "Kategorija")
@@ -164,7 +166,8 @@ sf_clc12_urb <- subset(sf_clc12, CODE_12 == "111" | CODE_12 == "112")
 sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>%
   st_transform(crs = "+init=epsg:32634")
 
-clc121 <- subset(sf_clc18, CODE_18 == "121")
+clc121 <- subset(sf_clc18, CODE_18 == "121") %>%
+  st_transform(crs = "+init=epsg:32634")
 
 mapview(clc121, zcol = "CODE_18")
 
@@ -194,10 +197,10 @@ buf_bIB$id = seq.int(nrow(buf_bIB))
 buf_bIIB <- st_sf(buf_bIIB) 
 buf_bIIB$id = seq.int(nrow(buf_bIIB))
 
-buf_bIA <- st_join(buf_bIA, bIA, join = st_intersects)
-buf_bIIA <- st_join(buf_bIIA, bIIA, join = st_intersects)
-buf_bIB <- st_join(buf_bIB, bIB, join = st_intersects)
-buf_bIIB <- st_join(buf_bIIB, bIIB, join = st_intersects)
+buf_bIA <- st_join(st_sf(buf_bIA), bIA, join = st_intersects) %>% dplyr::select("PGDS_2015_") %>% dplyr::rename(PGDS_2015 = PGDS_2015_) 
+buf_bIIA <- st_join( st_sf(buf_bIIA), bIIA, join = st_intersects) %>% dplyr::select("PGDS_2015_") %>% dplyr::rename(PGDS_2015 = PGDS_2015_) 
+buf_bIB <- st_join(st_sf(buf_bIB), bIB, join = st_intersects) %>% dplyr::select("PGDS_2015_") %>% dplyr::rename(PGDS_2015 = PGDS_2015_) 
+buf_bIIB <- st_join(st_sf(buf_bIIB), bIIB, join = st_intersects) %>% dplyr::select("PGDS_2015_") %>% dplyr::rename(PGDS_2015 = PGDS_2015_) 
 
 pIA <- st_join(pIA, buf_bIA, join = st_intersects)
 pIIA <- st_join(pIIA, buf_bIIA, join = st_intersects)
@@ -296,6 +299,8 @@ cvorovi <- readOGR("Data/cvorovi/Saobracajni_cvorovi.shp",
 sf_cvorovi <- st_as_sf(cvorovi) %>%
   st_transform(crs = "+init=epsg:32634") 
 
+mapview(sf_cvorovi) + mapview(pIIA) + mapview(pIB) + mapview(pIIB)
+
 # ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
 # OSM putevi unutar urbanih podrucja
 # ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
@@ -311,4 +316,47 @@ sf_cvorovi <- st_as_sf(cvorovi) %>%
 
 osm_urb <- st_read("Data/putevi/OSM_putevi_urbana_podrucja.gpkg")
 mapview(osm_urb)
+
+############################################################################################
+
+pIA <- pIA %>% mutate(is.Brojac = !is.na(PGDS_2015))
+pIIA <- pIIA %>% mutate(is.Brojac = !is.na(PGDS_2015))
+pIB <- pIB %>% mutate(is.Brojac = !is.na(PGDS_2015))
+pIIB <- pIIB %>% mutate(is.Brojac = !is.na(PGDS_2015))
+
+pIB %>% dplyr::filter(Broj_puta == 22 & Oznaka_deo == "02201o2") %>% nngeo::st_nn(., pIIB)
+
+putevi <- rbind(pIA, pIIA, pIB, pIIB)
+
+
+foo <- pIB %>% dplyr::filter(Broj_puta == "10" & Oznaka_deo == "01002")
+plot(foo$geometry)
+
+nngeo::st_nn(foo, pIB %>% dplyr::filter(Broj_puta == "10" & Oznaka_deo != "01002" & !is.na(PGDS_2015)), returnDist = TRUE, progress = FALSE, k = 3, maxdist = 3)[[1]][[1]]
+
+mapview(pIIA, zcol = "is.Brojac")  + mapview(sf_brojaci, zcol = "Kategorija")
+
+
+br.puta <- unique(putevi$Broj_puta)[30]
+
+nngeo::st_nn(foo, pIIB %>% dplyr::filter(Broj_puta == br.puta & Oznaka_deo != "01002" & !is.na(PGDS_2015)), returnDist = TRUE, progress = FALSE, k = 3, maxdist = 3)[[1]][[1]]
+
+
+
+bar <- function(put){
+  
+}
+
+
+bar <- pIIA %>% group_by(Broj_puta) %>% st_drop_geometry() %>% summarise( non_na_count = sum(!is.na(PGDS_2015)), na_count = sum(is.na(PGDS_2015))) %>% 
+
+
+pIIA %>% group_by(Broj_puta) %>% st_drop_geometry() %>% select(is.Brojac)
+
+pIIA %>% group_by(Broj_puta) %>% st_drop_geometry() %>% mutate_at(.vars = "PGDS_2015", )
+
+
+foo <- pIIA %>% st_drop_geometry() %>% mutate_at(.vars = "PGDS_2015", .funs = as.numeric) %>% split(., f = as.factor(.$Broj_puta)) 
+
+lapply(foo, function(x) x[!(x$is.Brojac), "PGDS_2015"] = mean(x[x$is.Brojac, "PGDS_2015"]))
 
