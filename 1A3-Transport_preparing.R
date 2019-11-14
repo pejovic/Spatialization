@@ -10,6 +10,7 @@ library(DT)
 library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
+library(nngeo)
 # devtools::install_github("basarabam/SerbianCyrLat")
 
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -85,12 +86,14 @@ mapview(sf_opstine, zcol = "Br_reg_vozila")
 # ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
 brojaci <- readOGR("Data/brojaci/Polozaj_automatskih_brojaca.shp", 
                    use_iconv=TRUE,  
-                   encoding = "UTF-8")
-sf_brojaci <- st_as_sf(brojaci)
+                   encoding = "UTF-8",
+                   stringsAsFactors = FALSE)
+sf_brojaci <- st_as_sf(brojaci) %>% mutate_at(vars(starts_with("PGDS")), .funs = as.numeric)
 
 putevi <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
                        use_iconv=TRUE,  
-                       encoding = "UTF-8")
+                       encoding = "UTF-8",
+                       stringsAsFactors = FALSE)
 sf_putevi <- st_as_sf(putevi)
 
 mapview(sf_putevi, zcol = "Kategorija") + mapview(sf_brojaci, zcol = "Kategorija")
@@ -182,22 +185,11 @@ mapview(sf_grid, col.regions = "red", legend = F)
 # ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
 # Mid_points deoinca
 # ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
-buf_bIA <- st_sf(buf_bIA) 
-buf_bIA$id <- seq.int(nrow(buf_bIA))
 
-buf_bIIA <- st_sf(buf_bIIA) 
-buf_bIIA$id = seq.int(nrow(buf_bIIA))
-
-buf_bIB <- st_sf(buf_bIB) 
-buf_bIB$id = seq.int(nrow(buf_bIB))
-
-buf_bIIB <- st_sf(buf_bIIB) 
-buf_bIIB$id = seq.int(nrow(buf_bIIB))
-
-buf_bIA <- st_join(buf_bIA, bIA, join = st_intersects)
-buf_bIIA <- st_join(buf_bIIA, bIIA, join = st_intersects)
-buf_bIB <- st_join(buf_bIB, bIB, join = st_intersects)
-buf_bIIB <- st_join(buf_bIIB, bIIB, join = st_intersects)
+buf_bIA <- st_join(st_sf(buf_bIA), bIA, join = st_intersects) %>% dplyr::select(PGDS_2015 = PGDS_2015_) %>% mutate_at(.vars = "PGDS_2015", .funs = as.numeric)
+buf_bIIA <- st_join(st_sf(buf_bIIA), bIIA, join = st_intersects) %>% dplyr::select(PGDS_2015 = PGDS_2015_) %>% mutate_at(.vars = "PGDS_2015", .funs = as.numeric)
+buf_bIB <- st_join(st_sf(buf_bIB), bIB, join = st_intersects) %>% dplyr::select(PGDS_2015 = PGDS_2015_) %>% mutate_at(.vars = "PGDS_2015", .funs = as.numeric)
+buf_bIIB <- st_join(st_sf(buf_bIIB), bIIB, join = st_intersects) %>% dplyr::select(PGDS_2015 = PGDS_2015_) %>% mutate_at(.vars = "PGDS_2015", .funs = as.numeric)
 
 pIA <- st_join(pIA, buf_bIA, join = st_intersects)
 pIIA <- st_join(pIIA, buf_bIIA, join = st_intersects)
@@ -311,4 +303,36 @@ sf_cvorovi <- st_as_sf(cvorovi) %>%
 
 osm_urb <- st_read("Data/putevi/OSM_putevi_urbana_podrucja.gpkg")
 mapview(osm_urb)
+
+
+
+
+########################################################################
+
+IIA <- st_drop_geometry(pIIA) 
+
+IIA[IIA$Broj_puta == "100" & is.na(IIA$PGDS_2015), "PGDS_2015"] <- mean(IIA[IIA$Broj_puta == "100" & !is.na(IIA$PGDS_2015), "PGDS_2015"])
+
+
+foo <- function(road.net){
+  road.net.res <- data.frame()
+  for(i in road.net$Broj_puta){
+    road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == i, ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 1000, k = 5, returnDist = TRUE, progress = FALSE)[[1]][[1]]
+    road.net.nn <- road.net[road.net.nn.ind, ]
+    road.net.nn.dt <- st_drop_geometry(road.net.nn)
+    road.net.nn.dt[road.net.nn.dt$Broj_puta == i & is.na(road.net.nn.dt$PGDS_2015), "PGDS_2015"] <- mean(road.net.nn.dt[road.net.nn.dt$Broj_puta == i & !is.na(road.net.nn.dt$PGDS_2015), "PGDS_2015"])
+  }
+  return(road.net)
+}
+
+
+foo(road.net = pIIA[1:50, ])
+
+road.net <- pIIA
+
+road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == "108" & road.net$Oznaka_deo == "10801",], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 3000, k = 2, returnDist = TRUE, progress = FALSE)[[1]][[1]]
+
+road.net[!is.na(road.net$PGDS_2015), ][road.net.nn.ind, ]
+plot(road.net[!is.na(road.net$PGDS_2015), ][road.net.nn.ind, ]$geometry)
+plot(road.net[road.net$Broj_puta == "108" & road.net$Oznaka_deo == "10801",], add = TRUE)
 
