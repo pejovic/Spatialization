@@ -315,33 +315,56 @@ IIA <- st_drop_geometry(pIIA)
 
 IIA[IIA$Broj_puta == "100" & is.na(IIA$PGDS_2015), "PGDS_2015"] <- mean(IIA[IIA$Broj_puta == "100" & !is.na(IIA$PGDS_2015), "PGDS_2015"])
 
-road.net <- pIIA
+road.nett <- pIIA[21:50, ]
 i = unique(road.net$Broj_puta)[3]
 
 foo <- function(road.net){
-  road.net.res <- data.frame()
+  road.net <- road.net %>% mutate(PGDS_2015.est = NA)
   for(i in unique(road.net$Broj_puta)){
-    road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 10, k = 5, returnDist = TRUE, progress = FALSE)
-    
-    road.nn.list <- road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), ] %>% st_drop_geometry() %>% split(., f = as.factor(.$Oznaka_deo))
-    road.nn <- road.net.nn.ind$nn
-    road.nn.dist <- road.net.nn.ind$dist
-    
-    apply(road.nn.dist, 1, function(x) sum(is.na(x)) == 5)
-    
-    for(j in 1:length(foo)){
-      road.net[!is.na(road.net$PGDS_2015), ] %>% st_drop_geometry() %>% weighted.mean(.[as.numeric(road.nn[[i]]), "PGDS_2015"], na.rm = TRUE, w = road.nn.dist[i, ]/sum(road.nn.dist[i, ], na.rm = TRUE))
+    road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == i, ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 10, k = 5, returnDist = TRUE, progress = FALSE)
+    road.solve.ind <- unlist(lapply(road.net.nn.ind$nn, function(x) !identical(x, integer(0))))
+    if(sum(road.solve.ind) != 0){
+      road.nn.ind <- (road.net.nn.ind$nn)[(road.solve.ind)]
+      road.solve.10 <- road.net[road.net$Broj_puta == i, ] %>%  .[road.solve.ind, ] %>% mutate(PGDS_2015.est = NA) #%>% split(., f = as.factor(.$Oznaka_deo))
+      road.nn.dist <- road.net.nn.ind$dist[road.solve.ind, ]
+      for(j in 1:dim(road.solve.10)[1]){
+        dists <- data.frame(road.nn.dist)[j,][!is.na(data.frame(road.nn.dist)[j,])]
+        dists[dists == 0] <- 10^-10
+        road.solve.10[j, "PGDS_2015.est"] <- road.net[!is.na(road.net$PGDS_2015), ][road.nn.ind[[j]],] %>% st_drop_geometry() %>% .$PGDS_2015 %>% weighted.mean(., na.rm = TRUE, w = dists/sum(dists, na.rm = TRUE))
+      }
+      if(sum(!road.solve.ind) != 0){
+        road.net.nn.ind.10000 <- st_nn(road.net[road.net$Broj_puta == i, ][!road.solve.ind, ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 10000, k = 5, returnDist = TRUE, progress = FALSE)
+        road.solve.ind.10000 <- unlist(lapply(road.net.nn.ind.10000$nn, function(x) !identical(x, integer(0))))
+        road.nn.ind.10000 <- (road.net.nn.ind.10000$nn)[(road.solve.ind.10000)]
+        road.solve.10000 <- road.net[road.net$Broj_puta == i, ][!road.solve.ind, ][road.solve.ind.10000, ] %>% mutate(PGDS_2015.est = NA) #%>% split(., f = as.factor(.$Oznaka_deo))
+        road.nn.dist.10000 <- road.net.nn.ind.10000$dist[road.solve.ind.10000, ]
+        for(k in 1:dim(road.solve.10000)[1]){
+          dists.10000 <- data.frame(road.nn.dist.10000)[k,][!is.na(data.frame(road.nn.dist.10000)[k,])]
+          dists.10000[dists.10000 == 0] <- 10^-10
+          road.solve.10000[k, "PGDS_2015.est"] <- road.net[!is.na(road.net$PGDS_2015), ][road.nn.ind.10000[[k]],] %>% st_drop_geometry() %>% .$PGDS_2015 %>% weighted.mean(., na.rm = TRUE, w = dists.10000/sum(dists.10000, na.rm = TRUE))
         }
-    
-    road.net.nn <- road.net[road.net.nn.ind, ]
-    road.net.nn.dt <- st_drop_geometry(road.net.nn)
-    road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), "PGDS_2015"] <- mean(road.net.nn.dt[road.net.nn.dt$Broj_puta == i & !is.na(road.net.nn.dt$PGDS_2015), "PGDS_2015"])
+        road.i.solved <- rbind(road.solve.10, road.solve.10000)
+      }
+      road.net[road.net$Oznaka_deo %in% road.i.solved$Oznaka_deo, "PGDS_2015.est"] <- road.i.solved$PGDS_2015.est
+    }else{
+      road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == i, ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 20000, k = 5, returnDist = TRUE, progress = FALSE)
+      road.solve.ind <- unlist(lapply(road.net.nn.ind$nn, function(x) !identical(x, integer(0))))
+      road.nn.ind <- (road.net.nn.ind$nn)[(road.solve.ind)]
+      road.solve.10000 <- road.net[road.net$Broj_puta == i, ] %>%  .[road.solve.ind, ] %>% mutate(PGDS_2015.est = NA) #%>% split(., f = as.factor(.$Oznaka_deo))
+      road.nn.dist <- road.net.nn.ind$dist[road.solve.ind, ]
+      for(j in 1:dim(road.solve.10000)[1]){
+        data.frame(road.nn.dist)[j,][!is.na(data.frame(road.nn.dist)[j,])]
+        dists[dists == 0] <- 10^-10
+        road.solve.10000[j, "PGDS_2015.est"] <- road.net[!is.na(road.net$PGDS_2015), ][road.nn.ind[j],] %>% st_drop_geometry() %>% .$PGDS_2015 %>% weighted.mean(., na.rm = TRUE, w = dists/sum(dists, na.rm = TRUE))
+      }
+      road.net[road.net$Oznaka_deo %in% road.solve.10000$Oznaka_deo, "PGDS_2015.est"] <- road.solve.10000$PGDS_2015.est
+}
   }
   return(road.net)
 }
 
-
-foo(road.net = pIIA[1:50, ])
+road.nett <- pIIA[21:50, ]
+rn <- foo(road.net = road.nett)
 
 
 
