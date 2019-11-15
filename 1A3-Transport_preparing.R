@@ -326,6 +326,9 @@ foo <- function(road.net){
     road.nn.list <- road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), ] %>% st_drop_geometry() %>% split(., f = as.factor(.$Oznaka_deo))
     road.nn <- road.net.nn.ind$nn
     road.nn.dist <- road.net.nn.ind$dist
+    
+    apply(road.nn.dist, 1, function(x) sum(is.na(x)) == 5)
+    
     for(j in 1:length(foo)){
       road.net[!is.na(road.net$PGDS_2015), ] %>% st_drop_geometry() %>% weighted.mean(.[as.numeric(road.nn[[i]]), "PGDS_2015"], na.rm = TRUE, w = road.nn.dist[i, ]/sum(road.nn.dist[i, ], na.rm = TRUE))
         }
