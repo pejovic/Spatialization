@@ -321,7 +321,15 @@ i = unique(road.net$Broj_puta)[3]
 foo <- function(road.net){
   road.net.res <- data.frame()
   for(i in unique(road.net$Broj_puta)){
-    road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == i, ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 10, k = 5, returnDist = TRUE, progress = FALSE)#[[1]][[1]]
+    road.net.nn.ind <- st_nn(road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), ], road.net[!is.na(road.net$PGDS_2015), ], maxdist = 10, k = 5, returnDist = TRUE, progress = FALSE)
+    
+    road.nn.list <- road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), ] %>% st_drop_geometry() %>% split(., f = as.factor(.$Oznaka_deo))
+    road.nn <- road.net.nn.ind$nn
+    road.nn.dist <- road.net.nn.ind$dist
+    for(j in 1:length(foo)){
+      road.net[!is.na(road.net$PGDS_2015), ] %>% st_drop_geometry() %>% weighted.mean(.[as.numeric(road.nn[[i]]), "PGDS_2015"], na.rm = TRUE, w = road.nn.dist[i, ]/sum(road.nn.dist[i, ], na.rm = TRUE))
+        }
+    
     road.net.nn <- road.net[road.net.nn.ind, ]
     road.net.nn.dt <- st_drop_geometry(road.net.nn)
     road.net[road.net$Broj_puta == i & is.na(road.net$PGDS_2015), "PGDS_2015"] <- mean(road.net.nn.dt[road.net.nn.dt$Broj_puta == i & !is.na(road.net.nn.dt$PGDS_2015), "PGDS_2015"])
