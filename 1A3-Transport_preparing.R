@@ -317,7 +317,10 @@ osm_urb <- st_read("Data/putevi/OSM_putevi_urbana_podrucja.gpkg")
 mapview(osm_urb)
 
 
-#############################################################################333
+#############################################################################
+
+road.net = pIIA; max.dist = 50000; use.est = TRUE
+i = 56
 
 pgds <- function(road.net, max.dist, use.est = FALSE){
   road.net <- road.net %>% mutate(ID = seq(1:dim(road.net)[1]), is.PGDS = !is.na(PGDS_2015), PGDS_2015.est = NA) %>% select(ID, is.PGDS, PGDS_2015.est, everything())
@@ -332,7 +335,7 @@ pgds <- function(road.net, max.dist, use.est = FALSE){
     weigths <- weigths/sum(weigths)
     road.net$PGDS_2015.est[i] <- road.net[!is.na(road.net$PGDS_2015) & road.net$ID != i, ][road.net.nn.ind$nn[[1]],] %>% st_drop_geometry() %>% .$PGDS_2015 %>% weighted.mean(., na.rm = TRUE, w = weigths)
     if(use.est & !road.net$is.PGDS[i]){
-      road.net$PGDS_2015 <- road.net$PGDS_2015.est[i]
+      road.net$PGDS_2015[i] <- road.net$PGDS_2015.est[i]
     }
   }
   return(road.net)
@@ -361,9 +364,10 @@ rn.IB <- pgds(road.net = pIB, max.dist = 50000, use.est = TRUE)
 rn.IIB <- pgds(road.net = pIIB, max.dist = 50000, use.est = TRUE)
 
 
-
-
-
+save(rn.IA, file = "rn_IA.RDS")
+save(rn.IIA, file = "rn_IIA.RDS")
+save(rn.IB, file = "rn_IB.RDS")
+save(rn.IIB, file = "rn_IIB.RDS")
 
 
 

@@ -130,7 +130,18 @@ corsum2sf_polygon <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
-
+# Function for spatial data visualisation at web maps
+# Parameters:
+#    1. sf.sources -  sf object with sources to be spatialised
+#    2. sf.spatialised - sf object with polygons after spatialisation
+spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, layer.name.2 = "", vars = vars){
+  sf.spatialised$Spatialised <- NA
+  sf.spatialised[ ,vars] %<>% st_drop_geometry() %>% dplyr::mutate_all(.,as.double)
+  sf.spatialised$Spatialised[sf.spatialised$NOx == 0 | sf.spatialised$SO2 == 0 | sf.spatialised$PM10 == 0 | sf.spatialised$PM2.5 == 0 | sf.spatialised$NMVOC == 0 | sf.spatialised$NH3 == 0] <- 0
+  sf.spatialised$Spatialised[sf.spatialised$NOx !=0 & sf.spatialised$SO2 !=0 & sf.spatialised$PM10 !=0 & sf.spatialised$PM2.5 !=0 & sf.spatialised$NMVOC !=0 & sf.spatialised$NH3 != 0] <- 1
+  web_map <- mapview(sf.spatialised, layer.name = layer.name.2, zcol = "Spatialised") + mapview(sf.sources, layer.name = layer.name.1, col.regions = "red")
+  return(web_map)
+}
 
 #'
 #'
@@ -812,9 +823,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g
 #+ include = FALSE
 source.1A2gvi <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S213", sheet = source.sheet, col_names = header)
-source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D222:I222", sheet = source.sheet, col_names = vars)
-source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D227:I227", sheet = source.sheet, col_names = vars)
+source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S246", sheet = source.sheet, col_names = header)
+source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D253:I253", sheet = source.sheet, col_names = vars)
+source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D258:I258", sheet = source.sheet, col_names = vars)
 
 sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -897,13 +908,13 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2gvi, total.1A
 #+ include = FALSE
 source.1A2gvii <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2gvii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D237:I237", sheet = source.sheet, col_names = vars)
-source.1A2gvii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D238:I238", sheet = source.sheet, col_names = vars)
+source.1A2gvii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D268:I268", sheet = source.sheet, col_names = vars)
+source.1A2gvii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D269:I269", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
-clc133 <- subset(sf_clc18, CODE_18 == "133") %>%
+clc133 <- subset(sf_clc18, CODE_18 == "133" | CODE_18 == "121") %>% # Construction sites and industrial sites
   st_set_crs(32634)
 clc133[,vars] <- NA
 clc133.int <- st_intersection(clc133, sf.grid.5km) %>%
@@ -983,6 +994,7 @@ p.1A2gvii <- sf.grid.5km %>%
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 mapview(p.1A2gvii, layer.name = "Spatialised 1A2gvii") + mapview(sf.1A2gvii, layer.name = "Sources 1A2gvii", col.regions = "red") 
+spatialised.mapview(sf.sources = sf.1A2gvii, layer.name.1 = "Sources 1A2gvii", sf.spatialised = p.1A2gvii, layer.name.2 = "Spatialised 1A2gvii", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2gvii <- p.1A2gvii %>% 
