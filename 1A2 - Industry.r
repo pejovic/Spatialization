@@ -137,7 +137,7 @@ corsum2sf_polygon <- function(source.list, distribute = FALSE){
 spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, layer.name.2 = "", vars = vars){
   sf.spatialised$Spatialised <- NA
   sf.spatialised[ ,vars] %<>% st_drop_geometry() %>% dplyr::mutate_all(.,as.double)
-  sf.spatialised$Spatialised[sf.spatialised$NOx == 0 | sf.spatialised$SO2 == 0 | sf.spatialised$PM10 == 0 | sf.spatialised$PM2.5 == 0 | sf.spatialised$NMVOC == 0 | sf.spatialised$NH3 == 0] <- 0
+  sf.spatialised$Spatialised[sf.spatialised$NOx == 0 & sf.spatialised$SO2 == 0 & sf.spatialised$PM10 == 0 & sf.spatialised$PM2.5 == 0 & sf.spatialised$NMVOC == 0 & sf.spatialised$NH3 == 0] <- 0
   sf.spatialised$Spatialised[sf.spatialised$NOx !=0 & sf.spatialised$SO2 !=0 & sf.spatialised$PM10 !=0 & sf.spatialised$PM2.5 !=0 & sf.spatialised$NMVOC !=0 & sf.spatialised$NH3 != 0] <- 1
   web_map <- mapview(sf.spatialised, layer.name = layer.name.2, zcol = "Spatialised") + mapview(sf.sources, layer.name = layer.name.1, col.regions = "red")
   return(web_map)
@@ -882,7 +882,8 @@ p.1A2gvi <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2gvi, layer.name = "Sources 1A2g - Auto-production", col.regions = "red") + mapview(p.1A2gvi, layer.name = "Spatialised 1A2gvi")
+# mapview(sf.1A2gvi, layer.name = "Sources 1A2g - Auto-production", col.regions = "red") + mapview(p.1A2gvi, layer.name = "Spatialised 1A2gvi")
+spatialised.mapview(sf.sources = sf.1A2gvi, layer.name.1 = "Sources 1A2g - Auto-production", sf.spatialised = p.1A2gvi, layer.name.2 = "Spatialised 1A2gvi", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2gvi <- p.1A2gvi %>% 
@@ -993,7 +994,7 @@ p.1A2gvii <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(p.1A2gvii, layer.name = "Spatialised 1A2gvii") + mapview(sf.1A2gvii, layer.name = "Sources 1A2gvii", col.regions = "red") 
+# mapview(p.1A2gvii, layer.name = "Spatialised 1A2gvii") + mapview(sf.1A2gvii, layer.name = "Sources 1A2gvii", col.regions = "red") 
 spatialised.mapview(sf.sources = sf.1A2gvii, layer.name.1 = "Sources 1A2gvii", sf.spatialised = p.1A2gvii, layer.name.2 = "Spatialised 1A2gvii", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE

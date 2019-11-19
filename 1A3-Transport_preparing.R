@@ -369,19 +369,22 @@ save(rn.IIA, file = "rn_IIA.RDS")
 save(rn.IB, file = "rn_IB.RDS")
 save(rn.IIB, file = "rn_IIB.RDS")
 
+rn.IA$PGDS_2015.est
+rn.IIA$PGDS_2015.est
+rn.IB$PGDS_2015.est
 
+names(rn.IA)
+names(rn.IIA)
+rn.IA %<>% select(-fid)
+es_pgds <- rbind(rn.IA, rn.IIA, rn.IB)
+es_pgds %<>% mutate(lwd  = PGDS_2015.est/1000)
 
+# st_write(es_pgds, dsn="Products/es_pgds.gpkg", layer='es_pgds')
 
-
-
-
-
-
-
-
-
-
-
+es_pgds %>% dplyr::filter(is.PGDS) %>%
+  dplyr::group_by(., Kategorija) %>%
+  dplyr::summarise(nn = n(), n.counters = sum(is.PGDS), mape = (1/nn)*(sum(abs(PGDS_2015.est - PGDS_2015)/PGDS_2015)), 
+                   RMSE = sqrt((1/nn)*sum((PGDS_2015.est - PGDS_2015)^2)), mean.PGDS = mean(PGDS_2015), mean.PGDS.est = mean(PGDS_2015.est))
 
 
 
