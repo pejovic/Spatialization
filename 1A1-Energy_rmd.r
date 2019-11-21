@@ -96,6 +96,19 @@ corsum2sf <- function(source.list){
   }
   return(source.sf)
 }
+# Function for spatial data visualisation at web maps
+# Parameters:
+#    1. sf.sources -  sf object with sources to be spatialised
+#    2. sf.spatialised - sf object with polygons after spatialisation
+spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, layer.name.2 = "", vars = vars){
+  sf.spatialised$Spatialised <- NA
+  sf.spatialised[ ,vars] %<>% st_drop_geometry() %>% dplyr::mutate_all(.,as.double)
+  sf.spatialised$Spatialised[sf.spatialised$NOx == 0 & sf.spatialised$SO2 == 0 & sf.spatialised$PM10 == 0 & sf.spatialised$PM2.5 == 0 & sf.spatialised$NMVOC == 0 & sf.spatialised$NH3 == 0] <- 0
+  sf.spatialised$Spatialised[sf.spatialised$NOx !=0 | sf.spatialised$SO2 !=0 | sf.spatialised$PM10 !=0 | sf.spatialised$PM2.5 !=0 | sf.spatialised$NMVOC !=0 | sf.spatialised$NH3 != 0] <- 1
+  web_map <- mapview(sf.spatialised, layer.name = layer.name.2, zcol = "Spatialised") + mapview(sf.sources, layer.name = layer.name.1, col.regions = "red")
+  return(web_map)
+}
+
 #'
 #'
 #+ include = FALSE
@@ -176,7 +189,8 @@ p.1A1a <- sf.grid.5km %>%
   mutate(ID = as.numeric(ID))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A1a, layer.name = "Sources 1A1a", col.regions = "red") + mapview(p.1A1a)
+# mapview(sf.1A1a, layer.name = "Sources 1A1a", col.regions = "red") + mapview(p.1A1a)
+spatialised.mapview(sf.sources = sf.1A1a, layer.name.1 = "Sources 1A1a", sf.spatialised = p.1A1a, layer.name.2 = "Spatialised 1A1a", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A1a <- p.1A1a %>% 
@@ -261,7 +275,8 @@ p.1A1b <- sf.grid.5km %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A1b, layer.name = "Sources 1A1b", col.regions = "red") + mapview(p.1A1b)
+# mapview(sf.1A1b, layer.name = "Sources 1A1b", col.regions = "red") + mapview(p.1A1b)
+spatialised.mapview(sf.sources = sf.1A1b, layer.name.1 = "Sources 1A1b", sf.spatialised = p.1A1b, layer.name.2 = "Spatialised 1A1b", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A1b <- p.1A1b %>% 
@@ -342,7 +357,8 @@ p.1B2aiv <- sf.grid.5km %>%
   mutate(ID = as.numeric(ID))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1B2aiv, layer.name = "Sources 1B2aiv", col.regions = "red") + mapview(p.1B2aiv)
+# mapview(sf.1B2aiv, layer.name = "Sources 1B2aiv", col.regions = "red") + mapview(p.1B2aiv)
+spatialised.mapview(sf.sources = sf.1B2aiv, layer.name.1 = "Sources 1B2aiv", sf.spatialised = p.1B2aiv, layer.name.2 = "Spatialised 1B2aiv", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1B2aiv <- p.1B2aiv %>% 
@@ -430,7 +446,8 @@ p.1B2c <- sf.grid.5km %>%
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1B2c, layer.name = "Sources 1B2c", col.regions = "red") + mapview(p.1B2c)
+# mapview(sf.1B2c, layer.name = "Sources 1B2c", col.regions = "red") + mapview(p.1B2c)
+spatialised.mapview(sf.sources = sf.1B2c, layer.name.1 = "Sources 1B2c", sf.spatialised = p.1B2c, layer.name.2 = "Spatialised 1B2c", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1B2c <- p.1B2c %>% 
@@ -518,7 +535,8 @@ p.1A1c <- sf.grid.5km %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A1c, layer.name = "Sources 1A1c", col.regions = "red") + mapview(p.1A1c)
+# mapview(sf.1A1c, layer.name = "Sources 1A1c", col.regions = "red") + mapview(p.1A1c)
+spatialised.mapview(sf.sources = sf.1A1c, layer.name.1 = "Sources 1A1c", sf.spatialised = p.1A1c, layer.name.2 = "Spatialised 1A1c", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A1c <- p.1A1c %>% 
@@ -606,7 +624,8 @@ p.1B1b <- sf.grid.5km %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1B1b, layer.name = "Sources 1B1b", col.regions = "red") + mapview(p.1B1b)
+# mapview(sf.1B1b, layer.name = "Sources 1B1b", col.regions = "red") + mapview(p.1B1b)
+spatialised.mapview(sf.sources = sf.1B1b, layer.name.1 = "Sources 1B1b", sf.spatialised = p.1B1b, layer.name.2 = "Spatialised 1B1b", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1B1b <- p.1B1b %>% 

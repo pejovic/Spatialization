@@ -138,7 +138,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
   sf.spatialised$Spatialised <- NA
   sf.spatialised[ ,vars] %<>% st_drop_geometry() %>% dplyr::mutate_all(.,as.double)
   sf.spatialised$Spatialised[sf.spatialised$NOx == 0 & sf.spatialised$SO2 == 0 & sf.spatialised$PM10 == 0 & sf.spatialised$PM2.5 == 0 & sf.spatialised$NMVOC == 0 & sf.spatialised$NH3 == 0] <- 0
-  sf.spatialised$Spatialised[sf.spatialised$NOx !=0 & sf.spatialised$SO2 !=0 & sf.spatialised$PM10 !=0 & sf.spatialised$PM2.5 !=0 & sf.spatialised$NMVOC !=0 & sf.spatialised$NH3 != 0] <- 1
+  sf.spatialised$Spatialised[sf.spatialised$NOx !=0 | sf.spatialised$SO2 !=0 | sf.spatialised$PM10 !=0 | sf.spatialised$PM2.5 !=0 | sf.spatialised$NMVOC !=0 | sf.spatialised$NH3 != 0] <- 1
   web_map <- mapview(sf.spatialised, layer.name = layer.name.2, zcol = "Spatialised") + mapview(sf.sources, layer.name = layer.name.1, col.regions = "red")
   return(web_map)
 }
@@ -218,7 +218,8 @@ p.1A2a <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2a, layer.name = "Sources 1A2a", col.regions = "red") + mapview(p.1A2a, layer.name = "Spatialised 1A2a")
+# mapview(sf.1A2a, layer.name = "Sources 1A2a", col.regions = "red") + mapview(p.1A2a, layer.name = "Spatialised 1A2a")
+spatialised.mapview(sf.sources = sf.1A2a, layer.name.1 = "Sources 1A2a", sf.spatialised = p.1A2a, layer.name.2 = "Spatialised 1A2a", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2a <- p.1A2a %>% 
@@ -299,7 +300,8 @@ p.1A2b <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2b, layer.name = "Sources 1A2b", col.regions = "red") + mapview(p.1A2b, layer.name = "Spatialised 1A2b")
+# mapview(sf.1A2b, layer.name = "Sources 1A2b", col.regions = "red") + mapview(p.1A2b, layer.name = "Spatialised 1A2b")
+spatialised.mapview(sf.sources = sf.1A2b, layer.name.1 = "Sources 1A2b", sf.spatialised = p.1A2b, layer.name.2 = "Spatialised 1A2b", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2b <- p.1A2b %>% 
@@ -326,8 +328,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2b, total.1A2b
 source.1A2c <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.1A2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D55:S69", sheet = source.sheet, col_names = header)
-source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
+source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D71:I71", sheet = source.sheet, col_names = vars)
+source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D86:I86", sheet = source.sheet, col_names = vars)
 
 sf.1A2c <- corsum2sf(source.1A2c) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -379,7 +381,8 @@ p.1A2c <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2c, layer.name = "Sources 1A2c", col.regions = "red") + mapview(p.1A2c, layer.name = "Spatialised 1A2c")
+# mapview(sf.1A2c, layer.name = "Sources 1A2c", col.regions = "red") + mapview(p.1A2c, layer.name = "Spatialised 1A2c")
+spatialised.mapview(sf.sources = sf.1A2c, layer.name.1 = "Sources 1A2c", sf.spatialised = p.1A2c, layer.name.2 = "Spatialised 1A2c", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2c <- p.1A2c %>% 
@@ -412,7 +415,7 @@ source.1A2d$sources$points <- readxl::read_xlsx(path = source.file, range = "D87
 source.1A2d$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D103:I103", sheet = source.sheet, col_names = vars)
 source.1A2d$total$inventory <- readxl::read_xlsx(path = source.file, range = "D109:I109", sheet = source.sheet, col_names = vars)
 
-sf.1A2d <- corsum2sf(source.1A2d) %>%
+sf.1A2d <- corsum2sf(source.1A2d, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 #'
 #'
@@ -466,7 +469,8 @@ p.1A2d <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2d, layer.name = "Sources 1A2d", col.regions = "red") + mapview(p.1A2d, layer.name = "Spatialised 1A2d")
+# mapview(sf.1A2d, layer.name = "Sources 1A2d", col.regions = "red") + mapview(p.1A2d, layer.name = "Spatialised 1A2d")
+spatialised.mapview(sf.sources = sf.1A2d, layer.name.1 = "Sources 1A2d", sf.spatialised = p.1A2d, layer.name.2 = "Spatialised 1A2d", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2d <- p.1A2d %>% 
@@ -496,7 +500,7 @@ source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D11
 source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D137:I137", sheet = source.sheet, col_names = vars)
 source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "D151:I151", sheet = source.sheet, col_names = vars)
 
-sf.1A2e <- corsum2sf(source.1A2e) %>%
+sf.1A2e <- corsum2sf(source.1A2e, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -551,7 +555,8 @@ p.1A2e <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2e, layer.name = "Sources 1A2e", col.regions = "red") + mapview(p.1A2e, layer.name = "Spatialised 1A2e")
+# mapview(sf.1A2e, layer.name = "Sources 1A2e", col.regions = "red") + mapview(p.1A2e, layer.name = "Spatialised 1A2e")
+spatialised.mapview(sf.sources = sf.1A2e, layer.name.1 = "Sources 1A2e", sf.spatialised = p.1A2e, layer.name.2 = "Spatialised 1A2e", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2e <- p.1A2e %>% 
@@ -584,7 +589,7 @@ source.1A2f$sources$points <- readxl::read_xlsx(path = source.file, range = "D15
 source.1A2f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D182:I182", sheet = source.sheet, col_names = vars)
 source.1A2f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D189:I189", sheet = source.sheet, col_names = vars)
 
-sf.1A2f <- corsum2sf(source.1A2f) %>%
+sf.1A2f <- corsum2sf(source.1A2f, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 #'
 #'
@@ -637,7 +642,8 @@ p.1A2f <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2f, layer.name = "Sources 1A2f", col.regions = "red") + mapview(p.1A2f, layer.name = "Spatialised 1A2f")
+# mapview(sf.1A2f, layer.name = "Sources 1A2f", col.regions = "red") + mapview(p.1A2f, layer.name = "Spatialised 1A2f")
+spatialised.mapview(sf.sources = sf.1A2f, layer.name.1 = "Sources 1A2f", sf.spatialised = p.1A2f, layer.name.2 = "Spatialised 1A2f", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2f <- p.1A2f %>% 
@@ -797,7 +803,8 @@ p.1A2g <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-mapview(sf.1A2g, layer.name = "Sources 1A2g", col.regions = "red") + mapview(p.1A2g, layer.name = "Spatialised 1A2g")
+# mapview(sf.1A2g, layer.name = "Sources 1A2g", col.regions = "red") + mapview(p.1A2g, layer.name = "Spatialised 1A2g")
+spatialised.mapview(sf.sources = sf.1A2g, layer.name.1 = "Sources 1A2g", sf.spatialised = p.1A2g, layer.name.2 = "Spatialised 1A2g", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.1A2g <- p.1A2g %>% 
