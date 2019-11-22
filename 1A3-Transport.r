@@ -169,7 +169,7 @@ corsum2sf_polygon <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
-
+source.list = source.1A3c
 corsum2sf_lines <- function(source.list, distribute = FALSE){
   source.list$sources$lines[, vars] <- source.list$sources$lines[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
@@ -232,14 +232,236 @@ vars <- header[1:6]
 grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
 sf.grid.5km <- st_as_sf(grid.5km) 
 
+#'
+#'
+#' ## 1A3bi-Road Transport: Passengers cars
+#'
+#' ### Rural transport - Other than Highways
+#'
+#+ include = FALSE
+source.1A3bi_R <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A3bi_R$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
+source.1A3bi_R$total$inventory <- readxl::read_xlsx(path = source.file, range = "D43:I43", sheet = source.sheet, col_names = vars)
 
 
+load("./Data/Putevi/rn_IIA.RDS")
+load("./Data/Putevi/rn_IB.RDS")
 
 
+sf_roads <- rbind(rn.IIA ,rn.IB)
+
+sf_roads[,vars] <- NA
+
+sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
+sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
+
+sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
+  dplyr::select(.,vars, PGDS) %>%
+  mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
+  dplyr::select(.,vars, Length, PGDSL)
+  
+
+source.1A3bi_R$sources$lines <- sf_roads.int
+
+sf.1A3bi_R <- corsum2sf_lines(source.1A3bi_R, distribute = FALSE)
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A3bi_R %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 4: sf.1A3bi_R',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A3bi_R <- sf.1A3bi_R %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A3bi_R <- source.1A3bi_R[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3bi_R, total.1A3bi_R, data.frame(total.1A3bi_R - sum.1A3bi_R))) %>%
+  datatable(., caption = 'Table 5: Summary differences',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_PGDSL <- sum(sf.1A3bi_R$PGDSL)
+diff.1A3bi_R <- data.frame(total.1A3bi_R - sum.1A3bi_R)
+sf.1A3bi_R <- sf.1A3bi_R %>%
+  mutate(NOx = ((diff.1A3bi_R$NOx/sum_PGDSL)*PGDSL),
+         SO2 = ((diff.1A3bi_R$SO2/sum_PGDSL)*PGDSL),
+         PM10 = ((diff.1A3bi_R$PM10/sum_PGDSL)*PGDSL),
+         PM2.5 = ((diff.1A3bi_R$PM2.5/sum_PGDSL)*PGDSL),
+         NMVOC = ((diff.1A3bi_R$NMVOC/sum_PGDSL)*PGDSL),
+         NH3 = ((diff.1A3bi_R$NH3/sum_PGDSL)*PGDSL))
+sf.1A3bi_R %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A3bi_R <- sf.grid.5km %>%
+  st_join(sf.1A3bi_R, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(p.1A3c, layer.name = "Spatialised 1A3c") + mapview(sf.1A3c, layer.name = "Sources 1A3c", color = "red") 
+spatialised.mapview(sf.sources = sf.1A3bi_R, layer.name.1 = "Sources 1A3bi_R", sf.spatialised = p.1A3bi_R, layer.name.2 = "Spatialised 1A3bi_R", vars = vars, source.lines = TRUE)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A3bi_R <- p.1A3bi_R %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_R, total.1A3bi_R, data.frame(sum.p.1A3bi_R == total.1A3bi_R)-1)) %>%
+  datatable(., caption = 'Table 6: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#'
+#' 
+#' ### Highways transport
+#' 
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+load("./Data/Putevi/rn_IA.RDS")
+# Popunjavanje NA vrednosti (to su deonice koje algoritam nije resio). Dodeljena im je srednja vrednost protoka na 
+rn.IA$PGDS_2015.est[is.na(rn.IA$PGDS_2015.est)] <- mean(rn.IA$PGDS_2015[rn.IA$Broj_puta == "A1" & !is.na(rn.IA$PGDS_2015)])
 
 
+source.1A3bi_H <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A3bi_H$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
+source.1A3bi_H$total$inventory <- readxl::read_xlsx(path = source.file, range = "D44:I44", sheet = source.sheet, col_names = vars)
+
+sf_roads <- rn.IA
+
+sf_roads[,vars] <- NA
+
+sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
+sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
+
+sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
+  dplyr::select(.,vars, PGDS) %>%
+  mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
+  dplyr::select(.,vars, Length, PGDSL)
 
 
+source.1A3bi_H$sources$lines <- sf_roads.int
+
+sf.1A3bi_H <- corsum2sf_lines(source.1A3bi_H, distribute = FALSE)
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A3bi_H %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 4: sf.1A3bi_H',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A3bi_H <- sf.1A3bi_H %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A3bi_H <- source.1A3bi_H[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3bi_H, total.1A3bi_H, data.frame(total.1A3bi_H - sum.1A3bi_H))) %>%
+  datatable(., caption = 'Table 5: Summary differences',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_PGDSL <- sum(sf.1A3bi_H$PGDSL)
+diff.1A3bi_H <- data.frame(total.1A3bi_H - sum.1A3bi_H)
+sf.1A3bi_H <- sf.1A3bi_H %>%
+  mutate(NOx = ((diff.1A3bi_H$NOx/sum_PGDSL)*PGDSL),
+         SO2 = ((diff.1A3bi_H$SO2/sum_PGDSL)*PGDSL),
+         PM10 = ((diff.1A3bi_H$PM10/sum_PGDSL)*PGDSL),
+         PM2.5 = ((diff.1A3bi_H$PM2.5/sum_PGDSL)*PGDSL),
+         NMVOC = ((diff.1A3bi_H$NMVOC/sum_PGDSL)*PGDSL),
+         NH3 = ((diff.1A3bi_H$NH3/sum_PGDSL)*PGDSL))
+sf.1A3bi_H %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A3bi_H <- sf.grid.5km %>%
+  st_join(sf.1A3bi_H, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(p.1A3c, layer.name = "Spatialised 1A3c") + mapview(sf.1A3c, layer.name = "Sources 1A3c", color = "red") 
+spatialised.mapview(sf.sources = sf.1A3bi_H, layer.name.1 = "Sources 1A3bi_H", sf.spatialised = p.1A3bi_H, layer.name.2 = "Spatialised 1A3bi_H", vars = vars, source.lines = TRUE)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A3bi_H <- p.1A3bi_H %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_H, total.1A3bi_H, data.frame(sum.p.1A3bi_H == total.1A3bi_H)-1)) %>%
+  datatable(., caption = 'Table 6: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
 
 
 
