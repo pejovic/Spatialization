@@ -235,8 +235,122 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #'
 #'
 #' ## 1A3bi-Road Transport: Passengers cars
+#' 
+#' 
+#' ### Urban transport
+#' 
+source.1A3bi_U <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A3bi_U$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
+source.1A3bi_U$total$inventory <- readxl::read_xlsx(path = source.file, range = "D42:I42", sheet = source.sheet, col_names = vars)
+
+#+ include = FALSE
+urban_roads <- readOGR("Data/putevi/OSM_putevi_urbana_podrucja.gpkg", 
+                    use_iconv=TRUE,  
+                    encoding = "UTF-8",
+                    stringsAsFactors = FALSE)
+sf_urban_roads <- st_as_sf(urban_roads) %>%
+  st_transform(crs = "+init=epsg:32634") 
+
+
+sf_urban_roads[,vars] <- NA
+
+sf_urban_roads.int <- st_intersection(sf_urban_roads, sf.grid.5km) %>%
+  select(.,vars) %>%
+  mutate(Length = st_length(.))
+
+
+source.1A3bi_U$sources$lines <- sf_urban_roads.int
+
+sf.1A3bi_U <- corsum2sf_lines(source.1A3bi_U, distribute = FALSE)
+
 #'
-#' ### Rural transport - Other than Highways
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A3bi_U %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 4: sf.1A3bi_U',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A3bi_U <- sf.1A3bi_U %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A3bi_U <- source.1A3bi_U[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3bi_U, total.1A3bi_U, data.frame(total.1A3bi_U - sum.1A3bi_U))) %>%
+  datatable(., caption = 'Table 5: Summary differences',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_LengthUrban <- sum(sf.1A3bi_U$Length)
+diff.1A3bi_U <- data.frame(total.1A3bi_U - sum.1A3bi_U)
+sf.1A3bi_U <- sf.1A3bi_U %>%
+  mutate(NOx = ((diff.1A3bi_U$NOx/sum_LengthUrban)*Length),
+         SO2 = ((diff.1A3bi_U$SO2/sum_LengthUrban)*Length),
+         PM10 = ((diff.1A3bi_U$PM10/sum_LengthUrban)*Length),
+         PM2.5 = ((diff.1A3bi_U$PM2.5/sum_LengthUrban)*Length),
+         NMVOC = ((diff.1A3bi_U$NMVOC/sum_LengthUrban)*Length),
+         NH3 = ((diff.1A3bi_U$NH3/sum_LengthUrban)*Length))
+sf.1A3bi_U %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A3bi_U <- sf.grid.5km %>%
+  st_join(sf.1A3bi_U, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(p.1A3bi_U, layer.name = "Spatialised 1A3bi_U") + mapview(sf.1A3bi_U, layer.name = "Sources 1A3bi_U", color = "red") 
+spatialised.mapview(sf.sources = sf.1A3bi_U, layer.name.1 = "Sources 1A3bi_U", sf.spatialised = p.1A3bi_U, layer.name.2 = "Spatialised 1A3bi_U", vars = vars, source.lines = TRUE)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A3bi_U <- p.1A3bi_U %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_U, total.1A3bi_U, data.frame(sum.p.1A3bi_U == total.1A3bi_U)-1)) %>%
+  datatable(., caption = 'Table 6: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#' 
+#' 
+#' 
+#' 
+#'
+#' ### Rural transport
 #'
 #+ include = FALSE
 source.1A3bi_R <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
