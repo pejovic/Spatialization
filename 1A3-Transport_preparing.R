@@ -387,10 +387,20 @@ es_pgds %>% dplyr::filter(is.PGDS) %>%
                    RMSE = sqrt((1/nn)*sum((PGDS_2015.est - PGDS_2015)^2)), mean.PGDS = mean(PGDS_2015), mean.PGDS.est = mean(PGDS_2015.est))
 
 
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+# CLC waste klasa
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+
+sf_clc18_waste <- subset(sf_clc18, CODE_18 == "132") %>%
+  st_transform(crs = "+init=epsg:32634")
 
 
+mapview(sf_clc18_waste, zcol = "CODE_18")
 
 
+# ::::::::::::::::::::::::::::::::::;;;;;;;;;;;;;
 
 
 
