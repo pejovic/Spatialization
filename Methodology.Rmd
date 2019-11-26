@@ -45,12 +45,40 @@ library(DT)
 
 - **Methodology:** Considering that this category contains only the points sources and that the Total inventory match the Spatialized inventory, spatial dissagregation was done by spatially overlaying of the 5x5km cells grid with the spatial layer of the sources from each category.   
 
-# 1B - Fugitive emissions - Not resolved
+# 1B - Fugitive emissions - Solved
+
+### 1B1a - Fugitive emissions from solid fuels
 
 - **Problem:** The sources do not exist
 
-- **Methodology:**
+- **Methodology:** Spatial Locations of coal mines are identified, and then used for identification of the polygons within the CLC 131 class (Mines). Then,  the Total inventory were dissagregated to the 5x5km cells proportionally to the areas of the identified polygons of coal mines that lie within the each cell.  
 
+
+### 1B2ai - Fugitive emissions from liquid fuels : Exploration, production, transport.
+
+- **Problem:** The sources do not exist
+
+- **Methodology:** Total inventory was spatialized on 5x5km cells proportionally to the length on the length  multiplied by corresponding average road activity (average daily number of vehicles for one year). These informations were taken from the 1A3 (Transport) Category. 
+
+
+### 1B2ai - Fugitive emissions from liquid fuels : Exploration, production, transport.
+
+- **Problem:** The sources do not exist
+
+- **Methodology:** Total inventory was spatialized on 5x5km cells proportionally to the length of the roads (including road from IA, IIA and IB road categories)  multiplied by corresponding average road activity (average daily number of vehicles for one year). This information was previously calclulated for the purpose of the spatialization of 1A3-Transport Category. 
+
+
+### 1B2av - Fugitive emissions from liquid fuels : Distribution of oil products.
+
+- **Problem:** The sources do not exist
+
+- **Methodology:** Total inventory was spatialized on urban areas of the each municipality, proportionally to the number of vehicles registered in each municipality. The municipalities with the number of registered vehicles bellow the 100 were not considered. By doing this, it has adopted as the thesholds for a service station to be plausible. Number of registered vehicles were taken from the official database of the Statistical Office of the Republic of Serbia.
+
+### 1B2b - Fugitive emissions from natural gas : Exploration, production, transport.
+
+- **Problem:** The sources do not exist
+
+- **Methodology:** Total inventory was spatialized on 5x5km cells proportionally to the length of the roads (including road from IA, IIA and IB road categories)  multiplied by corresponding average road activity (average daily number of vehicles for one year). These informations were previously calclulated for the purpose of the spatialization of 1A3-Transport Category. 
 
 # 1A3 - Transport
 
@@ -117,13 +145,13 @@ The proposed methodology will be apply on the road transport subcategories that 
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally, by taking the lengths of the acitve rails that lie within the cell into account.
+- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally to the lengths of the acitve rails that lie within the cell.
 
 ### 1A3dii - National navigation (shipping) - Solved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally, by taking the lengths of the navigable rivers that lie within the cell into account.
+- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally area of the navigable rivers that lie within the cell.
 
 
 # 1A2-2 - Industry - Solved
@@ -148,7 +176,7 @@ The proposed methodology will be apply on the road transport subcategories that 
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Considering that there is no too much sources that belong to the Auto-production category, these will be identified as point sources. Spatial allocation of the Total inventory will be conducted proportionally by using the official data from the The Serbian Business Registers Agency [^6].
+- **Methodology:** Total of 37 factories that are included in automobile production industry are identified and geo-located. Spatial allocation of the Total inventory was conducted proportionally to the number of employs. This number was taken from the the official database of the The Serbian Business Registers Agency [^6].
 
 ### 1A2g - Mobile combustion in manufacturing industries and construction - Solved
 
@@ -163,32 +191,46 @@ The proposed methodology will be apply on the road transport subcategories that 
 
 - **Problem:** The difference between Total inventory and Total spatialized is significant
 
-- **Methodology:**
+- **Methodology:** The difference between Total inventory and Total spatialized inventory was spatially allocated to the identified locations of the mines of minerals (other than coals) proportionally, by taking the existing values of point sources into account. 
 
 ### 2A5b - Construction and demolition - Not resolved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:**
+- **Methodology:**  Total inventory was spatialized on urban areas proportionally to the population of the corresponding municipality.
 
 ### 2A5c - Storage, handling and transport of mineral products - Not resolved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** 
+- **Methodology:** Previously locations of mines were utilized to identify the major roads that intersect in the close vicinity of the each mine. Then, Total inventory was spatially allocated to the 5x5km cells proportionally to the length of selected roads that lie within each cell. 
 
-### 2D2G - Solvents (use) - Not resolved
+### 2D2G - Solvents (use) - Solved
 
-- **Problem:** The sources do not exist.
+- **2D3b - Road paving with asphalt**
+- **2D3c - Asphalt roofing**
+- **2D3d - Coating application**
 
-- **Methodology:**
+-- **Problem:** The sources do not exist.
+
+-- **Methodology:** Total inventory was spatialized on 5x5km cells proportionally to the length of the roads (including road from IA, IIA and IB road categories).
+
+- **2D3g - Chemical products**
+- **2D3i - Other solvent and product use**
+- **2D3a - Domestic solvent use including fungicides**
+- **2D3e - Degreasing**
+- **2D3f - Dry cleaning**
+- **2D3h - Printing**
+
+-- **Problem:** The sources do not exist.
+
+-- **Methodology:** Total inventory for those sub-categories were spatialized on the urban areas proportionally to the population of the corresponding municipality. It was calculated by using the data from the official database of the Statistical Office of the Republic of Serbia as well as the CLC class for urban zones.
 
 ### 2l - Wood processing - Not resolved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:**
-
+- **Methodology:** The official database of the Statistical Office of the Republic of Serbia provide the information about the total volume of the industrial woods in each municipality in Serbia. These information was geographically assign to the corresponding geometry and then to the corresponding urban areas, by using the CLC class for urban areas. After that, spatial allocation was done proportioanally the urban areas multiplied by the total volume of the industrial wood that lie within the each cell.
 
 # 3 - Agriculture - Partially solved
 
