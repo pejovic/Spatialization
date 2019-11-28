@@ -32,6 +32,7 @@ library(DT)
  - Network of rails[^4]
  - Database of the Serbian Business Registers Agency [^6]
  - National inventory of agriculture [^2]
+ - Official annual report from the public company "Toplane Srbije". [^7]
  
  [^1]: Source: Public Enterprise “Roads of Serbia”
  [^2]: Source: Statistical Office of the Republic of Serbia.
@@ -39,6 +40,8 @@ library(DT)
  [^4]: Source: Open Street Maps
  [^5]: Source: Corine Land Cover
  [^6]: Source: The Serbian Business Registers Agency
+ [^7]: Source: Official annual report of the public company "Toplane Srbije"
+
 
 
 # 1A1 - Energy - Solved
@@ -52,13 +55,6 @@ library(DT)
 - **Problem:** The sources do not exist
 
 - **Methodology:** Spatial Locations of coal mines are identified, and then used for identification of the polygons within the CLC 131 class (Mines). Then,  the Total inventory were dissagregated to the 5x5km cells proportionally to the areas of the identified polygons of coal mines that lie within the each cell.  
-
-
-### 1B2ai - Fugitive emissions from liquid fuels : Exploration, production, transport.
-
-- **Problem:** The sources do not exist
-
-- **Methodology:** Total inventory was spatialized on 5x5km cells proportionally to the length on the length  multiplied by corresponding average road activity (average daily number of vehicles for one year). These informations were taken from the 1A3 (Transport) Category. 
 
 
 ### 1B2ai - Fugitive emissions from liquid fuels : Exploration, production, transport.
@@ -86,20 +82,20 @@ library(DT)
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Total inventory will be allocated to the point sources (Airports) according to the official data from the Serbian Business Registers Agency.
+- **Methodology:** Total inventory was spatially allocated to the point sources (Airports) according to the official data from the Serbian Business Registers Agency.
 
 ### 1A3aii (i) - Domestic aviation LTO (civil) - Solved 
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Total inventory will be allocated to the point sources (Airports) according to the official data from the Serbian Business Registers Agency.
+- **Methodology:** Total inventory was spatially allocated to the point sources (Airports) according to the official data from the Serbian Business Registers Agency.
 
 
 ### Road transport - Solved
 
 - **Problem:** The sources do not exist.
 
-The proposed methodology will be apply on the road transport subcategories that includes the urban/rural/highway inventory separately:
+The proposed methodology was applied on the road transport subcategories that includes the urban/rural/highway inventory separately:
 
 - 1A3bi - Road transport: Light-duty vehicles
 - 1A3bii - Road transport: Heavy-duty vehicles
@@ -112,34 +108,34 @@ The proposed methodology will be apply on the road transport subcategories that 
 **Rural inventory**
 
  1. Spatial classification of the whole Territory of Serbia into urban and rural areas based on Corine Land Cover data.
- 2. Spatial interpolation of the MDTY values (for each vehicle category) from VCDs at the mid-points of the roads where VCD not exist. This will be done for each category of road, separately, by using the knn method (k-nearest neighbors). In doing so, the distances to the whole road section where AVC exist will be taken into account. Model will be trained based through the cross-validation procedure, by using the RMSE (Root Mean Squared Error) as a measure of performace. In this way, the vehicle activity for each road will be estimated.
+ 2. For each road section (including the sections with VCDs) MDTY was calculated as weighted mean of 5 neighbouring road section with VCDs (if exist within the radius of 50km.). Weights were created as inverse distances between the lines (road sections). If target road section intersect with another road section that has VCD, the distance between them is set to be close to zero in order to avoid dividing by zero. By doing so, the main influence in calculating the weighted mean belongs to the sections with VCDs from the very close vicinity. This interpolation was done within the each road category where VCD exist (IA, IIA and IB). In this way, the vehicle activity for each road will be estimated.
  3. Based on these estimates, total rural inventory for each vehicle category will be spatially dissagregated into the 5x5km cells propotionally, by taking the estimated MDTY and the lengths of corresponding road sections that lie within the cell into account.
  
 
 **Urban inventory**
- 1. First, total inventory pollution will be spatially dissagregated based on the number of the vehicles registered in each municipality.
- 2. Next, estimated urban emissions in each municipality will be further spatialized into 5x5km cells based on the the lenght of the roads that lie in each cell of urban areas.
+ 1. First, total inventory pollution was spatially dissagregated proportionally to the urban areas of each municipality based on the number of the vehicles registered in each municipality. For this purpose, data from the official database of the Statistical Office of the Republic of Serbia was used.
+ 2. Next, the estimated emissions in urban areas were further spatialized into 5x5km cells based on the the lenght of the roads in urban areas that lie in each cell. For this purpose, road network in urban areas was generated by using the Open Street Map data and CLC class for urban areas.
  
 **Highway inventory**
  
- - Total inventory for highway transport will be spatially dissagregated based on the MDTY values and the lenght of the corresponding highway section that lie in each cell. 
+ - Total inventory for highway transport will be spatially dissagregated based lenght of the corresponding highway section that lie in each cell multiplied by the estimated MDTY values The MDTY values are estimated according to the methodology given above. 
     
 **Total inventory**
  
- - Total air pollution from the road transport in each cell will be estimated as the sum of rural, urban and highway inventory for each cell proportionally.     
+ - Total air pollution from the road transport in each cell will be estimated as the sum of estimated/spatialized pollution for rural, urban and highway transport for each cell.     
 
 
 ### 1A3vi - Road transport: Automobile tyre and brake wear - Solved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally, by taking the estimated MDTY and the lengths of corresponding road sections that lie within the cell into account.
+- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally, based on the length of roads that lie within the cell multiplied by corresponding MDTY.
 
 ### 1A3vii - Road transport: Automobile road abrasion - Solved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally, by taking the estimated MDTY and the lengths of corresponding road sections that lie within the cell into account.
+- **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally, based on the length of roads that lie within the cell multiplied by corresponding MDTY.
 
 ### 1A3c - Railways - Solved
 
@@ -152,6 +148,38 @@ The proposed methodology will be apply on the road transport subcategories that 
 - **Problem:** The sources do not exist.
 
 - **Methodology:** Total inventory will be spatially dissagregated into the 5x5km cells propotionally area of the navigable rivers that lie within the cell.
+
+
+
+# 1A4 - Residential, Tertiary and Agriculture/Forestry sector - Solved
+
+
+### 1A4ai - Commercial/Institutional: Stationary Combustion
+
+- **Problem:** The sources do not exist.
+
+- **Methodology:** Total inventory was spatialized on the urban areas in each municipality, proportionally to the total heating area of the residental houses as well as, the institutional and commercial buildings, connected to the remote heating system. This information is available via official report of the public company "Toplane Srbije".
+
+### 1A4bi - Residential : Stationary combustion - Solved
+
+- **Problem:** The sources do not exist.
+
+- **Methodology:** Total inventory was spatialized on the urban areas in each municipality, proportionally to the number of the residental houses that are not connected to the remote heating system. Having the total number of houses as well as the number of houses connected to the remote heating system, number of residental houses that are not connected to the remote heating system is given as difference between two numbers. For the areas without remote heating plants, number of residental houses is available from the official database of the Statistical Office of the Republic of Serbia.
+
+
+### 1A4ci - Agriculture/Forestry/Fishing: Stationary combustion - Solved
+
+- **Problem:** The sources do not exist.
+
+- **Methodology:** Total inventory was spatialized on the urban areas of each municipality, proportionally to the total investment in  Agriculture/Forestry/Fishing. This information is available from the official database of the Statistical Office of the Republic of Serbia. **ili po povrsini poljoprivrednog zemiljista iz korine**
+
+
+### 1A4cii - Agriculture/Forestry/Fishing: Off-road vehicles and other machinery - Solved
+
+- **Problem:** The sources do not exist.
+
+- **Methodology:** Total inventory was spatialized on the rural areas (other than urban) of each municipality, proportionally to the total number of registered industrial vehicles. This information is available from the official database of the Statistical Office of the Republic of Serbia.
+
 
 
 # 1A2-2 - Industry - Solved
@@ -187,19 +215,19 @@ The proposed methodology will be apply on the road transport subcategories that 
 
 # 2-Other processes (Industrial Processes and Product Uses)
 
-### 2S5a - Quarrying and mining of minerals other than coal - Not resolved
+### 2S5a - Quarrying and mining of minerals other than coal - Solved
 
 - **Problem:** The difference between Total inventory and Total spatialized is significant
 
-- **Methodology:** The difference between Total inventory and Total spatialized inventory was spatially allocated to the identified locations of the mines of minerals (other than coals) proportionally, by taking the existing values of point sources into account. 
+- **Methodology:** The difference between Total inventory and Total spatialized inventory was spatially allocated to the identified locations of the mines of minerals (other than coals) proportionally, by taking the existing values of point sources to create weights. The larger the source, the larger portion of difference is assigned to it.  
 
-### 2A5b - Construction and demolition - Not resolved
+### 2A5b - Construction and demolition - Solved
 
 - **Problem:** The sources do not exist.
 
 - **Methodology:**  Total inventory was spatialized on urban areas proportionally to the population of the corresponding municipality.
 
-### 2A5c - Storage, handling and transport of mineral products - Not resolved
+### 2A5c - Storage, handling and transport of mineral products - Solved
 
 - **Problem:** The sources do not exist.
 
@@ -226,7 +254,7 @@ The proposed methodology will be apply on the road transport subcategories that 
 
 -- **Methodology:** Total inventory for those sub-categories were spatialized on the urban areas proportionally to the population of the corresponding municipality. It was calculated by using the data from the official database of the Statistical Office of the Republic of Serbia as well as the CLC class for urban zones.
 
-### 2l - Wood processing - Not resolved
+### 2l - Wood processing - Solved
 
 - **Problem:** The sources do not exist.
 
@@ -234,18 +262,18 @@ The proposed methodology will be apply on the road transport subcategories that 
 
 # 3 - Agriculture - Partially solved
 
-### 3B3 - Manure management - Swine - Not resolved 
+### 3B3 - Manure management - Swine - Solved 
 
-- **Problem:** Total inventory does not match the Spatialized inventory. In case of PM10 and NMVOC, Spatialized inventory is bigger, while in case  of NOx, PM2.5 and NH3 Total is bigger.
+- **Problem:** Total inventory does not match the Spatialized inventory.
 
-- **Methodology:** This subcategory migth be resolved by using the data from the National inventory of agriculture database [^2] up to level of the rural land of the municipalities.
+- **Methodology:** The difference between Total inventory and Total spatialized inventory was spatially allocated to the identified locations of the existing sources proportionally, by taking the existing values of point sources to create weights. The larger the source, the larger portion of difference is assigned to it.
 
 ### 3B4gi &  3B4gii - Laying hens & Broilers - Solved
 
 
  - **Problem:** The Total inventory does not match the Spatialized inventory.
 
- - **Methodology:** Considering that the Total inventory is bigger than Spatialized inventory, the difference will be proportionally allocated to each of the sources listed. After that, spatial dissagregation will be done by spatially overlaying of the 5x5km cells grid with the spatial layer of the sources from each category.
+ - **Methodology:** The difference between Total inventory and Total spatialized inventory was spatially allocated to the identified locations of the existing sources proportionally, by taking the existing values of point sources to create weights. The larger the source, the larger portion of difference is assigned to it.
  
  
 ### Other agriculture - Not resolved
@@ -264,9 +292,22 @@ The proposed methodology will be apply on the road transport subcategories that 
 - **Methodology:** The Total inventory from this subcategory will be spatially allocated to the areas that represents the Solid waste disposal. For thus purpose, the dump sites will be extracted from the Corine Land Cover data (class 1.3.2 the of Corine Land Cover). Spatial allocation will be conducted proportionally, according the areas of the dump sites. After that, each portion that belongs to individual site will be further allocated to 5x5km cells propotionally according the the areas of the dump site that lies in each cell.
  
  
-### Others (5C1bv, 5D1 and 5D2) - Not resolved
+### 5C1bv - Cremation - Solved
 
 - **Problem:** The sources do not exist.
 
-- **Methodology:** The Total inventory from subcategories (5C1bv, 5D1 and 5D2) still not resolved.
+- **Methodology:** The Total inventory will be spatialized on two locations where cremation happens (Belgrade and Novi Sad).
+
+
+### 5D1 - Domestic wastewater handling - Solved
+
+- **Problem:** The sources do not exist.
+
+- **Methodology:**  Total inventory was spatialized on the urban areas in each municipality, proportionally to the total volume of the waste water released from the residential houses. This information is available via the official database of the Statistical Office of the Republic of Serbia.
+
+### 5D2 - Industrial wastewater handling - Solved
+
+- **Problem:** The sources do not exist.
+
+- **Methodology:**  Total inventory is negligible.
 
