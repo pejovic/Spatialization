@@ -404,20 +404,37 @@ mapview(sf_clc18_waste, zcol = "CODE_18")
 
 
 
+akey = "AIzaSyAHhi2-kx5vb4DfWBUd3I0Kv9M4vqrc2O4"
+
+sa <- readxl::read_xls(path = "Data/Sportski_aerodromi.xls")
+
+# install.packages("googleway")
+library(googleway)
+
+address_strings = paste0(sa$First, ", ", sa$Second)
+lat = vector("numeric", length = nrow(sa))
+lng = vector("numeric", length = nrow(sa))
 
 
 
+for (i in 1:nrow(sa)) {
+  coord = googleway::google_geocode(address_strings[1], key = akey)
+  
+  if (coord$status == "OK") {
+    coord = googleway::geocode_coordinates(coord)
+    lat[i] = coord$lat[1]  
+    lng[i] = coord$lng[1]  
+  } else {
+    lat[i] = NA
+    lng[i] = NA
+  }
+  
+}
 
+sa$lat = lat
+sa$lng = lng
 
-
-
-
-
-
-
-
-
-
+sa
 
 
 
