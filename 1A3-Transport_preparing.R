@@ -404,8 +404,9 @@ mapview(sf_clc18_waste, zcol = "CODE_18")
 
 
 
-akey = "AIzaSyAHhi2-kx5vb4DfWBUd3I0Kv9M4vqrc2O4"
-
+akey = "AIzaSyDXXdUtrebEA3TqzyPeKGoHzibw121ZVGU"
+set_key(key = akey, api = "geocode")
+google_keys()
 sa <- readxl::read_xls(path = "Data/Sportski_aerodromi.xls")
 
 # install.packages("googleway")
