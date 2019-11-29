@@ -66,6 +66,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #+ include = FALSE, echo = FALSE
 # Parameters:
 #  - distribute - TRUE or FALSE, depend on that if someone want to distribute total inventory emissions to sources, when difference exists
+#+ include = FALSE, echo = FALSE
 corsum2sf <- function(source.list, distribute = FALSE){
   source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
@@ -97,7 +98,7 @@ corsum2sf <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
-#'    
+#+ include = FALSE, echo = FALSE   
 corsum2sf_polygon <- function(source.list, distribute = FALSE){
   source.list$sources$polygon[, vars] <- source.list$sources$polygon[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
@@ -130,7 +131,6 @@ corsum2sf_polygon <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
-
 corsum2sf_lines <- function(source.list, distribute = FALSE){
   source.list$sources$lines[, vars] <- source.list$sources$lines[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
@@ -164,7 +164,7 @@ corsum2sf_lines <- function(source.list, distribute = FALSE){
   return(source.sf)
 }
 
-
+#+ include = FALSE, echo = FALSE
 # Function for spatial data visualisation at web maps
 # Parameters:
 #    1. sf.sources -  sf object with sources to be spatialised
@@ -249,7 +249,7 @@ sf.1A4ai %>%
   st_drop_geometry() %>%
   dplyr::rename(Total_heating_area = Toplane, Manucipality = NAME_2) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.1A4ai',
+  datatable(., caption = 'Table 1: sf.1A4ai',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -277,7 +277,7 @@ total.1A4ai <- source.1A4ai[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4ai, total.1A4ai, data.frame(total.1A4ai - sum.1A4ai))) %>%
-  datatable(., caption = 'Table 8: Summary differences',
+  datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
 
@@ -321,7 +321,7 @@ sum.p.1A4ai <- p.1A4ai %>%
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
 data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4ai, total.1A4ai, data.frame(sum.p.1A4ai == total.1A4ai)-1)) %>%
-  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
@@ -396,12 +396,12 @@ sf.1A4bi <- corsum2sf_polygon(source.1A4bi, distribute = FALSE) %>%
 
 #'
 #'
-#+ echo = FALSE, result = TRUE, eval = TRUE
+#+ echo = FALSE, result = TRUE, eval = TRUE, message = FALSE
 sf.1A4bi %>% 
   st_drop_geometry() %>%
   dplyr::rename(Residential = Br_domacinstva, Manucipality = NAME_2) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.1A4bi',
+  datatable(., caption = 'Table 4: sf.1A4bi',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -429,7 +429,7 @@ total.1A4bi <- source.1A4bi[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4bi, total.1A4bi, data.frame(total.1A4bi - sum.1A4bi))) %>%
-  datatable(., caption = 'Table 8: Summary differences',
+  datatable(., caption = 'Table 5: Summary differences',
             options = list(pageLength = 5)
   )
 
@@ -473,7 +473,7 @@ sum.p.1A4bi <- p.1A4bi %>%
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
 data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4bi, total.1A4bi, data.frame(sum.p.1A4bi == total.1A4bi)-1)) %>%
-  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+  datatable(., caption = 'Table 6: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
@@ -509,7 +509,7 @@ sf.1A4ci <- corsum2sf_polygon(source.1A4ci, distribute = FALSE) %>%
 sf.1A4ci %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 1: sf.1A4ci',
+  datatable(., caption = 'Table 7: sf.1A4ci',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -537,7 +537,7 @@ total.1A4ci <- source.1A4ci[[2]][[2]][, vars] %>%
   as.data.frame()
 
 data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4ci, total.1A4ci, data.frame(total.1A4ci - sum.1A4ci))) %>%
-  datatable(., caption = 'Table 2: Summary differences',
+  datatable(., caption = 'Table 8: Summary differences',
             options = list(pageLength = 5)
   )
 #'
@@ -582,7 +582,7 @@ sum.p.1A4ci <- p.1A4ci %>%
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
 data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4ci, total.1A4ci, data.frame(sum.p.1A4ci == total.1A4ci)-1)) %>%
-  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
@@ -601,5 +601,144 @@ source.1A4cii <- list(sources = list(points = NA, lines = NA, polygon = NA), tot
 source.1A4cii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D61:I61", sheet = source.sheet, col_names = vars)
 source.1A4cii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D64:I64", sheet = source.sheet, col_names = vars)
 
+#+ include = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
+  st_transform(crs = "+init=epsg:32634")
+
+#+ include = FALSE
+Sys.setlocale(locale = 'Serbian (Latin)')
+opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+                   use_iconv=TRUE,  
+                   encoding = "UTF-8")
+sf_opstine <- st_as_sf(opstine)
+
+#+ include = FALSE
+traktori <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
+lcl(loc = "C")
+traktori <- cyr_lat(traktori)
+names(traktori) <- cyr_lat(names(traktori)) 
+traktori <- traktori %>%
+  mutate_all(~replace_na(., 0))
+traktori$Opština[traktori$Opština == "Indjija"] <- "Inđija"
+traktori$Opština[traktori$Opština == "LJubovija"] <- "Ljubovija"
+traktori$Opština[traktori$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+traktori$Opština[traktori$Opština == "Savski venac"] <- "Savski Venac"
+traktori$Opština[traktori$Opština == "Stari grad"] <- "Stari Grad"
+traktori$Opština[traktori$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+traktori$Opština[traktori$Opština == "Arandjelovac"] <- "Aranđelovac"
+traktori$Opština[traktori$Opština == "LJig"] <- "Ljig"
+traktori$Opština[traktori$Opština == "Žitoradja"] <- "Žitorađa"
+traktori$Opština[traktori$Opština == "Medvedja"] <- "Medveđa"
+
+sf_opstine$Br_traktori <- traktori$Traktori[match(sf_opstine$NAME_2, traktori$Opština)]
+
+sf_opstine %<>% 
+  st_transform(crs = "+init=epsg:32634")
+
+# sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
+sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+
+sf_rur %<>% dplyr::select(.,Br_traktori, NAME_2) %>% 
+  filter(!is.na(Br_traktori))
+sf_rur[,vars] <- NA
+
+sf_rur.int <- st_intersection(sf_rur, sf.grid.5km) %>% 
+  filter(!is.na(Br_traktori))
+
+source.1A4cii$sources$polygon <- sf_rur.int
+
+sf.1A4cii <- corsum2sf_polygon(source.1A4cii, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A4cii %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Off_road_vehicles = Br_traktori, Manucipality = NAME_2) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 10: sf.1A4cii',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A4cii <- sf.1A4cii %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A4cii <- source.1A4cii[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4cii, total.1A4cii, data.frame(total.1A4cii - sum.1A4cii))) %>%
+  datatable(., caption = 'Table 11: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sf.1A4cii <- sf.1A4cii %>%
+  mutate(Area = st_area(.))
+
+sum_Area <- sum(sf.1A4cii$Area)
+diff.1A4cii <- data.frame(total.1A4cii - sum.1A4cii)
+sf.1A4cii <- sf.1A4cii %>%
+  mutate(NOx = ((diff.1A4cii$NOx/sum_Area)*Area),
+         SO2 = ((diff.1A4cii$SO2/sum_Area)*Area),
+         PM10 = ((diff.1A4cii$PM10/sum_Area)*Area),
+         PM2.5 = ((diff.1A4cii$PM2.5/sum_Area)*Area),
+         NMVOC = ((diff.1A4cii$NMVOC/sum_Area)*Area),
+         NH3 = ((diff.1A4cii$NH3/sum_Area)*Area))
+sf.1A4cii %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A4cii <- sf.grid.5km %>%
+  st_join(sf.1A4cii, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.1A4cii, layer.name.1 = "Sources 1A4cii", sf.spatialised = p.1A4cii, layer.name.2 = "Spatialised 1A4cii", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A4cii <- p.1A4cii %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4cii, total.1A4cii, data.frame(sum.p.1A4cii == total.1A4cii)-1)) %>%
+  datatable(., caption = 'Table 12: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A4cii, dsn="Products/1A4 - Residential-Tertiary/1A4cii.gpkg", layer='1A4cii')
 
 
