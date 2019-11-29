@@ -238,22 +238,22 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #' ## 1A3ai-International aviation LTO (civil)
 #' 
 #' 
-source.1A3ai_i <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.1A3ai <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A3ai_i$sources$points <- readxl::read_xlsx(path = source.file, range = "D10:S11", sheet = source.sheet, col_names = header)
-source.1A3ai_i$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D19:I19", sheet = source.sheet, col_names = vars)
-source.1A3ai_i$total$inventory <- readxl::read_xlsx(path = source.file, range = "D20:I20", sheet = source.sheet, col_names = vars)
+source.1A3ai$sources$points <- readxl::read_xlsx(path = source.file, range = "D10:S11", sheet = source.sheet, col_names = header)
+source.1A3ai$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D19:I19", sheet = source.sheet, col_names = vars)
+source.1A3ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D20:I20", sheet = source.sheet, col_names = vars)
 
-sf.1A3ai_i <- corsum2sf(source.1A3ai_i, distribute = TRUE) %>%
+sf.1A3ai <- corsum2sf(source.1A3ai, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3ai_i %>% 
+sf.1A3ai %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 1: sf.1A3ai_i',
+  datatable(., caption = 'Table 1: sf.1A3ai',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -268,26 +268,26 @@ sf.1A3ai_i %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.1A3ai_i <- sf.1A3ai_i %>% 
+sum.1A3ai <- sf.1A3ai %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-total.1A3ai_i <- source.1A3ai_i[[2]][[2]][, vars] %>% 
+total.1A3ai <- source.1A3ai[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3ai_i, total.1A3ai_i, data.frame(sum.1A3ai_i == total.1A3ai_i)-1)) %>%
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3ai, total.1A3ai, data.frame(sum.1A3ai == total.1A3ai)-1)) %>%
   datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE, echo = FALSE, result = FALSE
-p.1A3ai_i <- sf.grid.5km %>%
-  st_join(sf.1A3ai_i) %>%
+p.1A3ai <- sf.grid.5km %>%
+  st_join(sf.1A3ai) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -298,23 +298,23 @@ p.1A3ai_i <- sf.grid.5km %>%
   mutate(ID = as.numeric(ID))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-spatialised.mapview(sf.sources = sf.1A3ai_i, layer.name.1 = "Sources 1A3ai_i", sf.spatialised = p.1A3ai_i, layer.name.2 = "Spatialised 1A3ai_i", vars = vars)
+spatialised.mapview(sf.sources = sf.1A3ai, layer.name.1 = "Sources 1A3ai", sf.spatialised = p.1A3ai, layer.name.2 = "Spatialised 1A3ai", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.1A3ai_i <- p.1A3ai_i %>% 
+sum.p.1A3ai <- p.1A3ai %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3ai_i, total.1A3ai_i, data.frame(sum.p.1A3ai_i == total.1A3ai_i)-1)) %>%
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3ai, total.1A3ai, data.frame(sum.p.1A3ai == total.1A3ai)-1)) %>%
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE
-# st_write(p.1A3ai_i, dsn="Products/1A3 - Transport/1A3ai_i.gpkg", layer='1A3ai')
+# st_write(p.1A3ai, dsn="Products/1A3 - Transport/1A3ai.gpkg", layer='1A3ai')
 
 
 
@@ -325,20 +325,20 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3ai_i, total.1
 #' 
 source.1A3aii <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A3ai_i$sources$points <- readxl::read_xlsx(path = source.file, range = "D10:S11", sheet = source.sheet, col_names = header)
-source.1A3ai_i$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D19:I19", sheet = source.sheet, col_names = vars)
-source.1A3ai_i$total$inventory <- readxl::read_xlsx(path = source.file, range = "D20:I20", sheet = source.sheet, col_names = vars)
+source.1A3aii$sources$points <- readxl::read_xlsx(path = source.file, range = "D21:S41", sheet = source.sheet, col_names = header)
+source.1A3aii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D48:I48", sheet = source.sheet, col_names = vars)
+source.1A3aii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D49:I49", sheet = source.sheet, col_names = vars)
 
-sf.1A3ai_i <- corsum2sf(source.1A3ai_i, distribute = TRUE) %>%
+sf.1A3aii <- corsum2sf(source.1A3aii, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3ai_i %>% 
+sf.1A3aii %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 1: sf.1A3ai_i',
+  datatable(., caption = 'Table 1: sf.1A3aii',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -353,26 +353,26 @@ sf.1A3ai_i %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.1A3ai_i <- sf.1A3ai_i %>% 
+sum.1A3aii <- sf.1A3aii %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-total.1A3ai_i <- source.1A3ai_i[[2]][[2]][, vars] %>% 
+total.1A3aii <- source.1A3aii[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3ai_i, total.1A3ai_i, data.frame(sum.1A3ai_i == total.1A3ai_i)-1)) %>%
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3aii, total.1A3aii, data.frame(sum.1A3aii == total.1A3aii)-1)) %>%
   datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE, echo = FALSE, result = FALSE
-p.1A3ai_i <- sf.grid.5km %>%
-  st_join(sf.1A3ai_i) %>%
+p.1A3aii <- sf.grid.5km %>%
+  st_join(sf.1A3aii) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -383,37 +383,23 @@ p.1A3ai_i <- sf.grid.5km %>%
   mutate(ID = as.numeric(ID))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-spatialised.mapview(sf.sources = sf.1A3ai_i, layer.name.1 = "Sources 1A3ai_i", sf.spatialised = p.1A3ai_i, layer.name.2 = "Spatialised 1A3ai_i", vars = vars)
+spatialised.mapview(sf.sources = sf.1A3aii, layer.name.1 = "Sources 1A3aii", sf.spatialised = p.1A3aii, layer.name.2 = "Spatialised 1A3aii", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.1A3ai_i <- p.1A3ai_i %>% 
+sum.p.1A3aii <- p.1A3aii %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3ai_i, total.1A3ai_i, data.frame(sum.p.1A3ai_i == total.1A3ai_i)-1)) %>%
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3aii, total.1A3aii, data.frame(sum.p.1A3aii == total.1A3aii)-1)) %>%
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE
-# st_write(p.1A3ai_i, dsn="Products/1A3 - Transport/1A3ai_i.gpkg", layer='1A3ai_i')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# st_write(p.1A3aii, dsn="Products/1A3 - Transport/1A3aii.gpkg", layer='1A3aii')
 
 #'
 #'
@@ -424,8 +410,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3ai_i, total.1
 #' 
 source.1A3bi_U <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A3bi_U$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
-source.1A3bi_U$total$inventory <- readxl::read_xlsx(path = source.file, range = "D42:I42", sheet = source.sheet, col_names = vars)
+source.1A3bi_U$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D59:I59", sheet = source.sheet, col_names = vars)
+source.1A3bi_U$total$inventory <- readxl::read_xlsx(path = source.file, range = "D60:I60", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 urban_roads <- readOGR("Data/putevi/OSM_putevi_urbana_podrucja.gpkg", 
@@ -538,8 +524,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_U, total.1
 #+ include = FALSE
 source.1A3bi_R <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A3bi_R$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
-source.1A3bi_R$total$inventory <- readxl::read_xlsx(path = source.file, range = "D43:I43", sheet = source.sheet, col_names = vars)
+source.1A3bi_R$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D59:I59", sheet = source.sheet, col_names = vars)
+source.1A3bi_R$total$inventory <- readxl::read_xlsx(path = source.file, range = "D61:I61", sheet = source.sheet, col_names = vars)
 
 
 load("./Data/Putevi/rn_IIA.RDS")
@@ -659,8 +645,8 @@ rn.IA$PGDS_2015.est[is.na(rn.IA$PGDS_2015.est)] <- mean(rn.IA$PGDS_2015[rn.IA$Br
 
 source.1A3bi_H <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A3bi_H$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
-source.1A3bi_H$total$inventory <- readxl::read_xlsx(path = source.file, range = "D44:I44", sheet = source.sheet, col_names = vars)
+source.1A3bi_H$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D59:I59", sheet = source.sheet, col_names = vars)
+source.1A3bi_H$total$inventory <- readxl::read_xlsx(path = source.file, range = "D62:I62", sheet = source.sheet, col_names = vars)
 
 sf_roads <- rn.IA
 
