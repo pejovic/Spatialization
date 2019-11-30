@@ -695,20 +695,17 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4cii, total.1A4ci
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-
-sf.1A4cii <- sf.1A4cii %>%
-  mutate(Area = st_area(.))
-
-sum_Area <- sum(sf.1A4cii$Area)
+sum_s <- sum(sf.1A4cii$Br_traktori)
 diff.1A4cii <- data.frame(total.1A4cii - sum.1A4cii)
 sf.1A4cii <- sf.1A4cii %>%
-  mutate(NOx = ((diff.1A4cii$NOx/sum_Area)*Area),
-         SO2 = ((diff.1A4cii$SO2/sum_Area)*Area),
-         PM10 = ((diff.1A4cii$PM10/sum_Area)*Area),
-         PM2.5 = ((diff.1A4cii$PM2.5/sum_Area)*Area),
-         NMVOC = ((diff.1A4cii$NMVOC/sum_Area)*Area),
-         NH3 = ((diff.1A4cii$NH3/sum_Area)*Area))
+  mutate(NOx = ((diff.1A4cii$NOx/sum_s)*Br_traktori),
+         SO2 = ((diff.1A4cii$SO2/sum_s)*Br_traktori),
+         PM10 = ((diff.1A4cii$PM10/sum_s)*Br_traktori),
+         PM2.5 = ((diff.1A4cii$PM2.5/sum_s)*Br_traktori),
+         NMVOC = ((diff.1A4cii$NMVOC/sum_s)*Br_traktori),
+         NH3 = ((diff.1A4cii$NH3/sum_s)*Br_traktori))
 sf.1A4cii %<>% select(vars)
+
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
