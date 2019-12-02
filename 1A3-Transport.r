@@ -250,21 +250,21 @@ sf.1A3ai <- corsum2sf(source.1A3ai, distribute = TRUE) %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3ai %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 1: sf.1A3ai',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3ai %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 1: sf.1A3ai',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -336,21 +336,21 @@ sf.1A3aii <- corsum2sf(source.1A3aii, distribute = TRUE) %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3aii %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 4: sf.1A3aii',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+#sf.1A3aii %>% 
+#  st_drop_geometry() %>% 
+#  dplyr::mutate_if(is.numeric, round, 2) %>%
+#  datatable(., caption = 'Table 4: sf.1A3aii',
+#            rownames = FALSE, escape = FALSE, selection = "single",
+#            extensions = c('Buttons'),
+#            class = 'white-space: nowrap',
+#            options = list(
+#              pageLength = 5,
+#              dom = 'Bfrtip',
+#              buttons = list('pageLength'),
+#              searchHighlight = TRUE,
+#              scrollX = TRUE,
+#              scrollY = TRUE
+#            ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -437,21 +437,21 @@ sf.1A3bi_U <- corsum2sf_lines(source.1A3bi_U, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bi_U %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.1A3bi_U',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bi_U %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 7: sf.1A3bi_U',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -555,21 +555,21 @@ sf.1A3bi_R <- corsum2sf_lines(source.1A3bi_R, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bi_R %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 10: sf.1A3bi_R',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bi_R %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 10: sf.1A3bi_R',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -673,21 +673,21 @@ sf.1A3bi_H <- corsum2sf_lines(source.1A3bi_H, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bi_H %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 13: sf.1A3bi_H',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bi_H %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 13: sf.1A3bi_H',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -790,21 +790,21 @@ sf.1A3bii_U <- corsum2sf_lines(source.1A3bii_U, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bii_U %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 16: sf.1A3bii_U',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bii_U %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 16: sf.1A3bii_U',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -903,21 +903,21 @@ sf.1A3bii_R <- corsum2sf_lines(source.1A3bii_R, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bii_R %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 19: sf.1A3bii_R',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bii_R %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 19: sf.1A3bii_R',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1020,21 +1020,21 @@ sf.1A3bii_H <- corsum2sf_lines(source.1A3bii_H, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bii_H %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 22: sf.1A3bii_H',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bii_H %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 22: sf.1A3bii_H',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1134,21 +1134,21 @@ sf.1A3biii_U <- corsum2sf_lines(source.1A3biii_U, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biii_U %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 25: sf.1A3biii_U',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biii_U %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 25: sf.1A3biii_U',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1247,21 +1247,21 @@ sf.1A3biii_R <- corsum2sf_lines(source.1A3biii_R, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biii_R %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 28: sf.1A3biii_R',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biii_R %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 28: sf.1A3biii_R',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1364,21 +1364,21 @@ sf.1A3biii_H <- corsum2sf_lines(source.1A3biii_H, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biii_H %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 31: sf.1A3biii_H',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biii_H %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 31: sf.1A3biii_H',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1482,21 +1482,21 @@ sf.1A3biii_bc_U <- corsum2sf_lines(source.1A3biii_bc_U, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biii_bc_U %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 34: sf.1A3biii_bc_U',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biii_bc_U %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 34: sf.1A3biii_bc_U',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1595,21 +1595,21 @@ sf.1A3biii_bc_R <- corsum2sf_lines(source.1A3biii_bc_R, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biii_bc_R %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 37: sf.1A3biii_bc_R',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biii_bc_R %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 37: sf.1A3biii_bc_R',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1712,21 +1712,21 @@ sf.1A3biii_bc_H <- corsum2sf_lines(source.1A3biii_bc_H, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biii_bc_H %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 40: sf.1A3biii_bc_H',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biii_bc_H %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 40: sf.1A3biii_bc_H',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1826,21 +1826,21 @@ sf.1A3biv_U <- corsum2sf_lines(source.1A3biv_U, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biv_U %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 43: sf.1A3biv_U',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biv_U %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 43: sf.1A3biv_U',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1938,21 +1938,21 @@ sf.1A3biv_R <- corsum2sf_lines(source.1A3biv_R, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biv_R %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 46: sf.1A3biv_R',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biv_R %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 46: sf.1A3biv_R',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2055,21 +2055,21 @@ sf.1A3biv_H <- corsum2sf_lines(source.1A3biv_H, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3biv_H %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 49: sf.1A3biv_H',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3biv_H %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 49: sf.1A3biv_H',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2171,21 +2171,21 @@ sf.1A3bv_U <- corsum2sf_lines(source.1A3bv_U, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bv_U %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 52: sf.1A3bv_U',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bv_U %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 52: sf.1A3bv_U',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2283,21 +2283,21 @@ sf.1A3bv_R <- corsum2sf_lines(source.1A3bv_R, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bv_R %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 55: sf.1A3bv_R',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bv_R %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 55: sf.1A3bv_R',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2400,21 +2400,21 @@ sf.1A3bv_H <- corsum2sf_lines(source.1A3bv_H, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bv_H %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 58: sf.1A3bv_H',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bv_H %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 58: sf.1A3bv_H',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2514,21 +2514,21 @@ sf.1A3bvi <- corsum2sf_lines(source.1A3bvi, distribute = FALSE) %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bvi %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 61: sf.1A3bvi',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bvi %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 61: sf.1A3bvi',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2614,21 +2614,21 @@ sf.1A3bvii <- corsum2sf_lines(source.1A3bvii, distribute = FALSE) %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3bvii %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 64: sf.1A3bvii',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3bvii %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 64: sf.1A3bvii',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2730,21 +2730,21 @@ sf.1A3c <- corsum2sf_lines(source.1A3c, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3c %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 67: sf.1A3c',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3c %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 67: sf.1A3c',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2839,21 +2839,21 @@ sf.1A3dii <- corsum2sf_polygon(source.1A3dii, distribute = FALSE)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A3dii %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 70: sf.1A3dii',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
+# sf.1A3dii %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 70: sf.1A3dii',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
