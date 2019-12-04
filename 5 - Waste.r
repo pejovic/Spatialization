@@ -447,7 +447,7 @@ sf.5D1 <- corsum2sf_polygon(source.5D1, distribute = FALSE) %>%
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sf.5D1 %>% 
   st_drop_geometry() %>%
-  dplyr::rename(Wastewater = Otpadne_vode) %>%
+  dplyr::rename(Wastewater = Otpadne_vode, Munucipality = NAME_2) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   datatable(., caption = 'Table 7: sf.5D1',
             rownames = FALSE, escape = FALSE, selection = "single",
