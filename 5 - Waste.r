@@ -63,10 +63,10 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 
 #'  
 #'    
-#+ include = FALSE, echo = FALSE
+#+ include = TRUE
+# Function: 
 # Parameters:
 #  - distribute - TRUE or FALSE, depend on that if someone want to distribute total inventory emissions to sources, when difference exists
-#+ include = FALSE, echo = FALSE
 corsum2sf <- function(source.list, distribute = FALSE){
   source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
@@ -98,7 +98,7 @@ corsum2sf <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
-#+ include = FALSE, echo = FALSE   
+#+ include = TRUE  
 corsum2sf_polygon <- function(source.list, distribute = FALSE){
   source.list$sources$polygon[, vars] <- source.list$sources$polygon[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
   source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
@@ -200,24 +200,24 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #'
 #'
 #'
-#+ include = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 source.5A <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.5A$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D22:I22", sheet = source.sheet, col_names = vars)
 source.5A$total$inventory <- readxl::read_xlsx(path = source.file, range = "D23:I23", sheet = source.sheet, col_names = vars)
 
-#+ include = FALSE
-clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+#+ include = TRUE, message = FALSE, warning = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp") # Reading data
 sf_clc18 <- st_as_sf(clc_18)
 clc132 <- subset(sf_clc18, CODE_18 == "132") %>% # Dump sites
   st_transform(32634)
 clc132[,vars] <- NA
 
-clc132.int <- st_intersection(clc132, sf.grid.5km) %>%
+clc132.int <- st_intersection(clc132, sf.grid.5km) %>% # Intersection with grid cells
   select(.,vars)
 
 source.5A$sources$polygon <- clc132.int
-sf.5A <- corsum2sf_polygon(source.5A, distribute = FALSE) %>%
+sf.5A <- corsum2sf_polygon(source.5A, distribute = FALSE) %>% # Preparing data for final spatialization
   st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -259,14 +259,14 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.5A, total.5A, data.
   )
 #'
 #'
-#+ include = FALSE, echo = FALSE, result = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 
-sf.5A <- sf.5A %>%
+sf.5A <- sf.5A %>% # Calculating polygons area
   mutate(Area = st_area(.))
 
 sum_Area <- sum(sf.5A$Area)
 diff.5A <- data.frame(total.5A - sum.5A)
-sf.5A <- sf.5A %>%
+sf.5A <- sf.5A %>% # Calculating weights and distibute data
   mutate(NOx = ((diff.5A$NOx/sum_Area)*Area),
          SO2 = ((diff.5A$SO2/sum_Area)*Area),
          PM10 = ((diff.5A$PM10/sum_Area)*Area),
@@ -276,8 +276,8 @@ sf.5A <- sf.5A %>%
 sf.5A %<>% select(vars)
 #'
 #'
-#+ include = FALSE, echo = FALSE, result = FALSE
-p.5A <- sf.grid.5km %>%
+#+ include = TRUE, message= FALSE, warning = FALSE
+p.5A <- sf.grid.5km %>% # Spatialization
   st_join(sf.5A, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
@@ -312,14 +312,14 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5A, total.5A, da
 #'
 #' ## 5C1bv-Cremation
 #' 
-#+ include = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 source.5C1bv <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.5C1bv$sources$points <- readxl::read_xlsx(path = source.file, range = "D24:S25", sheet = source.sheet, col_names = header)
 source.5C1bv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D34:I34", sheet = source.sheet, col_names = vars)
 source.5C1bv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D35:I35", sheet = source.sheet, col_names = vars)
 
-sf.5C1bv <- corsum2sf(source.5C1bv, distribute = TRUE) %>%
+sf.5C1bv <- corsum2sf(source.5C1bv, distribute = TRUE) %>% # Preparing data for final spatialization
   st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -360,8 +360,8 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.5C1bv, total.5C1bv,
             options = list(pageLength = 5)
   )
 
-#+ include = FALSE, echo = FALSE, result = FALSE
-p.5C1bv <- sf.grid.5km %>%
+#+ include = TRUE, message = FALSE, warning = FALSE
+p.5C1bv <- sf.grid.5km %>% # Spatialization
   st_join(sf.5C1bv) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
@@ -398,20 +398,20 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5C1bv, total.5C1
 #'
 #' ## 5D1-Domestic wastewater handling
 #' 
-#+ include = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 source.5D1 <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.5D1$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
 source.5D1$total$inventory <- readxl::read_xlsx(path = source.file, range = "D47:I47", sheet = source.sheet, col_names = vars)
 
-#+ include = FALSE
-Sys.setlocale(locale = 'Serbian (Latin)')
+#+ include = TRUE, message = FALSE, warning = FALSE
+Sys.setlocale(locale = 'Serbian (Latin)') # Reading data
 opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
                    use_iconv=TRUE,  
                    encoding = "UTF-8")
 sf_opstine <- st_as_sf(opstine)
 
-#+ include = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 otpadne_vode <- readxl::read_xls(path = "Data/Vodosnabdevanje_2015.xls", sheet = "Vodosnabdevanje")
 lcl(loc = "C")
 otpadne_vode <- cyr_lat(otpadne_vode)
@@ -428,7 +428,7 @@ otpadne_vode$Opština[otpadne_vode$Opština == "Arandjelovac"] <- "Aranđelovac"
 otpadne_vode$Opština[otpadne_vode$Opština == "LJig"] <- "Ljig"
 otpadne_vode$Opština[otpadne_vode$Opština == "Žitoradja"] <- "Žitorađa"
 otpadne_vode$Opština[otpadne_vode$Opština == "Medvedja"] <- "Medveđa"
-sf_opstine$Otpadne_vode <- otpadne_vode$`Ukupne ispuštene otpadne vode`[match(sf_opstine$NAME_2, otpadne_vode$Opština)]
+sf_opstine$Otpadne_vode <- otpadne_vode$`Ukupne ispuštene otpadne vode`[match(sf_opstine$NAME_2, otpadne_vode$Opština)] # Matching data 
 
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634")
@@ -439,7 +439,7 @@ sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km) %>%
   filter(!is.na(Otpadne_vode))
 
 source.5D1$sources$polygon <- sf_opstine.int
-sf.5D1 <- corsum2sf_polygon(source.5D1, distribute = FALSE) %>%
+sf.5D1 <- corsum2sf_polygon(source.5D1, distribute = FALSE) %>% # Preparing data for final spatialization
   st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -484,11 +484,11 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.5D1, total.5D1, dat
 
 #'
 #'
-#+ include = FALSE, echo = FALSE, result = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 
 sum_s <- sum(sf.5D1$Otpadne_vode)
 diff.5D1 <- data.frame(total.5D1 - sum.5D1)
-sf.5D1 <- sf.5D1 %>%
+sf.5D1 <- sf.5D1 %>% # Calculate weights and distribute data
   mutate(NOx = ((diff.5D1$NOx/sum_s)*Otpadne_vode),
          SO2 = ((diff.5D1$SO2/sum_s)*Otpadne_vode),
          PM10 = ((diff.5D1$PM10/sum_s)*Otpadne_vode),
@@ -498,8 +498,8 @@ sf.5D1 <- sf.5D1 %>%
 sf.5D1 %<>% select(vars)
 #'
 #'
-#+ include = FALSE, echo = FALSE, result = FALSE
-p.5D1 <- sf.grid.5km %>%
+#+ include = TRUE, message = FALSE, warning = FALSE
+p.5D1 <- sf.grid.5km %>% # Spatialization
   st_join(sf.5D1, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
@@ -534,22 +534,22 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5D1, total.5D1, 
 #'
 #'
 #'
-#+ include = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 source.5D2 <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.5D2$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D58:I58", sheet = source.sheet, col_names = vars)
 source.5D2$total$inventory <- readxl::read_xlsx(path = source.file, range = "D59:I59", sheet = source.sheet, col_names = vars)
 
-#+ include = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 clc121 <- subset(sf_clc18, CODE_18 == "121") %>% # Industrial sites
-  st_transform(32634)
+  st_transform(32634) # Transform to UTM projection
 clc121[,vars] <- NA
 
-clc121.int <- st_intersection(clc121, sf.grid.5km) %>%
+clc121.int <- st_intersection(clc121, sf.grid.5km) %>% # Intersection with grid cells
   select(.,vars)
 
 source.5D2$sources$polygon <- clc121.int
-sf.5D2 <- corsum2sf_polygon(source.5D2, distribute = FALSE) %>%
+sf.5D2 <- corsum2sf_polygon(source.5D2, distribute = FALSE) %>% # Preparing data for final spatialization
   st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -591,14 +591,14 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.5D2, total.5D2, dat
   )
 #'
 #'
-#+ include = FALSE, echo = FALSE, result = FALSE
+#+ include = TRUE, message = FALSE, warning = FALSE
 
-sf.5D2 <- sf.5D2 %>%
+sf.5D2 <- sf.5D2 %>% # Calculate polygons area
   mutate(Area = st_area(.))
 
-sum_Area <- sum(sf.5D2$Area)
+sum_Area <- sum(sf.5D2$Area) 
 diff.5D2 <- data.frame(total.5D2 - sum.5D2)
-sf.5D2 <- sf.5D2 %>%
+sf.5D2 <- sf.5D2 %>% # Calculate weights and distibute data
   mutate(NOx = ((diff.5D2$NOx/sum_Area)*Area),
          SO2 = ((diff.5D2$SO2/sum_Area)*Area),
          PM10 = ((diff.5D2$PM10/sum_Area)*Area),
@@ -608,8 +608,8 @@ sf.5D2 <- sf.5D2 %>%
 sf.5D2 %<>% select(vars)
 #'
 #'
-#+ include = FALSE, echo = FALSE, result = FALSE
-p.5D2 <- sf.grid.5km %>%
+#+ include = TRUE, message = FALSE, warning = FALSE
+p.5D2 <- sf.grid.5km %>% # Spatialization
   st_join(sf.5D2, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
