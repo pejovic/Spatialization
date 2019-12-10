@@ -244,7 +244,7 @@ source.1A3ai$sources$points <- readxl::read_xlsx(path = source.file, range = "D1
 source.1A3ai$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D19:I19", sheet = source.sheet, col_names = vars)
 source.1A3ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D20:I20", sheet = source.sheet, col_names = vars)
 
-sf.1A3ai <- corsum2sf(source.1A3ai, distribute = TRUE) %>%
+sf.1A3ai <- corsum2sf(source.1A3ai, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -280,10 +280,29 @@ total.1A3ai <- source.1A3ai[[2]][[2]][, vars] %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3ai, total.1A3ai, data.frame(sum.1A3ai == total.1A3ai)-1)) %>%
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3ai, total.1A3ai, data.frame(total.1A3ai - sum.1A3ai))) %>%
   datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
+#'
+#'
+#+ include = TRUE, message = FALSE, warning = FALSE
+
+
+sf.1A3ai$Passangers <- NA
+sf.1A3ai$Passangers[1] <- 4776110
+sf.1A3ai$Passangers[2] <- 36258 
+
+sum_Passangers <- sum(sf.1A3ai$Passangers)
+diff.1A3ai <- data.frame(total.1A3ai - sum.1A3ai)
+sf.1A3ai <- sf.1A3ai %>% # Calculating weights and distibute data
+  mutate(NOx = ((diff.1A3ai$NOx/sum_Passangers)*Passangers),
+         SO2 = ((diff.1A3ai$SO2/sum_Passangers)*Passangers),
+         PM10 = ((diff.1A3ai$PM10/sum_Passangers)*Passangers),
+         PM2.5 = ((diff.1A3ai$PM2.5/sum_Passangers)*Passangers),
+         NMVOC = ((diff.1A3ai$NMVOC/sum_Passangers)*Passangers),
+         NH3 = ((diff.1A3ai$NH3/sum_Passangers)*Passangers))
+sf.1A3ai %<>% select(vars)
 
 #+ include = FALSE, echo = FALSE, result = FALSE
 p.1A3ai <- sf.grid.5km %>%
@@ -2862,7 +2881,7 @@ sum.1A3dii <- sf.1A3dii %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
-  as.data.frame() %>%
+  as.data.frame() %>%``
   dplyr::mutate_if(is.numeric, round, 2)
 total.1A3dii <- source.1A3dii[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
