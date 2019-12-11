@@ -11,7 +11,9 @@ library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
 library(stringr)
-
+library(classInt)
+library(viridis)
+library(gridExtra)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Read all data files
@@ -47,6 +49,7 @@ for(i in 2:length(data.spat)){
 sf_data
 
 mapview(sf_data, zcol = "NMVOC")
+# st_write(sf_data, dsn="Products/sf_data.gpkg", layer='sf_data')
 
 ###################################################################
 # d <- st_join(sf_data, data.spat.list[[2]], join = st_equals) %>% 
@@ -62,3 +65,132 @@ mapview(sf_data, zcol = "NMVOC")
 # 
 # mapview(d, zcol = "SO2") + mapview(sf_data, zcol = "SO2") + mapview(data.spat.list[[2]], zcol = "SO2")
 ###################################################################
+
+
+
+classes.NOx <- classIntervals(sf_data$NOx, n = 40, style = "jenks")
+classes.SO2 <- classIntervals(sf_data$SO2, n = 40, style = "jenks")
+classes.PM10 <- classIntervals(sf_data$PM10, n = 40, style = "jenks")
+classes.PM2.5 <- classIntervals(sf_data$PM2.5, n = 40, style = "jenks")
+classes.NMVOC <- classIntervals(sf_data$NMVOC, n = 40, style = "jenks")
+classes.NH3 <- classIntervals(sf_data$NH3, n = 40, style = "jenks")
+
+sf_data <- sf_data %>%
+  mutate(percent_class_NOx = cut(NOx, classes$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes$brks, include.lowest = T)
+         )
+
+pal1 <- viridisLite::viridis(40)
+pal2 <- viridisLite::cividis(40)
+pal3 <- viridisLite::inferno(40)
+pal4 <- viridisLite::magma(40)
+pal5 <- viridisLite::plasma(40)
+pal6 <- viridisLite::viridis(40)
+
+
+a<-ggplot() +
+  geom_sf(data = sf_data,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+mapview(sf_data, zcol = "percent_class_NH3", alpha.regions = 80, col.regions = pal6, query.type = c("mousemove"), query.digits = 2)
+
+
+
