@@ -35,7 +35,7 @@ activity_df <- data.frame(times, day_in_year, day_in_month, day_hours, month_in_
 
 # Na primer neka aktivnost (A1) moze biti predstavljena formulom A1 =((working_time_8_16h + working_time_8_16h)/2) x !weekends x !public_holidays:
 
-activity_df %<>% dplyr::mutate(A1 = ((working_time_8_16h + working_time_8_16h)/2)*!weekends*!public_holidays)
+activity_df %<>% dplyr::mutate(A1 = (0.7*(working_time_8_16h + working_time_16_24h))*!weekends*!public_holidays)
 
 p <- ggplot(activity_df, aes(x = times, y = A1)) +
   geom_point(size = 0.1) +
@@ -43,20 +43,45 @@ p <- ggplot(activity_df, aes(x = times, y = A1)) +
   theme_bw()
 
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-03-21 00"),
-                       to   = ymd_h("2015-03-25 23"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
+                       to   = ymd_h("2015-02-15 23"),
                        by   = dhours(1)) 
 
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
 
 
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Function hourly.emissions
+# Parameters:
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+hourly.emissions <- function(pollutant = pollutant, formula = formula, activity_df = activity_df){
+  
+  
+  
+  
+}
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Read all data files
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+data.spat <- list.files('C:/Users/pbursac/Desktop/data/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+ data.spat.list[[i]] <- st_read(paste("C:/Users/pbursac/Desktop/data/",data.spat[i], sep = ""))
+}
 
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-
-
+pol.list <- list(NOx = NA, SO2 = NA, PM10 = NA, PM2.5 = NA, NMVOC = NA, NH3 = NA)
+pol.1 <- data.spat.list[[1]]
 
 
 

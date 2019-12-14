@@ -90,12 +90,12 @@ sf_data <- st_read(dsn = "Products/sf_data.gpkg", layer = "sf_data")
 ###################################################################
 
 #+ include = FALSE 
-classes.NOx <- classIntervals(sf_data$NOx, n = 40, style = "jenks")
-classes.SO2 <- classIntervals(sf_data$SO2, n = 40, style = "jenks")
-classes.PM10 <- classIntervals(sf_data$PM10, n = 40, style = "jenks")
-classes.PM2.5 <- classIntervals(sf_data$PM2.5, n = 40, style = "jenks")
-classes.NMVOC <- classIntervals(sf_data$NMVOC, n = 40, style = "jenks")
-classes.NH3 <- classIntervals(sf_data$NH3, n = 40, style = "jenks")
+classes.NOx <- classIntervals(sf_data$NOx, n = 40, style = "fisher")
+classes.SO2 <- classIntervals(sf_data$SO2, n = 40, style = "fisher")
+classes.PM10 <- classIntervals(sf_data$PM10, n = 40, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data$PM2.5, n = 40, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data$NMVOC, n = 40, style = "fisher")
+classes.NH3 <- classIntervals(sf_data$NH3, n = 40, style = "fisher")
 
 sf_data <- sf_data %>%
   mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
@@ -126,7 +126,7 @@ a<-ggplot() +
   theme(line = element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank(),
-        legend.position = "None", ###################### legend
+        #legend.position = "None", ###################### legend
         panel.background = element_blank()) +
   coord_sf(datum = NA)
 
@@ -142,7 +142,7 @@ b<-ggplot() +
   theme(line = element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank(),
-        legend.position = "None", ###################### legend
+        #legend.position = "None", ###################### legend
         panel.background = element_blank()) +
   coord_sf(datum = NA)
 
@@ -157,7 +157,7 @@ c<-ggplot() +
        caption = "© GiLab (2019)") +
   theme(line = element_blank(),
         axis.text = element_blank(),
-        legend.position = "None", ###################### legend
+        #legend.position = "None", ###################### legend
         axis.title = element_blank(),
         panel.background = element_blank()) +
   coord_sf(datum = NA)
@@ -173,7 +173,7 @@ d<-ggplot() +
        caption = "© GiLab (2019)") +
   theme(line = element_blank(),
         axis.text = element_blank(),
-        legend.position = "None", ###################### legend
+        #legend.position = "None", ###################### legend
         axis.title = element_blank(),
         panel.background = element_blank()) +
   coord_sf(datum = NA)
@@ -189,7 +189,7 @@ e<-ggplot() +
        caption = "© GiLab (2019)") +
   theme(line = element_blank(),
         axis.text = element_blank(),
-        legend.position = "None", ###################### legend
+        #legend.position = "None", ###################### legend
         axis.title = element_blank(),
         panel.background = element_blank()) +
   coord_sf(datum = NA)
@@ -205,22 +205,40 @@ f<-ggplot() +
        caption = "© GiLab (2019)") +
   theme(line = element_blank(),
         axis.text = element_blank(),
-        legend.position = "None", ###################### legend
+        #legend.position = "None", ###################### legend
         axis.title = element_blank(),
         panel.background = element_blank()) +
   coord_sf(datum = NA)
 
-#grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
-#mapview(sf_data, zcol = "percent_class_NH3", alpha.regions = 80, col.regions = pal6, query.type = c("mousemove"), query.digits = 2)
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+# out.width="100%"
+mapview(sf_data, zcol = "percent_class_NH3", alpha.regions = 30, col.regions = pal6, query.type = c("mousemove"), query.digits = 2)
+#' ## Map - NOx
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
 a
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+#' ## Map - SO2
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
 b
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+#' ## Map - PM10
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
 c
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+#' ## Map - PM2.5
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
 d
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+#' ## Map - NMVOC
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
 e
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+#' ## Map - NH3
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
 f
+
+#+ echo = FALSE, result = TRUE, eval = TRUE, fig.width = 10, fig.height = 10, fig.align='center'
+mapview(sf_data, zcol = "percent_class_NOx", col.regions = pal1, query.type = c("mousemove"), query.digits = 2) + 
+  mapview(sf_data, zcol = "percent_class_SO2", col.regions = pal2, query.type = c("mousemove"), query.digits = 2) + 
+  mapview(sf_data, zcol = "percent_class_PM10", col.regions = pal3, query.type = c("mousemove"), query.digits = 2) + 
+  mapview(sf_data, zcol = "percent_class_PM2.5", col.regions = pal4, query.type = c("mousemove"), query.digits = 2) + 
+  mapview(sf_data, zcol = "percent_class_NMVOC", col.regions = pal5, query.type = c("mousemove"), query.digits = 2) + 
+  mapview(sf_data, zcol = "percent_class_NH3", col.regions = pal6, query.type = c("mousemove"), query.digits = 2) 
+
+
+
