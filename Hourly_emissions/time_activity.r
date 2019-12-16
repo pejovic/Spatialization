@@ -34,21 +34,39 @@ activity_df <- data.frame(times, day_in_year, day_in_month, day_hours, month_in_
 
 # Na primer neka aktivnost (A1) moze biti predstavljena formulom A1 =((working_time_8_16h + working_time_8_16h)/2) x !weekends x !public_holidays:
 
-activity_df %<>% dplyr::mutate(A1 = ((working_time_8_16h + working_time_16_24h))/2*!weekends*!public_holidays) %>% 
-  dplyr::filter(working_time_8_16h == TRUE) %>% 
-  dplyr::mutate(A2 = sin(2*pi*(day_hours)/(24)))   
+activity_df %<>% 
+  dplyr::mutate(A1 = ((working_time_8_16h + working_time_16_24h))/2*!weekends*!public_holidays) %>% 
+  #dplyr::filter(working_time_8_16h == TRUE) %>% 
+  dplyr::mutate(A2 = 0.5*sin(((2*pi)/24)*(day_hours)) + 0.5) %>%
+  dplyr::mutate(A3 = A2*A1) %>% 
+  dplyr::mutate(A4 = 0.5*sin(0.5*(day_hours-16)) + 0.5) %>%
+  dplyr::mutate(A5 = A4 * working_time_16_24h)
 
 
-p <- ggplot(activity_df, aes(x = times, y = A2)) +
+p <- ggplot(activity_df, aes(x = times, y = A5, colour = "red")) +
   geom_point(size = 0.1) +
   geom_line() + 
   theme_bw()
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-02-02 00"),
-                       to   = ymd_h("2015-02-05 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-02 24"),
                        by   = dhours(1)) 
 
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+p1 <- ggplot() +
+  geom_line(data = activity_df, aes(x = times, y = A2, colour = "red")) +
+  geom_line(data = activity_df, aes(x = times, y = A1, colour = "blue")) +
+  geom_line(data = activity_df, aes(x = times, y = A3, colour = "green")) +
+  theme_bw()
+p1 + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+
 
 
 
