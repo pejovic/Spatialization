@@ -580,7 +580,7 @@ counters_IB <- counters %>%
 
 
 
-p <- counters_all %>% ggplot(., aes(x = time, y = count)) + geom_line() + theme_bw()
+p <- counters_IIA %>% ggplot(., aes(x = time, y = count)) + geom_line() + theme_bw()
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
                        to   = ymd_h("2015-08-14 23"),
