@@ -11,6 +11,12 @@ library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
 library(nngeo)
+library(tsibble)
+library(lubridate)
+library(magrittr)
+library(ggforce)
+library(feasts)
+library(stringr)
 # devtools::install_github("basarabam/SerbianCyrLat")
 
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -88,7 +94,7 @@ brojaci <- readOGR("Data/brojaci/Polozaj_automatskih_brojaca_bez_duplikata.shp",
                    use_iconv=TRUE,  
                    encoding = "UTF-8",
                    stringsAsFactors = FALSE)
-sf_brojaci <- st_as_sf(brojaci) %>% mutate_at(vars(starts_with("PGDS")), .funs = as.numeric)
+sf_brojaci <- st_as_sf(brojaci) %>% mutate_at(vars(starts_with("PGDS")), .funs = as.numeric) %>% dplyr::rename(ID = ID_BROJAÄ)
 
 putevi <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
                        use_iconv=TRUE,  
@@ -439,8 +445,162 @@ sa
 
 
 
+##################### TIME #########################################################
+
+times <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                    to   = ymd_h("2015-12-31 23"),
+                    by   = dhours(1))  
 
 
+public_holidays <- as.Date(c("2015-01-01", "2015-01-02", "2015-01-07", "2015-02-15", "2015-02-16", "2015-02-17",
+                             "2015-04-10", "2015-04-11", "2015-04-12", "2015-04-13", "2015-05-01", "2015-05-02",
+                             "2015-11-11", "2015-12-25"), format = "%Y-%m-%d")
+
+day_hours <- rep(c(1:24), 365)
+
+day_in_month <- lubridate::day(times)
+
+month_in_year <- lubridate::month(times)
+
+day_in_year <- rep(1:365, each = 24)
+
+public_holidays <- day_in_year %in% julian.Date(public_holidays, origin = as.Date("2014-12-31"))
+working_days <- !lubridate::wday(times) %in% c(1, 7)
+working_time_8_16h <- day_hours %in% c(8:16)
+working_time_16_24h <- day_hours %in% c(16:24)
+day_light <- day_hours %in% c(7:19)
+weekends <- lubridate::wday(times) %in% c(1, 7)
+rush_hour <- day_hours %in% c(7:9, 15:17)
+
+
+activity_df <- data.frame(times, day_in_year, day_in_month, day_hours, month_in_year, public_holidays, working_days, working_time_8_16h, day_light, weekends, rush_hour)
+
+# Na primer neka aktivnost (A1) moze biti predstavljena formulom A1 =((working_time_8_16h + working_time_8_16h)/2) x !weekends x !public_holidays:
+
+activity_df %<>% dplyr::mutate(A1 = ((working_time_8_16h + working_time_8_16h)/2)*!weekends*!public_holidays)
+
+p <- ggplot(activity_df, aes(x = times, y = A1)) +
+  geom_point(size = 0.1) +
+  geom_line() +
+  theme_bw()
+
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-03-21 00"),
+                       to   = ymd_h("2015-03-25 23"),
+                       by   = dhours(1))
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+
+
+
+############# Vremenski brojaci #############################
+
+times <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                    to   = ymd_h("2015-12-31 23"),
+                    by   = dhours(1))  
+
+
+read_excel_allsheets <- function(filename, tibble = FALSE, Range, sheets) {
+  sheets <- readxl::excel_sheets(filename)[sheets]
+  ranges <- c("B9:Y71", "B9:Y65", "B9:Y71", "B9:Y69", "B9:Y71", "B9:Y69", "B9:Y71", "B9:Y71", "B9:Y69", "B9:Y71", "B9:Y69", "B9:Y71")
+  xlist <- as.list(sheets)
+  for(i in 1:12){
+    xlist[[i]] <- readxl::read_excel(filename, sheet = sheets[i], range = ranges[i], col_names = TRUE)
+  }
+  names(xlist) <- sheets
+  return(xlist)
+}
+
+path <- "C:/R_projects/03 DETALJNI PODACI SA BROJACA/"
+
+files <- list.files(path, full.names = TRUE)
+
+counters <- lapply(files, function(X) read_excel_allsheets(filename = X, sheets = 2:13))
+
+#counters_id <- paste("c", substr(list.files(path, full.names = FALSE), start = 1, stop = 4), sep = "_")
+counters_id <- substr(list.files(path, full.names = FALSE), start = 1, stop = 4)
+
+
+# Funkcija racuna sredinu dobijenih vrednosti u oba smera i sredjuje podatke.
+aux_fun <- function(x){
+  days_seq <- rep(seq(from = as.Date("2015-01-01"),
+                      to = as.Date("2015-12-31"),
+                      by = "days"), each = 2)
+  
+  days_months <- lubridate::month(days_seq)
+  
+  x %>% do.call(rbind, .) %>%
+    dplyr::rename_all(.,  list(~paste(1:24, "h", sep = ""))) %>%
+    dplyr::mutate(days = days_seq, months = days_months) %>%
+    dplyr::select(months, days, everything()) %>%
+    dplyr::group_by(days) %>%
+    dplyr::summarise_each(funs(mean), -months) %>%
+    tidyr::pivot_longer(-days, names_to = "hours", values_to = "count") %>%
+    dplyr::mutate(time = times) %>%
+    dplyr::select(time, count)
+}
+
+
+counters <- lapply(counters, aux_fun) %>%
+  bind_cols() %>%
+  dplyr::select(starts_with("count")) %>%
+  dplyr::rename_all(.,  list(~counters_id)) %>%
+  dplyr::mutate(time = times) %>%
+  dplyr::select(time, everything()) 
+
+
+counters_category <- sf_brojaci %>% st_drop_geometry() %>% dplyr::select(ID, Kategorija) %>% dplyr::filter(Kategorija != "nije u mrezi") #%>% dplyr::mutate(ID = paste("c", ID, sep = "_"))
+
+
+IA_ids <- counters_category$ID[counters_category$Kategorija == "IA"]
+IIA_ids <- counters_category$ID[counters_category$Kategorija == "IIA"]
+IB_ids <- counters_category$ID[counters_category$Kategorija == "IB"]
+
+counters_all <- counters %>% 
+  dplyr::mutate(count = rowMeans(.[,-1]), count = count/sum(count)) 
+
+
+counters_IA <- counters %>% 
+  dplyr::select(time, one_of(IA_ids)) %>%
+  dplyr::mutate(count = rowMeans(.[,-1]), count = count/sum(count)) 
+
+
+counters_IIA <- counters %>% 
+  dplyr::select(time, one_of(IIA_ids)) %>%
+  dplyr::mutate(count = rowMeans(.[,-1]), count = count/sum(count)) 
+
+
+counters_IB <- counters %>% 
+  dplyr::select(time, one_of(IB_ids)) %>%
+  dplyr::mutate(count = rowMeans(.[,-1]), count = count/sum(count)) 
+
+
+
+p <- counters_all %>% ggplot(., aes(x = time, y = count)) + geom_line() + theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
+                       to   = ymd_h("2015-08-14 23"),
+                       by   = dhours(1))
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .3)
+
+
+
+counters_IIA %>% as_tsibble() %>% autoplot(count)
+
+counters_IIA %>% as_tsibble() %>% gg_season(count)
+
+counters_IIA %>% as_tsibble() %>% gg_subseries(count)
+
+counters_IIA %>% as_tsibble() %>% gg_tsdisplay(count)
+
+
+
+load(file = "pIIA_est.RDS")
 
 
 

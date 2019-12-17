@@ -72,25 +72,16 @@ read_excel_allsheets <- function(filename, tibble = FALSE, Range, sheets) {
   return(xlist)
 }
 
-path <- "D:/Projekti/Spatialisation/03 DETALJNI PODACI SA BROJACA/"
+path <- "C:/R_projects/03 DETALJNI PODACI SA BROJACA/"
 
 files <- list.files(path, full.names = TRUE)
 
+counters <- lapply(files, function(X) read_excel_allsheets(filename = X, sheets = 2:13))
 
-aa <- lapply(files, function(X) read_excel_allsheets(filename = X, sheets = 2:13))
+counters_id <- substr(list.files(path, full.names = FALSE), start = 1, stop = 4)
 
-file.names <- substr(list.files(path, full.names = FALSE), start = 2, stop = 5)
-
-
-f1091 <- read_excel_allsheets(filename = paste(path, " 1091.xls", sep = ""), sheets = 2:13)
-
-days_seq <- rep(seq(from = as.Date("2015-01-01"),
-                    to = as.Date("2015-12-31"),
-                    by = "days"), each = 2)
-
-days_months <- lubridate::month(days_seq)
-
-ttt <- function(x){
+# Funkcija racuna sredinu dobijenih vrednosti u oba smera i sredjuje podatke.
+aux_fun <- function(x){
   days_seq <- rep(seq(from = as.Date("2015-01-01"),
                       to = as.Date("2015-12-31"),
                       by = "days"), each = 2)
@@ -101,28 +92,24 @@ ttt <- function(x){
     dplyr::rename_all(.,  list(~paste(1:24, "h", sep = ""))) %>%
     dplyr::mutate(days = days_seq, months = days_months) %>%
     dplyr::select(months, days, everything()) %>%
-    group_by(days) %>%
-    summarise_each(funs(mean), -months) %>%
+    dplyr::group_by(days) %>%
+    dplyr::summarise_each(funs(mean), -months) %>%
     tidyr::pivot_longer(-days, names_to = "hours", values_to = "count") %>%
     dplyr::mutate(time = times) %>%
     dplyr::select(time, count)
 }
 
-lapply(aa[1:92], ttt)
 
-aaa <- lapply(aa, ttt) %>%
+counters <- lapply(aa, aux_fun) %>%
   bind_cols() %>%
   dplyr::select(starts_with("count")) %>%
-  dplyr::rename_all(.,  list(~file.names)) %>%
+  dplyr::rename_all(.,  list(~counters_id)) %>%
   dplyr::mutate(time = times) %>%
-  dplyr::select(time, everything()) %>%
-  # as_tsibble() %>%
-  # dplyr::select(time, starts_with("101")) %>% # seleckija samo 20
-  # ::select(starts_with("100")) %>%
-  # apply(., 1, function(x) c = mean(x))
-    tidyr::pivot_longer(-time, names_to = "brojac", values_to = "count")
+  dplyr::select(time, everything()) 
 
 
+
+tidyr::pivot_longer(-time, names_to = "brojac", values_to = "count")
 aaa %>% dplyr::select(starts_with("100")) %>%
   rowwise() %>%
   do( (.) %>% as.data.frame %>% mutate(c = mean(.)) ) %>%
