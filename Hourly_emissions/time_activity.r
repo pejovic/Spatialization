@@ -46,6 +46,28 @@ rush_hour <- day_hours %in% c(7:9, 15:17)
 activity_df <- data.frame(times, day_in_year, day_in_month, day_hours, month_in_year, public_holidays, working_days, working_time_8_16h, day_light, weekends, rush_hour)
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Working days
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+activity_df %<>% 
+  dplyr::mutate(WD = sin(((2*pi)/4)*(working_days)))
+
+
+p <- ggplot(activity_df, aes(x = times, y = WD, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Working days, working weekends
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,8 +131,10 @@ activity_df %<>%
                           indhs == FALSE & working_time_06_22h == FALSE ~ 0,
                           indhs == FALSE & working_time_06_22h == TRUE ~ 0))
 
-
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Daylength from data
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 dayl <- readxl::read_xlsx(path = "Hourly_emissions/Data/Sunrise_Sunset_Daylength_Serbia.xlsx", sheet = "Sum") 
 
 timesdl <- seq(from = ymd('2015-01-01'),
@@ -128,19 +152,42 @@ ggplot(dayl, aes(x = time, y = Daylength, colour = "red")) +
   theme_bw()
 
 activity_df$dayl <- dayl$Daylength
-day_light <- day_hours %in% c(7:20)
+day_light <- day_hours %in% c(7:20) #19
 activity_df$day_light <- day_light 
 activity_df %<>% 
   dplyr::mutate(DL = dplyr::case_when(day_light == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + dayl,
-                                      day_light == FALSE ~ 0))
+                                      day_light == FALSE ~ 0)) #dayl
+
+
+
+p <- ggplot(activity_df, aes(x = times, y = DL, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw() +
+  geom_smooth(formula =  ~ dayl, colour = "blue")
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Weekends
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-p <- ggplot(activity_df, aes(x = times, y = weekends, colour = "red")) +
+activity_df %<>% 
+  dplyr::mutate(WE = sin(((2*pi)/4)*(weekends)))
+
+
+p <- ggplot(activity_df, aes(x = times, y = WE, colour = "red")) +
   geom_point(size = 0.5) +
-  #geom_line() + 
+  geom_line() + 
   theme_bw()
   
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -181,22 +228,304 @@ activity_df %<>%
 
 
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Public holidays
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+activity_df %<>% 
+  dplyr::mutate(PH = sin(((2*pi)/4)*(public_holidays)))
 
 
-
-p <- ggplot(activity_df, aes(x = times, y = RH0709, colour = "red")) +
+p <- ggplot(activity_df, aes(x = times, y = PH, colour = "red")) +
   geom_point(size = 0.5) +
   geom_line() + 
-  theme_bw()#+
-  #geom_smooth(formula =  ~ dayl, colour = "blue")
+  theme_bw()
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
                        by   = dhours(1)) 
 
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Seasons
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+t1 <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                     to   = ymd_h("2015-03-20 23"),
+                     by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-03-20 23"),
+                     to   = ymd_h("2015-06-21 18"),
+                     by   = dhours(1)) 
+
+t3 <- seq.POSIXt(from = ymd_h("2015-06-21 18"),
+                 to   = ymd_h("2015-09-23 16"),
+                 by   = dhours(1)) 
+t4 <- seq.POSIXt(from = ymd_h("2015-09-23 16"),
+                 to   = ymd_h("2015-12-21 11"),
+                 by   = dhours(1)) 
+
+t5 <- seq.POSIXt(from = ymd_h("2015-12-21 11"),
+                 to   = ymd_h("2015-12-31 23"),
+                 by   = dhours(1)) 
+
+timesS <- c(t1, t2, t3, t4, t5)
+
+activity_df$indS[activity_df$times %in% t1] <- 1 
+activity_df$indS[activity_df$times %in% t2] <- 2 
+activity_df$indS[activity_df$times %in% t3] <- 3 
+activity_df$indS[activity_df$times %in% t4] <- 4 
+activity_df$indS[activity_df$times %in% t5] <- 1 
+
+activity_df$indS <- as.numeric(activity_df$indS)
+
+activity_df %<>% 
+  dplyr::mutate(SA = 0.5*sin(((2*pi)/24)*(indS)) + 0.5)
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Heating Season
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+times1 <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                     to   = ymd_h("2015-04-15 23"),
+                     by   = dhours(1)) 
+times2 <- seq.POSIXt(from = ymd_h("2015-10-15 00"),
+                     to   = ymd_h("2015-12-31 23"),
+                     by   = dhours(1)) 
+
+times3 <- c(times1,times2)
+
+activity_df$indhs[activity_df$times %in% times3] <- TRUE 
+activity_df$indhs[!(activity_df$times %in% times3)] <- FALSE 
+
+activity_df %<>% 
+  dplyr::mutate(HS = sin(((2*pi)/4)*(indhs)))
+
+
+p <- ggplot(activity_df, aes(x = times, y = HS, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Agriculture Season
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+timesAg <- c(t2, t3, t4)
+
+activity_df$indAg[activity_df$times %in% timesAg] <- TRUE 
+activity_df$indAg[!(activity_df$times %in% timesAg)] <- FALSE 
+
+activity_df %<>% 
+  dplyr::mutate(SAAG = sin(((2*pi)/4)*(indAg)))
+
+
+p <- ggplot(activity_df, aes(x = times, y = SAAG, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Repair - overhaul period
+# Q3 2015 -- July 1, 2015 to September 30, 2015
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+tRP <- seq.POSIXt(from = ymd_h("2015-07-01 00"),
+                     to   = ymd_h("2015-07-14 23"),
+                     by   = dhours(1)) 
+
+activity_df$indRP[activity_df$times %in% tRP] <- TRUE 
+activity_df$indRP[!(activity_df$times %in% tRP)] <- FALSE 
+
+activity_df %<>% 
+  dplyr::mutate(RP = sin(((2*pi)/4)*(indRP)))
+
+
+p <- ggplot(activity_df, aes(x = times, y = RP, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Temperature
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+load("Hourly_emissions/Data/TEMP_SLP/ogimet_temp_stfdf.rda")
+stfdf_temp
+
+temp <- as.data.frame(stfdf_temp)
+temp$time1 <- as.Date.POSIXct(temp$time)
+
+time_per_day <- seq(from = ymd('2015-01-01'),
+                    to   = ymd('2015-12-31'),
+                    by   = 'day')
+
+
+
+
+temp_2015 <- temp %>% subset(temp$time1 %in% time_per_day)
+
+temp_2015 %<>% 
+  tidyr::drop_na(tmean) %>%
+  dplyr::group_by(time1) %>%
+  dplyr::summarize(meanT = mean(tmean))
+
+
+
+temp_2015 <- temp_2015[rep(seq.int(1,nrow(temp_2015)), each = 24),]
+
+
+activity_df$TEMP <- temp_2015$meanT
+
+# za profiniti - ideja ...
+#day_light <- day_hours %in% c(7:20) #19
+#activity_df$day_light <- day_light 
+#activity_df %<>% 
+#  dplyr::mutate(DL = dplyr::case_when(day_light == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + dayl,
+#                                      day_light == FALSE ~ 0)) #dayl
+
+
+p <- ggplot(activity_df, aes(x = times, y = TEMP)) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw() +
+  geom_smooth(formula =  ~ TEMP, colour = "orange")
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-02-28 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Sea level pressure
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+load("Hourly_emissions/Data/TEMP_SLP/ogimet_slp_stfdf.rda")
+stfdf
+
+slp <- as.data.frame(stfdf)
+slp$time1 <- as.Date.POSIXct(slp$time)
+
+time_per_day <- seq(from = ymd('2015-01-01'),
+                    to   = ymd('2015-12-31'),
+                    by   = 'day')
+
+
+
+
+slp_2015 <- slp %>% as.data.frame() %>% subset(time1 %in% time_per_day)
+
+slp_2015 %<>% 
+  tidyr::drop_na(slp) %>%
+  dplyr::group_by(time1) %>%
+  dplyr::summarize(meanSLP = mean(slp))
+
+
+
+slp_2015 <- slp_2015[rep(seq.int(1,nrow(slp_2015)), each = 24),]
+
+
+activity_df$SLP <- slp_2015$meanSLP
+
+p <- ggplot(activity_df, aes(x = times, y = SLP)) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw() +
+  geom_smooth(formula =  ~ SLP, colour = "blue")
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-02-28 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Number of flights per hour
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+library(statsr)
+data(nycflights)
+nycflights
+
+unique(nycflights$year)
+nycflights$year <- 2015
+nycflights$time <- paste(nycflights$year, nycflights$month, nycflights$day, sep = "-") %>% 
+  ymd() %>% 
+  as.Date() 
+nycflights %<>% arrange(time)
+nycflights %<>% dplyr::group_by(time) %>% tally()
+
+flights_2015 <- nycflights[rep(seq.int(1,nrow(nycflights)), each = 24),]
+flights_2015 %<>% rename(NFH = n)
+
+p <- ggplot(flights_2015, aes(x = time, y = NFH)) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()+
+  geom_smooth(formula =  ~ NFH, colour = "green")
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-02-28 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+p <- ggplot(activity_df, aes(x = times, y = SA, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()#+
+#geom_smooth(formula =  ~ dayl, colour = "blue")
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
 
 
 
