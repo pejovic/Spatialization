@@ -473,22 +473,34 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Number of flights per hour
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-library(statsr)
-data(nycflights)
-nycflights
+# library(statsr)
+# data(nycflights)
+# nycflights
+# 
+# unique(nycflights$year)
+# nycflights$year <- 2015
+# nycflights$time <- paste(nycflights$year, nycflights$month, nycflights$day, sep = "-") %>% 
+#   ymd() %>% 
+#   as.Date() 
+# nycflights %<>% arrange(time)
+# nycflights %<>% dplyr::group_by(time) %>% tally()
+# 
+# flights_2015 <- nycflights[rep(seq.int(1,nrow(nycflights)), each = 24),]
+# flights_2015 %<>% rename(NFH = n)
 
-unique(nycflights$year)
-nycflights$year <- 2015
-nycflights$time <- paste(nycflights$year, nycflights$month, nycflights$day, sep = "-") %>% 
-  ymd() %>% 
-  as.Date() 
-nycflights %<>% arrange(time)
-nycflights %<>% dplyr::group_by(time) %>% tally()
+activity_df$dayl <- dayl$Daylength
+day_light <- day_hours %in% c(7:20) #19
+activity_df$day_light <- day_light 
+activity_df %<>% 
+  dplyr::mutate(NFH = dplyr::case_when(day_light == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours)) + dayl+0.2,
+                                      day_light == FALSE ~ dayl)) #dayl
 
-flights_2015 <- nycflights[rep(seq.int(1,nrow(nycflights)), each = 24),]
-flights_2015 %<>% rename(NFH = n)
 
-p <- ggplot(flights_2015, aes(x = time, y = NFH)) +
+
+dplyr::mutate(A4 = 0.5*sin(0.5*(day_hours-16)) + 0.5) 
+
+
+p <- ggplot(activity_df, aes(x = times, y = NFH)) +
   geom_point(size = 0.5) +
   geom_line() + 
   theme_bw()+
@@ -515,7 +527,7 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 
 
 
-p <- ggplot(activity_df, aes(x = times, y = SA, colour = "red")) +
+p <- ggplot(activity_df, aes(x = times, y = DL, colour = "red")) +
   geom_point(size = 0.5) +
   geom_line() + 
   theme_bw()#+
