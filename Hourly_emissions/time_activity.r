@@ -82,7 +82,7 @@ activity_df$wdww <- wdww
 activity_df %<>% 
   #dplyr::filter(working_time_8_16h == TRUE) %>% 
   dplyr::mutate(WT0816 = dplyr::case_when(working_time_8_16h == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + 0.5,
-                                   working_time_8_16h == FALSE ~ 0))
+                                          working_time_8_16h == FALSE ~ 0))
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Working hours from 16 - 24h
@@ -110,8 +110,8 @@ activity_df %<>%
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 times1 <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                    to   = ymd_h("2015-04-15 23"),
-                    by   = dhours(1)) 
+                     to   = ymd_h("2015-04-15 23"),
+                     by   = dhours(1)) 
 times2 <- seq.POSIXt(from = ymd_h("2015-10-15 00"),
                      to   = ymd_h("2015-12-31 23"),
                      by   = dhours(1)) 
@@ -127,9 +127,9 @@ activity_df %<>%
   #dplyr::filter(indhs == TRUE) %>% 
   #dplyr::filter(working_time_06_22h == TRUE) %>% 
   dplyr::mutate(WT0622 = dplyr::case_when(indhs == TRUE & working_time_06_22h == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-5)) + 0.5,
-                          indhs == TRUE & working_time_06_22h == FALSE ~ 0,
-                          indhs == FALSE & working_time_06_22h == FALSE ~ 0,
-                          indhs == FALSE & working_time_06_22h == TRUE ~ 0))
+                                          indhs == TRUE & working_time_06_22h == FALSE ~ 0,
+                                          indhs == FALSE & working_time_06_22h == FALSE ~ 0,
+                                          indhs == FALSE & working_time_06_22h == TRUE ~ 0))
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Daylength from data
@@ -138,10 +138,10 @@ activity_df %<>%
 dayl <- readxl::read_xlsx(path = "Hourly_emissions/Data/Sunrise_Sunset_Daylength_Serbia.xlsx", sheet = "Sum") 
 
 timesdl <- seq(from = ymd('2015-01-01'),
-                    to   = ymd('2015-12-31'),
-                    by   = 'day')
+               to   = ymd('2015-12-31'),
+               by   = 'day')
 
-                    
+
 dayl$time <- timesdl
 dayl <- dayl[rep(seq.int(1,nrow(dayl)), each = 24),]
 
@@ -189,7 +189,7 @@ p <- ggplot(activity_df, aes(x = times, y = WE, colour = "red")) +
   geom_point(size = 0.5) +
   geom_line() + 
   theme_bw()
-  
+
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
                        by   = dhours(1)) 
@@ -202,7 +202,7 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 
 activity_df %<>% 
   dplyr::mutate(WW = dplyr::case_when(weekends == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + 0.5, 
-                                          weekends == FALSE ~ 0))
+                                      weekends == FALSE ~ 0))
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -255,11 +255,11 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 
 
 t1 <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                     to   = ymd_h("2015-03-20 23"),
-                     by   = dhours(1)) 
+                 to   = ymd_h("2015-03-20 23"),
+                 by   = dhours(1)) 
 t2 <- seq.POSIXt(from = ymd_h("2015-03-20 23"),
-                     to   = ymd_h("2015-06-21 18"),
-                     by   = dhours(1)) 
+                 to   = ymd_h("2015-06-21 18"),
+                 by   = dhours(1)) 
 
 t3 <- seq.POSIXt(from = ymd_h("2015-06-21 18"),
                  to   = ymd_h("2015-09-23 16"),
@@ -350,8 +350,8 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 tRP <- seq.POSIXt(from = ymd_h("2015-07-01 00"),
-                     to   = ymd_h("2015-07-14 23"),
-                     by   = dhours(1)) 
+                  to   = ymd_h("2015-07-14 23"),
+                  by   = dhours(1)) 
 
 activity_df$indRP[activity_df$times %in% tRP] <- TRUE 
 activity_df$indRP[!(activity_df$times %in% tRP)] <- FALSE 
@@ -566,7 +566,7 @@ data.spat <- list.files('C:/Users/pbursac/Desktop/data/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("C:/Users/pbursac/Desktop/data/",data.spat[i], sep = ""))
+  data.spat.list[[i]] <- st_read(paste("C:/Users/pbursac/Desktop/data/",data.spat[i], sep = ""))
 }
 
 
@@ -609,4 +609,3 @@ p1 <- ggplot() +
   geom_line(data = activity_df, aes(x = times, y = A3, colour = "green")) +
   theme_bw()
 p1 + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
-
