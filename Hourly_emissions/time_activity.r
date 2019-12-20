@@ -73,7 +73,7 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 wdww <- rep(TRUE, length(day_hours))
-activity_df$wdww <- wdww
+activity_df$WDWW <- wdww
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Working hours from 8 - 16h
@@ -283,7 +283,22 @@ activity_df$indS[activity_df$times %in% t5] <- 1
 activity_df$indS <- as.numeric(activity_df$indS)
 
 activity_df %<>% 
-  dplyr::mutate(SA = 0.5*sin(((2*pi)/24)*(indS)) + 0.5)
+  dplyr::mutate(SA = 0.5*sin(((2*pi)/4)*(indS)) + 0.5)
+
+
+
+
+p <- ggplot(activity_df, aes(x = times, y = SA, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-03 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Heating Season
@@ -497,9 +512,7 @@ activity_df %<>%
 
 
 
-dplyr::mutate(A4 = 0.5*sin(0.5*(day_hours-16)) + 0.5) 
-
-
+# dplyr::mutate(A4 = 0.5*sin(0.5*(day_hours-16)) + 0.5) 
 p <- ggplot(activity_df, aes(x = times, y = NFH)) +
   geom_point(size = 0.5) +
   geom_line() + 
@@ -512,12 +525,16 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
 
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# FINAL DATA FRAME
 
-
-
-
-
-
+# saveRDS(activity_df, file = "Hourly_emissions/Data/activity_df.rds")
+# rm(list = ls())
+activity.df <- readRDS(file = "Hourly_emissions/Data/activity_df.rds")
+names(activity.df)
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
