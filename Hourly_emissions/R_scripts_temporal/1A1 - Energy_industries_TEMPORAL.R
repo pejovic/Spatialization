@@ -106,11 +106,20 @@ data.frame(t.1A1a%>%
 #
 
 he.1A1a <- activity.df %>%
-  dplyr::mutate(he_1A1a = WDWW * WT0024 * !PH * SA * TEMP * !RP * WT0622 * HS) %>%
+  dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
+                                       RP == FALSE ~ 0)) %>%
+  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
+                                       PH == FALSE ~ 0)) %>%
+  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
+                                       HS == FALSE ~ 0)) %>%
+  dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
+  dplyr::mutate(he_1A1a = (WDWW * WT0024 + WT0622)  * (30+TEMP)  * (HS2) * RP2 * PH2) %>%
   select(times, he_1A1a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
-                       to   = ymd_h("2015-02-02 24"),
+                       to   = ymd_h("2015-02-06 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -118,7 +127,11 @@ ggplot(he.1A1a, aes(x = times, y = he_1A1a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  labs( caption = "HE = WDWW + WT0024 + WT0622 + !PH + k*SA + k*HS + TEMP + !RP")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1a$he_1A1a), max(he.1A1a$he_1A1a), sum(he.1A1a$he_1A1a))) %>%
@@ -208,7 +221,11 @@ ggplot(he.1A1b, aes(x = times, y = he_1A1b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6) + 
+  labs( caption = "HE = WDWW + WT0024 + !RP")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1b$he_1A1b), max(he.1A1b$he_1A1b), sum(he.1A1b$he_1A1b))) %>%
@@ -300,7 +317,11 @@ ggplot(he.1B2aiv, aes(x = times, y = he_1B2aiv)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  labs( caption = "HE = WDWW + WT0024 + !RP")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1B2aiv$he_1B2aiv), max(he.1B2aiv$he_1B2aiv), sum(he.1B2aiv$he_1B2aiv))) %>%
@@ -391,7 +412,11 @@ ggplot(he.1B2c, aes(x = times, y = he_1B2c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  labs( caption = "HE = WDWW + WT0024 + !RP")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1B2c$he_1B2c), max(he.1B2c$he_1B2c), sum(he.1B2c$he_1B2c))) %>%
@@ -485,7 +510,11 @@ ggplot(he.1A1c, aes(x = times, y = he_1A1c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  labs( caption = "HE = WDWW + WT0816 + WT1624 + !PH + !RP")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1c$he_1A1c), max(he.1A1c$he_1A1c), sum(he.1A1c$he_1A1c))) %>%
@@ -581,7 +610,11 @@ ggplot(he.1B1b, aes(x = times, y = he_1B1b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  labs( caption = "HE = WDWW + WT0816 + WT1624 + !PH + !RP")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1B1b$he_1B1b), max(he.1B1b$he_1B1b), sum(he.1B1b$he_1B1b))) %>%
   datatable(., caption = 'Table 2: Function summary',
@@ -623,6 +656,13 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 
+
+
+
+# temporalProfile_Energy <- activity.df$times %>% cbind(he.1A1a[,1:6], he.1A1b[,1:6], he.1A1c[,1:6], he.1B1b[,1# :6], he.1B2aiv[,1:6], he.1B2c[,1:6]) %>% 
+#   as.data.frame()
+# 
+# writexl::write_xlsx(temporalProfile_Energy, path = 'Hourly_emissions/Products/TemporalProfile_Energy_industri# es.xlsx')
 
 
 
