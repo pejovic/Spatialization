@@ -953,7 +953,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 
-#temporalProfile_Industry <- activity.df$times %>% cbind(he.1A2a[,1:6], he.1A2b[,1:6], he.1A2c[,1:6], he.1A2d[#,1:6], he.1A2e[,1:6], he.1A2f[,1:6], he.1A2g[,1:6], he.1A2gvi[,1:6], he.1A2gvii[,1:6]) %>% 
+#temporalProfile_Industry <- activity.df$times %>% cbind(he.1A2a[,1:6], he.1A2b[,1:6], he.1A2c[,1:6], he.1A2d[,1:6], he.1A2e[,1:6], he.1A2f[,1:6], he.1A2g[,1:6], he.1A2gvi[,1:6], he.1A2gvii[,1:6]) %>% 
 #  as.data.frame()
-#
-#writexl::write_xlsx(temporalProfile_Industry, path = 'Hourly_emissions/Products/TemporalProfile_Industrial_ #processes.xlsx')
+
+#writexl::write_xlsx(temporalProfile_Industry, path = 'Hourly_emissions/Products/TemporalProfile_Industrial_ processes.xlsx')

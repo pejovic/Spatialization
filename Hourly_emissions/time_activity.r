@@ -28,7 +28,7 @@ public_holidays <- as.Date(c("2015-01-01", "2015-01-02", "2015-01-07", "2015-02-
 public_holidays <- day_in_year %in% julian.Date(public_holidays, origin = as.Date("2014-12-31"))
 
 # Function: working_time_8_16h
-working_time_8_16h <- day_hours %in% c(8:17)
+working_time_8_16h <- day_hours %in% c(8:16)
 
 # Function: working_time_16_24h
 working_time_16_24h <- day_hours %in% c(17:24)
