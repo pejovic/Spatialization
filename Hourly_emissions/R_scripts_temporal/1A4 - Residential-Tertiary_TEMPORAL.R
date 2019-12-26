@@ -70,6 +70,38 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #+ include = FALSE
 activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+                          Description = c("Working days", 
+                                          "Working days, working weekends", 
+                                          "Working time 08-16h",
+                                          "working time 16-24h",
+                                          "Working time 00-24h",
+                                          "Working time 06-22h",
+                                          "Day light", 
+                                          "Weekends",
+                                          "Working weekends",
+                                          "Rush hours 07-09h",
+                                          "Rush hours 15-17h",
+                                          "Public holidays",
+                                          "Seasons", 
+                                          "Heating Season",
+                                          "Agriculture Season",
+                                          "Temperature",
+                                          "Sea Level Pressure",
+                                          "Vehicles Trend Activity",
+                                          "Number of Flights per Hour",
+                                          "Repair - overhaul period"))
+#+ echo = FALSE, result = TRUE, eval = TRUE
+summary_tab %>%
+  datatable(., caption = 'Table: Label description',
+            options = list(pageLength = 10), 
+  )%>% formatStyle(
+    'Label',
+    backgroundColor = "lightblue"
+  )
+
+
 #'
 #'
 #'
@@ -114,7 +146,7 @@ he.1A4ai <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4ai = (WDWW * WT0622) / PH2 * (TEMP*(-1)+30)) %>%
+  dplyr::mutate(he_1A4ai = (WDWW * (WT0622+0.5)) / PH2 * (TEMP*(-1)+30)) %>%
   select(times, he_1A4ai)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -213,7 +245,7 @@ he.1A4bi <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4bi = (WDWW * WT0622) / PH2 * (TEMP*(-1)+30)) %>%
+  dplyr::mutate(he_1A4bi = (WDWW * (WT0622+0.5)) / PH2 * (TEMP*(-1)+30)) %>%
   select(times, he_1A4bi)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -312,7 +344,7 @@ he.1A4ci <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4ci = (WDWW * DL) * PH2 * (0.5+!SA) * (0.5+SAAG)  ) %>%
+  dplyr::mutate(he_1A4ci = (WDWW * (DL+0.5)) * PH2 * (0.5+!SA) * (0.5+SAAG)  ) %>%
   select(times, he_1A4ci)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
@@ -412,7 +444,7 @@ he.1A4cii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4cii = (WDWW * DL) * PH2 * (0.5+!SA) * (0.5+SAAG)  ) %>%
+  dplyr::mutate(he_1A4cii = (WDWW * (DL+0.5)) * PH2 * (0.5+!SA) * (0.5+SAAG)  ) %>%
   select(times, he_1A4cii)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
@@ -468,7 +500,11 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
   )
 
 
-#temporalProfile_ResidentialTertiary <- activity.df$times %>% cbind(he.1A4ai[,1:6], he.1A4bi[,1:6], he.1A4ci[,1:6], he.1A4cii[,1:6]) %>% 
-#  as.data.frame()
-
-#writexl::write_xlsx(temporalProfile_ResidentialTertiary, path = 'Hourly_emissions/Products/TemporalProfile_Residential_Tertiary.xlsx')
+#  temporalProfile_ResidentialTertiary <- activity.df$times %>% 
+#    cbind(he.1A4ai[,1:6], 
+#          he.1A4bi[,1:6], 
+#          he.1A4ci[,1:6], 
+#          he.1A4cii[,1:6]) %>% 
+#    as.data.frame()
+#  
+#  writexl::write_xlsx(temporalProfile_ResidentialTertiary, path = 'Hourly_emissions/Products/TemporalProfile_Residential_Tertiary.xlsx')

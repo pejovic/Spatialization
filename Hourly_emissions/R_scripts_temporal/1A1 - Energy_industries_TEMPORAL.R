@@ -64,6 +64,41 @@ my_theme <- function(base_size = 10, base_family = "sans"){
 
 theme_set(my_theme())
 mycolors=c("#f32440","#2185ef","#d421ef")
+#'
+#'
+#+ include = FALSE
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+                          Description = c("Working days", 
+                                          "Working days, working weekends", 
+                                          "Working time 08-16h",
+                                          "working time 16-24h",
+                                          "Working time 00-24h",
+                                          "Working time 06-22h",
+                                          "Day light", 
+                                          "Weekends",
+                                          "Working weekends",
+                                          "Rush hours 07-09h",
+                                          "Rush hours 15-17h",
+                                          "Public holidays",
+                                          "Seasons", 
+                                          "Heating Season",
+                                          "Agriculture Season",
+                                          "Temperature",
+                                          "Sea Level Pressure",
+                                          "Vehicles Trend Activity",
+                                          "Number of Flights per Hour",
+                                          "Repair - overhaul period"))
+#+ echo = FALSE, result = TRUE, eval = TRUE
+summary_tab %>%
+  datatable(., caption = 'Table: Label description',
+            options = list(pageLength = 10), 
+  )%>% formatStyle(
+    'Label',
+    backgroundColor = "lightblue"
+  )
 
 #'
 #'
@@ -111,11 +146,11 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(PH1))+0.5)) %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a = (WDWW * WT0024 + WT0622)  * (30+TEMP)  * (HS2) * RP2 * PH2) %>%
+  dplyr::mutate(he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP)  * (HS2) * RP2 * (PH2)) %>%
   select(times, he_1A1a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
@@ -209,7 +244,7 @@ he.1A1b <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1A1b = WDWW * WT0024 * RP2) %>%
+  dplyr::mutate(he_1A1b = WDWW * (WT0024+0.5) * RP2) %>%
   select(times, he_1A1b)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -305,7 +340,7 @@ he.1B2aiv <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1B2aiv = WDWW * WT0024 * RP2) %>%
+  dplyr::mutate(he_1B2aiv = WDWW * (WT0024+0.5) * RP2) %>%
   select(times, he_1B2aiv)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -400,7 +435,7 @@ he.1B2c <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1B2c = WDWW * WT0024 * RP2) %>%
+  dplyr::mutate(he_1B2c = WDWW * (WT0024+0.5) * RP2) %>%
   select(times, he_1B2c)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -498,7 +533,7 @@ he.1A1c <- activity.df %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
-  dplyr::mutate(he_1A1c = (WDWW * WT0816 + WT1624) * RP2 * PH2) %>%
+  dplyr::mutate(he_1A1c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2) %>%
   select(times, he_1A1c)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -598,7 +633,7 @@ he.1B1b <- activity.df %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
-  dplyr::mutate(he_1B1b = (WDWW * WT0816 + WT1624) * RP2 * PH2) %>%
+  dplyr::mutate(he_1B1b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2) %>%
   select(times, he_1B1b)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -659,10 +694,16 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 
-#temporalProfile_Energy <- activity.df$times %>% cbind(he.1A1a[,1:6], he.1A1b[,1:6], he.1A1c[,1:6], he.1B1b[,1 :6], he.1B2aiv[,1:6], he.1B2c[,1:6]) %>% 
-#   as.data.frame()
- 
-#writexl::write_xlsx(temporalProfile_Energy, path = 'Hourly_emissions/Products/TemporalProfile_Energy_industri# es.xlsx')
+# temporalProfile_Energy <- activity.df$times %>% 
+#   cbind(he.1A1a[,1:6], 
+#         he.1A1b[,1:6], 
+#         he.1A1c[,1:6], 
+#         he.1B1b[,1 :6], 
+#         he.1B2aiv[,1:6], 
+#         he.1B2c[,1:6]) %>% 
+#    as.data.frame()
+#  
+# writexl::write_xlsx(temporalProfile_Energy, path = 'Hourly_emissions/Products/TemporalProfile_Energy_industries.xlsx')
 
 
 
