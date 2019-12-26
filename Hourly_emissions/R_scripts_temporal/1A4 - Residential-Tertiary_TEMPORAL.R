@@ -344,7 +344,7 @@ he.1A4ci <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4ci = (WDWW * (DL+0.5)) * PH2 * (0.5+!SA) * (0.5+SAAG)  ) %>%
+dplyr::mutate(he_1A4ci = (WDWW * (DL+0.5)) * PH2  ) %>%
   select(times, he_1A4ci)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
@@ -353,8 +353,9 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A4ci, aes(x = times, y = he_1A4ci)) +
-  geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  # geom_point(size = 0.1) +
+  # geom_smooth() +
+   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = WDWW + DL + !PH + SA + SAAG")+

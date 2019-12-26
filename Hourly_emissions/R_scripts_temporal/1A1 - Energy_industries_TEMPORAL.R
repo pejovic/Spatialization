@@ -150,7 +150,7 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP)  * (HS2) * RP2 * (PH2)) %>%
+  dplyr::mutate(he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)) %>%
   select(times, he_1A1a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
@@ -163,10 +163,11 @@ ggplot(he.1A1a, aes(x = times, y = he_1A1a)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + WT0622 + !PH + k*SA + k*HS + TEMP + !RP")+
+  labs( caption = "HE = WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
+
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1a$he_1A1a), max(he.1A1a$he_1A1a), sum(he.1A1a$he_1A1a))) %>%
@@ -695,14 +696,14 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 # temporalProfile_Energy <- activity.df$times %>% 
-#   cbind(he.1A1a[,1:6], 
-#         he.1A1b[,1:6], 
-#         he.1A1c[,1:6], 
-#         he.1B1b[,1 :6], 
-#         he.1B2aiv[,1:6], 
-#         he.1B2c[,1:6]) %>% 
-#    as.data.frame()
-#  
+#  cbind(he.1A1a[,1:6], 
+#        he.1A1b[,1:6], 
+#        he.1A1c[,1:6], 
+#        he.1B1b[,1 :6], 
+#        he.1B2aiv[,1:6], 
+#        he.1B2c[,1:6]) %>% 
+#   as.data.frame()
+# 
 # writexl::write_xlsx(temporalProfile_Energy, path = 'Hourly_emissions/Products/TemporalProfile_Energy_industries.xlsx')
 
 
