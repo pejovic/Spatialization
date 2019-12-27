@@ -1225,6 +1225,11 @@ data.frame(t.3Da3%>%
 # ---  HE = (k+DL) + (k+SA) + inverse(TEMP) + SLP
 #
 
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
+
+
 he.3Da3 <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
@@ -1235,15 +1240,17 @@ he.3Da3 <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3Da3 = (DL+0.5) * (TEMP*(-1)+30) * SLP * (0.5+SA)) %>%
-  select(times, he_3Da3)
-
+  dplyr::mutate(he_3Da3 = (DL+0.5) * (TEMP*(-1)+30) * SLP ) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3Da3))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_sign = 100*he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::select(times, he_3Da3, he_sig, he_sign)
+# * (0.5+SA)
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-06 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-ggplot(he.3Da3, aes(x = times, y = he_3Da3)) +
+ggplot(he.3Da3, aes(x = times, y = he_sign)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
   geom_smooth() +
@@ -1253,7 +1260,7 @@ ggplot(he.3Da3, aes(x = times, y = he_3Da3)) +
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.3Da3$he_3Da3), max(he.3Da3$he_3Da3), sum(he.3Da3$he_3Da3))) %>%
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.3Da3$he_exp), max(he.3Da3$he_exp), sum(he.3Da3$he_exp))) %>%
   datatable(., caption = 'Table 2: Function summary',
             options = list(pageLength = 5)
   ) # min mora biti veci od 0 !!!!!

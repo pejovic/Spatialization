@@ -253,9 +253,9 @@ he.1A3aii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3aii = (DL) * ((SA * (-1.5))+2.5)) %>%
+  dplyr::mutate(he_1A3aii = (DL+0.5) * (TEMP+30)) %>%
   select(times, he_1A3aii)
-
+# ((SA * (-1.5))+2.5)
 time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
                        to   = ymd_h("2015-06-06 24"),
                        by   = dhours(1)) 
