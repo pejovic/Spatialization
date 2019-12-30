@@ -71,6 +71,41 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #+ include = FALSE
 activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+                          Description = c("Working days", 
+                                          "Working days, working weekends", 
+                                          "Working time 08-16h",
+                                          "working time 16-24h",
+                                          "Working time 00-24h",
+                                          "Working time 06-22h",
+                                          "Day light", 
+                                          "Weekends",
+                                          "Working weekends",
+                                          "Rush hours 07-09h",
+                                          "Rush hours 15-17h",
+                                          "Public holidays",
+                                          "Seasons", 
+                                          "Heating Season",
+                                          "Agriculture Season",
+                                          "Temperature",
+                                          "Sea Level Pressure",
+                                          "Vehicles Trend Activity",
+                                          "Number of Flights per Hour",
+                                          "Repair - overhaul period"))
+#+ echo = FALSE, result = TRUE, eval = TRUE
+summary_tab %>%
+  datatable(., caption = 'Table: Label description',
+            options = list(pageLength = 25), 
+  )%>% formatStyle(
+    'Label',
+    backgroundColor = "lightblue"
+  )
+
+
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
 #'
 #'
 #'
@@ -116,6 +151,8 @@ he.3B3 <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B3 = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B3))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B3 = he_sig) %>%
   select(times, he_3B3)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -129,7 +166,7 @@ ggplot(he.3B3, aes(x = times, y = he_3B3)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B3 = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -170,7 +207,6 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
   datatable(., caption = 'Table 3: Summary',
             options = list(pageLength = 5)
   )
-
 
 
 #'
@@ -218,6 +254,8 @@ he.3B4gi_gii <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B4gi_gii = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B4gi_gii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B4gi_gii = he_sig) %>%
   select(times, he_3B4gi_gii)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -231,7 +269,7 @@ ggplot(he.3B4gi_gii, aes(x = times, y = he_3B4gi_gii)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B4gi_gii = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -321,6 +359,8 @@ he.3B1a <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B1a = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B1a = he_sig) %>%
   select(times, he_3B1a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -334,7 +374,7 @@ ggplot(he.3B1a, aes(x = times, y = he_3B1a)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B1a = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -422,6 +462,8 @@ he.3B1b <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B1b = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B1b = he_sig) %>%
   select(times, he_3B1b)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -435,7 +477,7 @@ ggplot(he.3B1b, aes(x = times, y = he_3B1b)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B1b = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -523,6 +565,8 @@ he.3B2 <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B2 = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B2))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B2 = he_sig) %>%
   select(times, he_3B2)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -536,7 +580,7 @@ ggplot(he.3B2, aes(x = times, y = he_3B2)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B2 = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -625,6 +669,8 @@ he.3B4d <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B4d = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B4d))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B4d = he_sig) %>%
   select(times, he_3B4d)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -638,7 +684,7 @@ ggplot(he.3B4d, aes(x = times, y = he_3B4d)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B4d = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -726,6 +772,8 @@ he.3B4e <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B4e = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B4e))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B4e = he_sig) %>%
   select(times, he_3B4e)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -739,7 +787,7 @@ ggplot(he.3B4e, aes(x = times, y = he_3B4e)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B4e = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -828,6 +876,8 @@ he.3B4giii <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B4giii = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B4giii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B4giii = he_sig) %>%
   select(times, he_3B4giii)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -841,7 +891,7 @@ ggplot(he.3B4giii, aes(x = times, y = he_3B4giii)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B4giii = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -929,6 +979,8 @@ he.3B4giv <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3B4giv = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3B4giv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3B4giv = he_sig) %>%
   select(times, he_3B4giv)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -942,7 +994,7 @@ ggplot(he.3B4giv, aes(x = times, y = he_3B4giv)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + (k+DL) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3B4giv = (WDWW * (0.5+WT0024)) * (TEMP*(-1)+30) * SLP * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1030,6 +1082,8 @@ he.3Da1 <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3Da1 = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * PH2 * (0.5+SAAG)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3Da1))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3Da1 = he_sig) %>%
   select(times, he_3Da1)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -1043,7 +1097,7 @@ ggplot(he.3Da1, aes(x = times, y = he_3Da1)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + (k+DL) + !PH + (k+SAAG) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3Da1 = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * PH2 * (0.5+SAAG)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1134,6 +1188,8 @@ he.3Da2a <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3Da2a = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * PH2 * (0.5+SAAG)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3Da2a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3Da2a = he_sig) %>%
   select(times, he_3Da2a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -1147,7 +1203,7 @@ ggplot(he.3Da2a, aes(x = times, y = he_3Da2a)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + (k+DL) + !PH + (k+SAAG) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3Da2a = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * PH2 * (0.5+SAAG)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1225,10 +1281,6 @@ data.frame(t.3Da3%>%
 # ---  HE = (k+DL) + (k+SA) + inverse(TEMP) + SLP
 #
 
-sigmoid = function(x) {
-  1 / (1 + exp(-x))
-}
-
 
 he.3Da3 <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
@@ -1241,26 +1293,28 @@ he.3Da3 <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3Da3 = (DL+0.5) * (TEMP*(-1)+30) * SLP ) %>%
+  #dplyr::mutate(he_sig = sigmoid(scale(he_3Da3))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  #dplyr::mutate(he_sign = 100*he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_sig = sigmoid(scale(he_3Da3))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_sign = 100*he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  dplyr::select(times, he_3Da3, he_sig, he_sign)
+  dplyr::mutate(he_3Da3 = he_sig) %>%
+  dplyr::select(times, he_3Da3)
 # * (0.5+SA)
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-06 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-ggplot(he.3Da3, aes(x = times, y = he_sign)) +
+ggplot(he.3Da3, aes(x = times, y = he_3Da3)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = (k+DL) + (k+SA) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3Da3 = (DL+0.5) * (TEMP*(-1)+30) * SLP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.3Da3$he_exp), max(he.3Da3$he_exp), sum(he.3Da3$he_exp))) %>%
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.3Da3$he_3Da3), max(he.3Da3$he_3Da3), sum(he.3Da3$he_3Da3))) %>%
   datatable(., caption = 'Table 2: Function summary',
             options = list(pageLength = 5)
   ) # min mora biti veci od 0 !!!!!
@@ -1344,6 +1398,8 @@ he.3Dc <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3Dc = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * (0.5+SAAG)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3Dc))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3Dc = he_sig) %>%
   select(times, he_3Dc)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -1357,7 +1413,7 @@ ggplot(he.3Dc, aes(x = times, y = he_3Dc)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + (k+DL) + (k+SAAG) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3Dc = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * (0.5+SAAG)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1445,6 +1501,8 @@ he.3De <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_3De = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * PH2 * (0.5+SAAG)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3De))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3De = he_sig) %>%
   select(times, he_3De)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -1458,7 +1516,7 @@ ggplot(he.3De, aes(x = times, y = he_3De)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + (k+DL) + !PH + (k+SAAG) + inverse(TEMP) + SLP")+
+  labs( caption = "he_3De = (WDWW * (DL+0.5)) * (TEMP*(-1)+30) * SLP * PH2 * (0.5+SAAG)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1501,23 +1559,23 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
   )
 
 
-#temporalProfile_Agriculture <- activity.df$times %>% cbind(he.3B1a[,1:6], 
-#                                                           he.3B1b[,1:6], 
-#                                                           he.3B2[,1:6], 
-#                                                           he.3B3[,1:6], 
-#                                                           he.3B4d[,1:6], 
-#                                                           he.3B4e[,1:6], 
-#                                                           he.3B4gi_gii[,1:6], 
-#                                                           he.3B4giii[,1:6], 
-#                                                           he.3B4giv[,1:6], 
-#                                                           he.3Da1[,1:6], 
-#                                                           he.3Da2a[,1:6], 
-#                                                           he.3Da3[,1:6], 
-#                                                           he.3Dc[,1:6], 
-#                                                           he.3De[,1:6]) %>% 
-#  as.data.frame()
-#
-#writexl::write_xlsx(temporalProfile_Agriculture, path = 'Hourly_emissions/Products/TemporalProfile_Agriculture.xlsx')
+# temporalProfile_Agriculture <- activity.df$times %>% cbind(he.3B1a[,1:6], 
+#                                                            he.3B1b[,1:6], 
+#                                                            he.3B2[,1:6], 
+#                                                            he.3B3[,1:6], 
+#                                                            he.3B4d[,1:6], 
+#                                                            he.3B4e[,1:6], 
+#                                                            he.3B4gi_gii[,1:6], 
+#                                                            he.3B4giii[,1:6], 
+#                                                            he.3B4giv[,1:6], 
+#                                                            he.3Da1[,1:6], 
+#                                                            he.3Da2a[,1:6], 
+#                                                            he.3Da3[,1:6], 
+#                                                            he.3Dc[,1:6], 
+#                                                            he.3De[,1:6]) %>% 
+#   as.data.frame()
+# 
+# writexl::write_xlsx(temporalProfile_Agriculture, path = 'Hourly_emissions/Products/TemporalProfile_Agriculture.xlsx')
 
 
 

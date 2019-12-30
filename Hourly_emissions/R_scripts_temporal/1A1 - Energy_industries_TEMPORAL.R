@@ -94,7 +94,7 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
-            options = list(pageLength = 10), 
+            options = list(pageLength = 25), 
   )%>% formatStyle(
     'Label',
     backgroundColor = "lightblue"
@@ -105,7 +105,9 @@ summary_tab %>%
 #+ include = FALSE
 activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
-
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
 #'
 #'
 #'
@@ -151,7 +153,10 @@ he.1A1a <- activity.df %>%
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
   dplyr::mutate(he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)) %>%
-  select(times, he_1A1a)
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  #dplyr::mutate(he_sign = 100*he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::mutate(he_1A1a = he_sig) %>%
+  dplyr::select(times, he_1A1a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
                        to   = ymd_h("2015-02-06 24"),
@@ -163,7 +168,7 @@ ggplot(he.1A1a, aes(x = times, y = he_1A1a)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)")+
+  labs(caption = "he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -246,6 +251,8 @@ he.1A1b <- activity.df %>%
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
   dplyr::mutate(he_1A1b = WDWW * (WT0024+0.5) * RP2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A1b = he_sig) %>%
   select(times, he_1A1b)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -258,7 +265,7 @@ ggplot(he.1A1b, aes(x = times, y = he_1A1b)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6) + 
-  labs( caption = "HE = WDWW + WT0024 + !RP")+
+  labs( caption = "he_1A1b = WDWW * (WT0024+0.5) * RP2")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -342,6 +349,8 @@ he.1B2aiv <- activity.df %>%
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
   dplyr::mutate(he_1B2aiv = WDWW * (WT0024+0.5) * RP2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1B2aiv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1B2aiv = he_sig) %>%
   select(times, he_1B2aiv)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -354,7 +363,7 @@ ggplot(he.1B2aiv, aes(x = times, y = he_1B2aiv)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + !RP")+
+  labs( caption = "WDWW * (WT0024+0.5) * RP2")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -437,6 +446,8 @@ he.1B2c <- activity.df %>%
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
   dplyr::mutate(he_1B2c = WDWW * (WT0024+0.5) * RP2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1B2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1B2c = he_sig) %>%
   select(times, he_1B2c)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -449,7 +460,7 @@ ggplot(he.1B2c, aes(x = times, y = he_1B2c)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + !RP")+
+  labs( caption = "he_1B2c = WDWW * (WT0024+0.5) * RP2")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -535,6 +546,8 @@ he.1A1c <- activity.df %>%
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
   dplyr::mutate(he_1A1c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A1c = he_sig) %>%
   select(times, he_1A1c)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -547,7 +560,7 @@ ggplot(he.1A1c, aes(x = times, y = he_1A1c)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0816 + WT1624 + !PH + !RP")+
+  labs( caption = "he_1A1c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -635,6 +648,8 @@ he.1B1b <- activity.df %>%
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
   dplyr::mutate(he_1B1b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1B1b = he_sig) %>%
   select(times, he_1B1b)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -647,7 +662,7 @@ ggplot(he.1B1b, aes(x = times, y = he_1B1b)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0816 + WT1624 + !PH + !RP")+
+  labs( caption = "he_1B1b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )

@@ -95,12 +95,14 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
-            options = list(pageLength = 10), 
+            options = list(pageLength = 25), 
   )%>% formatStyle(
     'Label',
     backgroundColor = "lightblue"
   )
-
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
 
 #'
 #'
@@ -147,6 +149,8 @@ he.1A4ai <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A4ai = (WDWW * (WT0622+0.5)) / PH2 * (TEMP*(-1)+30)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A4ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A4ai = he_sig) %>%
   select(times, he_1A4ai)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -159,7 +163,7 @@ ggplot(he.1A4ai, aes(x = times, y = he_1A4ai)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0622 + k*PH + HS + inverse(TEMP)")+
+  labs( caption = "he_1A4ai = (WDWW * (WT0622+0.5)) / PH2 * (TEMP*(-1)+30)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -246,6 +250,8 @@ he.1A4bi <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A4bi = (WDWW * (WT0622+0.5)) / PH2 * (TEMP*(-1)+30)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A4bi))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A4bi = he_sig) %>%
   select(times, he_1A4bi)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -344,11 +350,16 @@ he.1A4ci <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-dplyr::mutate(he_1A4ci = (WDWW * (DL+0.5)) * PH2  ) %>%
+  dplyr::mutate(SAAG1 = dplyr::case_when(WE == TRUE ~ 1,
+                                       WE == FALSE ~ 0)) %>%
+  dplyr::mutate(SAAG2 = (sin(((2*pi)/12)*(!SAAG1))+0.5)) %>%
+  dplyr::mutate(he_1A4ci = (WDWW * (DL+0.5)) * PH2 * (TEMP+30) * SAAG2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A4ci))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A4ci = he_sig) %>%
   select(times, he_1A4ci)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-09 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -358,7 +369,7 @@ ggplot(he.1A4ci, aes(x = times, y = he_1A4ci)) +
    geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + DL + !PH + SA + SAAG")+
+  labs( caption = "he_1A4ci = (WDWW * (DL+0.5)) * PH2 * (TEMP+30) * SAAG2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -445,11 +456,16 @@ he.1A4cii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4cii = (WDWW * (DL+0.5)) * PH2 * (0.5+!SA) * (0.5+SAAG)  ) %>%
+  dplyr::mutate(SAAG1 = dplyr::case_when(WE == TRUE ~ 1,
+                                         WE == FALSE ~ 0)) %>%
+  dplyr::mutate(SAAG2 = (sin(((2*pi)/12)*(!SAAG1))+0.5)) %>%
+  dplyr::mutate(he_1A4cii = (WDWW * (DL+0.5)) * PH2 * (30+TEMP) * SAAG2  ) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A4cii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A4cii = he_sig) %>%
   select(times, he_1A4cii)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-09 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -458,7 +474,7 @@ ggplot(he.1A4cii, aes(x = times, y = he_1A4cii)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + DL + !PH + SA + SAAG")+
+  labs( caption = "he_1A4cii = (WDWW * (DL+0.5)) * PH2 * (30+TEMP) * SAAG2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE

@@ -95,12 +95,14 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
-            options = list(pageLength = 10), 
+            options = list(pageLength = 25), 
   )%>% formatStyle(
     'Label',
     backgroundColor = "lightblue"
   )
-
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
 
 #'
 #'
@@ -147,6 +149,8 @@ he.1A2a <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2a = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2a = he_sig) %>%
   select(times, he_1A2a)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -158,7 +162,11 @@ ggplot(he.1A2a, aes(x = times, y = he_1A2a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2a = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2a$he_1A2a), max(he.1A2a$he_1A2a), sum(he.1A2a$he_1A2a))) %>%
@@ -245,6 +253,8 @@ he.1A2b <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2b = he_sig) %>%
   select(times, he_1A2b)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -256,8 +266,11 @@ ggplot(he.1A2b, aes(x = times, y = he_1A2b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
-
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2b$he_1A2b), max(he.1A2b$he_1A2b), sum(he.1A2b$he_1A2b))) %>%
   datatable(., caption = 'Table 2: Function summary',
@@ -296,7 +309,6 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
   datatable(., caption = 'Table 3: Summary',
             options = list(pageLength = 5)
   )
-
 
 #'
 #'
@@ -343,6 +355,8 @@ he.1A2c <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2c = he_sig) %>%
   select(times, he_1A2c)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -354,8 +368,11 @@ ggplot(he.1A2c, aes(x = times, y = he_1A2c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
-
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2c$he_1A2c), max(he.1A2c$he_1A2c), sum(he.1A2c$he_1A2c))) %>%
   datatable(., caption = 'Table 2: Function summary',
@@ -441,6 +458,8 @@ he.1A2d <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2d = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2d))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2d = he_sig) %>%
   select(times, he_1A2d)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -452,7 +471,12 @@ ggplot(he.1A2d, aes(x = times, y = he_1A2d)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2d = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
+
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2d$he_1A2d), max(he.1A2d$he_1A2d), sum(he.1A2d$he_1A2d))) %>%
@@ -540,6 +564,8 @@ he.1A2e <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2e = (WDWW *(WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2e))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2e = he_sig) %>%
   select(times, he_1A2e)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -551,7 +577,11 @@ ggplot(he.1A2e, aes(x = times, y = he_1A2e)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2e = (WDWW *(WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2e$he_1A2e), max(he.1A2e$he_1A2e), sum(he.1A2e$he_1A2e))) %>%
@@ -638,6 +668,8 @@ he.1A2f <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2f = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2f))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2f = he_sig) %>%
   select(times, he_1A2f)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -649,7 +681,11 @@ ggplot(he.1A2f, aes(x = times, y = he_1A2f)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2f = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2f$he_1A2f), max(he.1A2f$he_1A2f), sum(he.1A2f$he_1A2f))) %>%
@@ -735,6 +771,8 @@ he.1A2g <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2g = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2g))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2g = he_sig) %>%
   select(times, he_1A2g)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -746,7 +784,11 @@ ggplot(he.1A2g, aes(x = times, y = he_1A2g)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2g = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2g$he_1A2g), max(he.1A2g$he_1A2g), sum(he.1A2g$he_1A2g))) %>%
@@ -832,6 +874,8 @@ he.1A2gvi <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2gvi = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2gvi))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2gvi = he_sig) %>%
   select(times, he_1A2gvi)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -843,7 +887,11 @@ ggplot(he.1A2gvi, aes(x = times, y = he_1A2gvi)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2gvi = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2gvi$he_1A2gvi), max(he.1A2gvi$he_1A2gvi), sum(he.1A2gvi$he_1A2gvi))) %>%
@@ -930,6 +978,8 @@ he.1A2gvii <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2gvii = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2gvii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2gvii = he_sig) %>%
   select(times, he_1A2gvii)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -941,7 +991,11 @@ ggplot(he.1A2gvii, aes(x = times, y = he_1A2gvii)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2gvii = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2)")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2gvii$he_1A2gvii), max(he.1A2gvii$he_1A2gvii), sum(he.1A2gvii$he_1A2gvii))) %>%
@@ -984,15 +1038,15 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 # temporalProfile_Industry <- activity.df$times %>% 
-#   cbind(he.1A2a[,1:6], 
-#         he.1A2b[,1:6], 
-#         he.1A2c[,1:6], 
-#         he.1A2d[,1:6], 
-#         he.1A2e[,1:6], 
-#         he.1A2f[,1:6], 
-#         he.1A2g[,1:6], 
-#         he.1A2gvi[,1:6], 
-#         he.1A2gvii[,1:6]) %>% 
-#   as.data.frame()
+#  cbind(he.1A2a[,1:6], 
+#        he.1A2b[,1:6], 
+#        he.1A2c[,1:6], 
+#        he.1A2d[,1:6], 
+#        he.1A2e[,1:6], 
+#        he.1A2f[,1:6], 
+#        he.1A2g[,1:6], 
+#        he.1A2gvi[,1:6], 
+#        he.1A2gvii[,1:6]) %>% 
+#  as.data.frame()
 # 
 # writexl::write_xlsx(temporalProfile_Industry, path = 'Hourly_emissions/Products/TemporalProfile_Industrial_ processes.xlsx')

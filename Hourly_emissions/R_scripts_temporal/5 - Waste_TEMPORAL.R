@@ -96,12 +96,14 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
-            options = list(pageLength = 10), 
+            options = list(pageLength = 25), 
   )%>% formatStyle(
     'Label',
     backgroundColor = "lightblue"
   )
-
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
 #'
 #'
 #'
@@ -147,6 +149,8 @@ he.5A <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_5A = (WDWW * (WT0816+0.5)) * PH2)  %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_5A))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_5A = he_sig) %>%
   select(times, he_5A)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -160,7 +164,7 @@ ggplot(he.5A, aes(x = times, y = he_5A)) +
   #geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0816 + !PH")+
+  labs( caption = "he_5A = (WDWW * (WT0816+0.5)) * PH2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -247,6 +251,8 @@ he.5C1bv <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_5C1bv = (WDWW * (WT0816+0.5)) * PH2)  %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_5C1bv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_5C1bv = he_sig) %>%
   select(times, he_5C1bv)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -260,7 +266,7 @@ ggplot(he.5C1bv, aes(x = times, y = he_5C1bv)) +
   #geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0816 + !PH")+
+  labs( caption = "he_5C1bv = (WDWW * (WT0816+0.5)) * PH2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -349,6 +355,8 @@ he.5D1 <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_5D1 = (WDWW * (WT0024+0.5)) * (TEMP*(-1)+30) * SLP )  %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_5D1))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_5D1 = he_sig) %>%
   select(times, he_5D1)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -362,7 +370,7 @@ ggplot(he.5D1, aes(x = times, y = he_5D1)) +
   #geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + inverse(TEMP) + SLP")+
+  labs( caption = "he_5D1 = (WDWW * (WT0024+0.5)) * (TEMP*(-1)+30) * SLP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -450,6 +458,8 @@ he.5D2 <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_5D2 = (WDWW * (WT0024+0.5)) * (TEMP*(-1)+30) * SLP )  %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_5D2))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_5D2 = he_sig) %>%
   select(times, he_5D2)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -463,7 +473,7 @@ ggplot(he.5D2, aes(x = times, y = he_5D2)) +
   #geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WDWW + WT0024 + inverse(TEMP) + SLP")+
+  labs( caption = "he_5D2 = (WDWW * (WT0024+0.5)) * (TEMP*(-1)+30) * SLP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -507,13 +517,13 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 
-# temporalProfile_Waste <- activity.df$times %>% cbind(he.5A[,1:6], 
-#                                                            he.5C1bv[,1:6], 
-#                                                            he.5D1[,1:6], 
-#                                                            he.5D2[,1:6]) %>% 
-#   as.data.frame()
-# 
-# writexl::write_xlsx(temporalProfile_Waste, path = 'Hourly_emissions/Products/TemporalProfile_Waste.xlsx')
+#  temporalProfile_Waste <- activity.df$times %>% cbind(he.5A[,1:6], 
+#                                                             he.5C1bv[,1:6], 
+#                                                             he.5D1[,1:6], 
+#                                                             he.5D2[,1:6]) %>% 
+#    as.data.frame()
+#  
+#  writexl::write_xlsx(temporalProfile_Waste, path = 'Hourly_emissions/Products/TemporalProfile_Waste.xlsx')
 
 
 
