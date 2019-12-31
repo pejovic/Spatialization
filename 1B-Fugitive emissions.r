@@ -332,26 +332,34 @@ source.1B2ai$total$spatialize <- readxl::read_xlsx(path = source.file, range = "
 source.1B2ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-roads <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
-                  use_iconv=TRUE,  
-                  encoding = "UTF-8",
-                  stringsAsFactors = FALSE)
-sf_roads <- st_as_sf(roads) %>%
-  st_transform(crs = "+init=epsg:32634") 
 
+source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.sheet =  "1A1-Energy"
+header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+vars <- header[1:6]
 
-sf_roads[,vars] <- NA
+source.1A1b <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
-  select(.,vars) %>%
-  mutate(Length = st_length(.))
+source.1A1b$sources$points <- readxl::read_xlsx(path = source.file, range = "D47:S50", sheet = source.sheet, col_names = header)
 
+rafineries <-  source.1A1b$sources$points
 
-source.1B2ai$sources$lines <- sf_roads.int
+sum.r_NOx <- sum(rafineries$NOx)
+sum.r_SO2 <- sum(rafineries$SO2)
+sum.r_PM10 <- sum(rafineries$PM10)
+sum.r_PM2.5 <- sum(rafineries$PM2.5)
+sum.r_NMVOC <- sum(rafineries$NMVOC)
+sum.r_NH3 <- sum(rafineries$NH3)
 
-sf.1B2ai <- corsum2sf_lines(source.1B2ai, distribute = FALSE) %>%
+source.1B2ai$sources$points <- rafineries
+
+sf.1B2ai <- corsum2sf(source.1B2ai, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
-
+sf.1B2ai$NOx <- 0
+sf.1B2ai$SO2 <- 0
+sf.1B2ai$PM10 <- 0
+sf.1B2ai$PM2.5 <- 0
+sf.1B2ai$NH3 <- 0
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -393,16 +401,16 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2ai, total.1B2ai,
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_Length <- sum(sf.1B2ai$Length)
-diff.1B2ai <- data.frame(total.1B2ai - sum.1B2ai)
-sf.1B2ai <- sf.1B2ai %>%
-  mutate(NOx = ((diff.1B2ai$NOx/sum_Length)*Length),
-         SO2 = ((diff.1B2ai$SO2/sum_Length)*Length),
-         PM10 = ((diff.1B2ai$PM10/sum_Length)*Length),
-         PM2.5 = ((diff.1B2ai$PM2.5/sum_Length)*Length),
-         NMVOC = ((diff.1B2ai$NMVOC/sum_Length)*Length),
-         NH3 = ((diff.1B2ai$NH3/sum_Length)*Length))
-sf.1B2ai %<>% select(vars)
+# sum_Length <- sum(sf.1B2ai$Length)
+# diff.1B2ai <- data.frame(total.1B2ai - sum.1B2ai)
+# sf.1B2ai <- sf.1B2ai %>%
+#   mutate(NOx = ((diff.1B2ai$NOx/sum_Length)*Length),
+#          SO2 = ((diff.1B2ai$SO2/sum_Length)*Length),
+#          PM10 = ((diff.1B2ai$PM10/sum_Length)*Length),
+#          PM2.5 = ((diff.1B2ai$PM2.5/sum_Length)*Length),
+#          NMVOC = ((diff.1B2ai$NMVOC/sum_Length)*Length),
+#          NH3 = ((diff.1B2ai$NH3/sum_Length)*Length))
+# sf.1B2ai %<>% select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -600,10 +608,22 @@ source.1B2b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D6
 
 #+ include = FALSE
 
-source.1B2b$sources$lines <- sf_roads.int
+source.1B2b$sources$points <- rafineries
 
-sf.1B2b <- corsum2sf_lines(source.1B2b, distribute = FALSE) %>%
+sf.1B2b <- corsum2sf(source.1B2b, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
+sf.1B2b$NOx <- 0
+sf.1B2b$SO2 <- 0
+sf.1B2b$PM10 <- 0
+sf.1B2b$PM2.5 <- 0
+sf.1B2b$NH3 <- 0
+
+
+
+#source.1B2b$sources$lines <- sf_roads.int
+
+#sf.1B2b <- corsum2sf_lines(source.1B2b, distribute = FALSE) %>%
+#  st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -646,16 +666,16 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2b, total.1B2b, d
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_Length <- sum(sf.1B2b$Length)
-diff.1B2b <- data.frame(total.1B2b - sum.1B2b)
-sf.1B2b <- sf.1B2b %>%
-  mutate(NOx = ((diff.1B2b$NOx/sum_Length)*Length),
-         SO2 = ((diff.1B2b$SO2/sum_Length)*Length),
-         PM10 = ((diff.1B2b$PM10/sum_Length)*Length),
-         PM2.5 = ((diff.1B2b$PM2.5/sum_Length)*Length),
-         NMVOC = ((diff.1B2b$NMVOC/sum_Length)*Length),
-         NH3 = ((diff.1B2b$NH3/sum_Length)*Length))
-sf.1B2b %<>% select(vars)
+# sum_Length <- sum(sf.1B2b$Length)
+# diff.1B2b <- data.frame(total.1B2b - sum.1B2b)
+# sf.1B2b <- sf.1B2b %>%
+#   mutate(NOx = ((diff.1B2b$NOx/sum_Length)*Length),
+#          SO2 = ((diff.1B2b$SO2/sum_Length)*Length),
+#          PM10 = ((diff.1B2b$PM10/sum_Length)*Length),
+#          PM2.5 = ((diff.1B2b$PM2.5/sum_Length)*Length),
+#          NMVOC = ((diff.1B2b$NMVOC/sum_Length)*Length),
+#          NH3 = ((diff.1B2b$NH3/sum_Length)*Length))
+# sf.1B2b %<>% select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
