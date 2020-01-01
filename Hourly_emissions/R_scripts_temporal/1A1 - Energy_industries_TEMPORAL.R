@@ -40,6 +40,7 @@ library(lubridate)
 library(magrittr)
 library(ggplot2)
 library(ggforce)
+library(data.table)
 #' 
 #' 
 #+ include = FALSE
@@ -67,7 +68,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "C:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
 summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
                                     "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
@@ -103,7 +104,7 @@ summary_tab %>%
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "C:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
 sigmoid = function(x) {
   1 / (1 + exp(-x))
@@ -116,7 +117,7 @@ sigmoid = function(x) {
 #'
 #' ## 1A1a - Public heat and electricity production
 #+ include = FALSE
-sf.1A1a <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
+sf.1A1a <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -154,9 +155,9 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
   dplyr::mutate(he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  #dplyr::mutate(he_sign = 100*he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::mutate(he_1A1a_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a = he_sig) %>%
-  dplyr::select(times, he_1A1a)
+  dplyr::select(times, he_1A1a, he_1A1a_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
                        to   = ymd_h("2015-02-06 24"),
@@ -216,11 +217,32 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
+#+
+sf.1A1a_df <- sf.1A1a %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1A1a.tl <- lapply(sf.1A1a_df[,-1], function(x) t((x %o% he.1A1a$he_1A1a_n)[,,1]))
+
+sf.1A1a.tl <- lapply(sf.1A1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+
+# str(sf.1A1a.tl)
+
+# writexl::write_xlsx(sf.1A1a.tle, "sf.1A1a.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1A1a_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1A1a.tl[[i]], file = paste("sf.1A1a", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
+
+
+#'
+#'
+#'
 #'
 #'
 #' ## 1A1b - Refineries
 #+ include = FALSE
-sf.1A1b <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1b.gpkg")
+sf.1A1b <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1A1b.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -253,7 +275,8 @@ he.1A1b <- activity.df %>%
   dplyr::mutate(he_1A1b = WDWW * (WT0024+0.5) * RP2) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1b = he_sig) %>%
-  select(times, he_1A1b)
+  dplyr::mutate(he_1A1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1A1b, he_1A1b_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
@@ -311,14 +334,30 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 #'
-#'
+#+
+sf.1A1b_df <- sf.1A1b %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1A1b.tl <- lapply(sf.1A1b_df[,-1], function(x) t((x %o% he.1A1b$he_1A1b_n)[,,1]))
+
+sf.1A1b.tl <- lapply(sf.1A1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+
+# str(sf.1A1b.tl)
+
+# writexl::write_xlsx(sf.1A1b.tle, "sf.1A1b.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1A1b_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1A1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("sf.1A1b", paste(vars[i],"csv", sep = "."), sep = "_")))
+}
+
 #'
 #'
 #'
 #'
 #' ## 1B2aiv - Fugitive emissions from liquid fuels: Refining, storage
 #+ include = FALSE
-sf.1B2aiv <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1B2aiv.gpkg")
+sf.1B2aiv <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1B2aiv.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -351,7 +390,8 @@ he.1B2aiv <- activity.df %>%
   dplyr::mutate(he_1B2aiv = WDWW * (WT0024+0.5) * RP2) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2aiv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2aiv = he_sig) %>%
-  select(times, he_1B2aiv)
+  dplyr::mutate(he_1B2aiv_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1B2aiv, he_1B2aiv_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
@@ -409,13 +449,28 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 #'
 #'
-#'
+#+
+sf.1B2aiv_df <- sf.1B2aiv %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1B2aiv.tl <- lapply(sf.1B2aiv_df[,-1], function(x) t((x %o% he.1B2aiv$he_1B2aiv_n)[,,1]))
+
+sf.1B2aiv.tl <- lapply(sf.1B2aiv.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+
+# str(sf.1B2aiv.tl)
+
+# writexl::write_xlsx(sf.1B2aiv.tle, "sf.1B2aiv.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1B2aiv_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1B2aiv.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B2aiv", paste(vars[i],"csv", sep = "."), sep = "_")))
+}
 #'
 #'
 #'
 #' ## 1B2c - Fugitive emissions: Venting and flaring
 #+ include = FALSE
-sf.1B2c <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1B2c.gpkg")
+sf.1B2c <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1B2c.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -448,7 +503,8 @@ he.1B2c <- activity.df %>%
   dplyr::mutate(he_1B2c = WDWW * (WT0024+0.5) * RP2) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2c = he_sig) %>%
-  select(times, he_1B2c)
+  dplyr::mutate(he_1B2c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1B2c, he_1B2c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
@@ -505,14 +561,30 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
   )
 
 #'
-#'
+#+
+sf.1B2c_df <- sf.1B2c %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1B2c.tl <- lapply(sf.1B2c_df[,-1], function(x) t((x %o% he.1B2c$he_1B2c_n)[,,1]))
+
+sf.1B2c.tl <- lapply(sf.1B2c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+
+# str(sf.1B2c.tl)
+
+# writexl::write_xlsx(sf.1B2c.tle, "sf.1B2c.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1B2c_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1B2c.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B2c", paste(vars[i],"csv", sep = "."), sep = "_")))
+}
+
 #'
 #'
 #'
 #'
 #' ## 1A1c - Manufacturing of solid fuels
 #+ include = FALSE
-sf.1A1c <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1c.gpkg")
+sf.1A1c <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1A1c.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -548,7 +620,8 @@ he.1A1c <- activity.df %>%
   dplyr::mutate(he_1A1c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1c = he_sig) %>%
-  select(times, he_1A1c)
+  dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1A1c, he_1A1c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
@@ -605,7 +678,23 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
   )
 
 #'
-#'
+#+
+sf.1A1c_df <- sf.1A1c %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1A1c.tl <- lapply(sf.1A1c_df[,-1], function(x) t((x %o% he.1A1c$he_1A1c_n)[,,1]))
+
+sf.1A1c.tl <- lapply(sf.1A1c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+
+# str(sf.1A1c.tl)
+
+# writexl::write_xlsx(sf.1A1c.tle, "sf.1A1c.tle.xlsx") # Mnogo traje...
+
+# vars <- names(sf.1A1c_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1A1c.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1A1c", paste(vars[i],"csv", sep = "."), sep = "_")))
+}
+
 #'
 #'
 #'
@@ -614,7 +703,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #+ include = FALSE
 
-sf.1B1b <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1B1b.gpkg")
+sf.1B1b <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1B1b.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -650,7 +739,8 @@ he.1B1b <- activity.df %>%
   dplyr::mutate(he_1B1b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B1b = he_sig) %>%
-  select(times, he_1B1b)
+  dplyr::mutate(he_1B1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1B1b, he_1B1b_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-01-03 24"),
@@ -705,6 +795,23 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
             options = list(pageLength = 5)
   )
 
+#'
+#+
+sf.1B1b_df <- sf.1B1b %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1B1b.tl <- lapply(sf.1B1b_df[,-1], function(x) t((x %o% he.1B1b$he_1B1b_n)[,,1]))
+
+sf.1B1b.tl <- lapply(sf.1B1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+
+# str(sf.1B1b.tl)
+
+# writexl::write_xlsx(sf.1B1b.tle, "sf.1B1b.tle.xlsx") # Mnogo traje...
+
+# vars <- names(sf.1B1b_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1B1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B1b", paste(vars[i],"csv", sep = "."), sep = "_")))
+}
 
 
 
