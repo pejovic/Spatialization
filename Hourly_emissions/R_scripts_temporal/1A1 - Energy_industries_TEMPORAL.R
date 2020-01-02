@@ -68,7 +68,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "C:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
 summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
                                     "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
@@ -104,7 +104,7 @@ summary_tab %>%
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "C:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
 sigmoid = function(x) {
   1 / (1 + exp(-x))
@@ -117,7 +117,7 @@ sigmoid = function(x) {
 #'
 #' ## 1A1a - Public heat and electricity production
 #+ include = FALSE
-sf.1A1a <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
+sf.1A1a <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -224,8 +224,6 @@ sf.1A1a.tl <- lapply(sf.1A1a_df[,-1], function(x) t((x %o% he.1A1a$he_1A1a_n)[,,
 
 sf.1A1a.tl <- lapply(sf.1A1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
 
-# str(sf.1A1a.tl)
-
 # writexl::write_xlsx(sf.1A1a.tle, "sf.1A1a.tle.xlsx") # Mnogo traje...
 
 vars <- names(sf.1A1a_df)[-1]
@@ -242,7 +240,7 @@ for(i in 1:length(vars)){
 #'
 #' ## 1A1b - Refineries
 #+ include = FALSE
-sf.1A1b <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1A1b.gpkg")
+sf.1A1b <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1b.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -348,7 +346,7 @@ sf.1A1b.tl <- lapply(sf.1A1b.tl, function(x) data.frame(x) %>% mutate(Time = act
 vars <- names(sf.1A1b_df)[-1]
 
 for(i in 1:length(vars)){
-  fwrite(sf.1A1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("sf.1A1b", paste(vars[i],"csv", sep = "."), sep = "_")))
+  fwrite(sf.1A1b.tl[[i]], file = paste("sf.1A1b", paste(vars[i],"csv", sep = "."), sep = "_"))
 }
 
 #'
@@ -357,7 +355,7 @@ for(i in 1:length(vars)){
 #'
 #' ## 1B2aiv - Fugitive emissions from liquid fuels: Refining, storage
 #+ include = FALSE
-sf.1B2aiv <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1B2aiv.gpkg")
+sf.1B2aiv <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1B2aiv.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -463,14 +461,14 @@ sf.1B2aiv.tl <- lapply(sf.1B2aiv.tl, function(x) data.frame(x) %>% mutate(Time =
 vars <- names(sf.1B2aiv_df)[-1]
 
 for(i in 1:length(vars)){
-  fwrite(sf.1B2aiv.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B2aiv", paste(vars[i],"csv", sep = "."), sep = "_")))
+  fwrite(sf.1B2aiv.tl[[i]], file = paste("sf.1B2aiv", paste(vars[i],"csv", sep = "."), sep = "_"))
 }
 #'
 #'
 #'
 #' ## 1B2c - Fugitive emissions: Venting and flaring
 #+ include = FALSE
-sf.1B2c <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1B2c.gpkg")
+sf.1B2c <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1B2c.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -575,7 +573,7 @@ sf.1B2c.tl <- lapply(sf.1B2c.tl, function(x) data.frame(x) %>% mutate(Time = act
 vars <- names(sf.1B2c_df)[-1]
 
 for(i in 1:length(vars)){
-  fwrite(sf.1B2c.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B2c", paste(vars[i],"csv", sep = "."), sep = "_")))
+  fwrite(sf.1B2c.tl[[i]], file = paste("sf.1B2c", paste(vars[i],"csv", sep = "."), sep = "_"))
 }
 
 #'
@@ -584,7 +582,7 @@ for(i in 1:length(vars)){
 #'
 #' ## 1A1c - Manufacturing of solid fuels
 #+ include = FALSE
-sf.1A1c <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1A1c.gpkg")
+sf.1A1c <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1c.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -692,7 +690,7 @@ sf.1A1c.tl <- lapply(sf.1A1c.tl, function(x) data.frame(x) %>% mutate(Time = act
 # vars <- names(sf.1A1c_df)[-1]
 
 for(i in 1:length(vars)){
-  fwrite(sf.1A1c.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1A1c", paste(vars[i],"csv", sep = "."), sep = "_")))
+  fwrite(sf.1A1c.tl[[i]], file = paste("sf.1A1c", paste(vars[i],"csv", sep = "."), sep = "_"))
 }
 
 #'
@@ -703,7 +701,7 @@ for(i in 1:length(vars)){
 #'
 #+ include = FALSE
 
-sf.1B1b <- st_read("C:/R_projects/Spatialization/Products/1A1 - Energy/1B1b.gpkg")
+sf.1B1b <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1B1b.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -809,11 +807,13 @@ sf.1B1b.tl <- lapply(sf.1B1b.tl, function(x) data.frame(x) %>% mutate(Time = act
 
 # vars <- names(sf.1B1b_df)[-1]
 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1B1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B1b", paste(vars[i],"csv", sep = "."), sep = "_")))
+# }
+
 for(i in 1:length(vars)){
-  fwrite(sf.1B1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B1b", paste(vars[i],"csv", sep = "."), sep = "_")))
+  fwrite(sf.1B1b.tl[[i]], file = paste("sf.1B1b", paste(vars[i],"csv", sep = "."), sep = "_"))
 }
-
-
 
 
 
