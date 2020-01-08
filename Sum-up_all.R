@@ -253,6 +253,13 @@ data.tprofiles <- list.files('Hourly_emissions/Products/')
                                           
 data.temp.all <- readxl::read_xlsx(path = "Hourly_emissions/Products/TemporalProfiles_All_in_one.xlsx")
 
+data.temp.list <- list()                                                   
+for(i in 1:length(data.tprofiles)){                                             
+  data.temp.list[[i]] <- readxl::read_xlsx(path = paste("Hourly_emissions/Products/",data.tprofiles[i], sep = ""))
+}
+
+
+
 
 NOx.temp <- data.temp.all %>% dplyr::select(ends_with("NOx")) %>% rowwise() %>%
   do( (.) %>% as.data.frame %>% mutate(NOx_temp = sum(.)) ) %>%
@@ -271,7 +278,7 @@ temporal_Profiles <- data.temp.list[[1]]$Time %>%
     data.temp.list[[2]][,2:37],
     data.temp.list[[3]][,2:25],
     data.temp.list[[4]][,2:55],
-    data.temp.list[[5]][,2:73],
+    data.temp.list[[5]][,2:79],
     data.temp.list[[6]][,2:25],
     data.temp.list[[7]][,2:145],
     data.temp.list[[8]][,2:25]
@@ -279,5 +286,6 @@ temporal_Profiles <- data.temp.list[[1]]$Time %>%
   as_data_frame()
 
 
+writexl::write_xlsx(temporal_Profiles, "Hourly_emissions/TemporalProfiles_by_pollutant_and_sub-categories.xlsx")
 
 
