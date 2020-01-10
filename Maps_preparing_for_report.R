@@ -14,7 +14,7 @@ library(stringr)
 library(classInt)
 library(viridis)
 library(gridExtra)
-
+library(ggsflabel)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Map of grid
@@ -37,7 +37,7 @@ grid_map <- ggplot() +
   #coord_sf(datum = NA)
 
 
-ggsave(plot = grid_map,filename = "Maps/Map_grid.jpg", width = 20, height = 20, units = "cm", device = "jpeg")
+ggsave(plot = grid_map,filename = "Maps/Map_grid.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
 
@@ -77,6 +77,96 @@ CLC_map <- ggplot() +
 ggsave(plot = CLC_map,filename = "Maps/Map_CLC.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Administrative zones – municipalities
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_mun <- st_read(dsn = "GIS_layers/Municipalities.gpkg")
+sf_mun %<>% dplyr::mutate(`Area [ha]` = Area/10000, 
+                          Name = as.character(Name),
+                          X = st_coordinates(st_centroid(sf_mun))[,1], 
+                          Y = st_coordinates(st_centroid(sf_mun))[,2])
+
+Map_mun <- ggplot() + 
+  geom_sf(data = sf_mun, aes(fill = `Area [ha]`))+ 
+  #geom_sf_text(data = sf_mun, aes(X, Y, label = Name))
+  labs(x = NULL, y = NULL,
+       title = "Map of Municipalities",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+
+
+ggsave(plot = Map_mun,filename = "Maps/Map_Municipalities.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Roads
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_roads <- st_read(dsn = "Data/Roads_PGDS_intersected_with_SRB_boundary.gpkg")
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg")
+sf_urbana <- st_read(dsn = "Products/es_pgds_samo_urbana_podrucja_koja_seku.gpkg")
+
+
+Map_roads <- ggplot()+
+  geom_sf(data = sf_roads, aes(size = lwd1*1.5))+
+  scale_size_identity()+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  geom_sf(data = sf_urbana, fill = "red", colour = "orange")+
+  labs(x = NULL, y = NULL,
+       title = "Road network with VCD values",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+
+ggsave(plot = Map_roads, filename = "Maps/Map_Roads.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Urban roads
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_roads_urban <- st_read(dsn = "Data/putevi/OSM_putevi_urbana_podrucja.gpkg")
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg")
+sf_urb <- st_read(dsn = "Products/urban_areas.gpkg")
+
+sf_bel <- st_read(dsn = "Data/Mun_Belgrade_urban.gpkg")
+sf_bel_roads <- sf_roads_urban %>% st_intersection(sf_bel)
+
+ggm2 <- ggplot()+
+  geom_sf(data = sf_roads_urban)+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  geom_sf(data = sf_urb, fill = "red", colour = "orange")+
+  theme_bw()+
+  theme(legend.position="none", axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),axis.title.y=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(color='red', fill="white"))
+
+
+
+ggm1<- ggplot()+
+  geom_sf(data = sf_bel, fill = NA)+
+  geom_sf(data = sf_bel_roads)+
+  labs(x = NULL, y = NULL,
+       title = "OSM road network for urban areas",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+  
+library(cowplot)
+
+gg_inset_map1 = ggdraw() +
+  draw_plot(ggm1)+
+  draw_plot(ggm2, x = 0.05, y = 0.50, width = 0.25, height = 0.25)
+  
+gg_inset_map1
+
+ggsave(plot = gg_inset_map1, filename = "Maps/Map_OSM_Urban_Roads.jpg", width = 30, height = 30, units = "cm", device = "jpeg", dpi = 300)
 
 
 
