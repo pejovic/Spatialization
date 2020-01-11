@@ -228,7 +228,7 @@ st_write(sf_navigation, dsn="GIS_layers/Navigable_rivers.gpkg", layer='Navigable
 sf_navigation.int <- st_intersection(sf_navigation, sf.grid.5km) %>%
   dplyr::mutate(Area = st_area(.)) %>%
   dplyr::select(Area)
-st_write(sf_navigation, dsn="GIS_layers/Navigable_rivers_intersected.gpkg", layer='Navigable_rivers_intersected')
+st_write(sf_navigation.int, dsn="GIS_layers/Navigable_rivers_intersected.gpkg", layer='Navigable_rivers_intersected')
 
 
 ###########################################################
