@@ -674,6 +674,22 @@ st_write(sf_opstine.int, dsn="GIS_layers/Municipalities_Volume_of_industrial_woo
 
 ###########################################################
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# From geopackeges to CSV
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+library(data.table)
+data.spat <- list.files('D:/R_projects/Spatialization/Products/5 - Waste/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/5 - Waste/",data.spat[i], sep = ""))
+}
+
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"csv", sep = "."), sep = ",")
+}
 
 
 
