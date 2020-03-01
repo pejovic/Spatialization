@@ -7,6 +7,10 @@ library(feasts)
 library(dplyr)
 library(stringr)
 
+#library(devtools)
+#install_github("duplisea/dublogistic")
+library(dublogistic)
+
 
 times <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                     to   = ymd_h("2015-12-31 23"),
@@ -16,6 +20,7 @@ times <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 public_holidays <- as.Date(c("2015-01-01", "2015-01-02", "2015-01-07", "2015-02-15", "2015-02-16", "2015-02-17",
                              "2015-04-10", "2015-04-11", "2015-04-12", "2015-04-13", "2015-05-01", "2015-05-02",
                              "2015-11-11", "2015-12-25"), format = "%Y-%m-%d")
+
 
 day_hours <- rep(c(1:24), 365)
 
