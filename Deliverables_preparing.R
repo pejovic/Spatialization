@@ -228,7 +228,7 @@ st_write(sf_navigation, dsn="GIS_layers/Navigable_rivers.gpkg", layer='Navigable
 sf_navigation.int <- st_intersection(sf_navigation, sf.grid.5km) %>%
   dplyr::mutate(Area = st_area(.)) %>%
   dplyr::select(Area)
-st_write(sf_navigation, dsn="GIS_layers/Navigable_rivers_intersected.gpkg", layer='Navigable_rivers_intersected')
+st_write(sf_navigation.int, dsn="GIS_layers/Navigable_rivers_intersected.gpkg", layer='Navigable_rivers_intersected')
 
 
 ###########################################################
@@ -673,6 +673,53 @@ sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km) %>%
 st_write(sf_opstine.int, dsn="GIS_layers/Municipalities_Volume_of_industrial_woods_intersected.gpkg", layer='Municipalities_Volume_of_industrial_woods_intersected')
 
 ###########################################################
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# From geopackeges to CSV
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+library(data.table)
+data.spat <- list.files('D:/R_projects/Spatialization/Products/5 - Waste/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/5 - Waste/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"csv", sep = "."), sep = ",")
+}
+
+
+
+##### Rename files
+old_files <- list.files("D:/R_projects/Spatialization/Products/! CSVs/5 - Waste/")
+old_files <- paste("D:/R_projects/Spatialization/Products/! CSVs/5 - Waste/", old_files, sep = "")
+
+# Create vector of new files
+
+new_files <- old_files %>% str_remove(., ".gpkg")
+new_files
+
+# Rename from old files to new files
+
+file.rename(from = old_files, to = new_files)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

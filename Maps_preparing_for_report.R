@@ -169,4 +169,1221 @@ gg_inset_map1
 ggsave(plot = gg_inset_map1, filename = "Maps/Map_OSM_Urban_Roads.jpg", width = 30, height = 30, units = "cm", device = "jpeg", dpi = 300)
 
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Railways
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_rail <- st_read(dsn = "GIS_layers/Railways.gpkg")
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg")
+
+map_rail <- ggplot()+
+  geom_sf(data = sf_rail, aes(size = 0.7, colour = "#c51b8a"))+
+  scale_size_identity()+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  labs(x = NULL, y = NULL,
+       title = "Map of Railways",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()+
+  theme(legend.position="none")
+
+ggsave(plot = map_rail, 
+       filename = "Maps/Map_Railways.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 300)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Navigable rivers
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_rivers <- st_read(dsn = "Data/Navigable_rivers_for_map.gpkg")
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg")
+
+map_river <- ggplot()+
+  geom_sf(data = sf_rivers, fill = "blue")+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  labs(x = NULL, y = NULL,
+       title = "Map of Navigable rivers",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+ggsave(plot = map_river, 
+       filename = "Maps/Map_Navigable_rivers.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 300)
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Rural and urban areas
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_rur <- st_read(dsn = "GIS_layers/Rural_areas.gpkg")
+
+map_rur <- ggplot()+
+  geom_sf(data = sf_rur, fill = "#c994c7")+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  labs(x = NULL, y = NULL,
+       title = "Map of Rurual areas",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+
+ggsave(plot = map_rur, 
+        filename = "Maps/Map_Rurual_areas.jpg", 
+        width = 30, 
+        height = 30, 
+        units = "cm", 
+        device = "jpeg", 
+        dpi = 300)
+
+sf_urb <- st_read(dsn = "GIS_layers/Urban_areas.gpkg")
+
+map_urb <- ggplot()+
+  geom_sf(data = sf_urb, fill = "red", colour = "orange")+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  labs(x = NULL, y = NULL,
+       title = "Map of Urban areas",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+
+ggsave(plot = map_urb, 
+       filename = "Maps/Map_Urban_areas.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 300)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Maps by category
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+# data.spat <- list.files('D:/R_projects/Spatialization/Products/3 - Agriculture/')
+# 
+# data.spat.list <- list()                                                   
+# for(i in 1:length(data.spat)){                                             
+#   data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/3 - Agriculture/",data.spat[i], sep = ""))
+# }
+# 
+# sf_data <- data.spat.list[[1]]
+# for(i in 2:length(data.spat)){                                             
+#   sf_data <- st_join(sf_data, data.spat.list[[i]], join = st_equals) %>% 
+#     group_by(ID.x) %>%
+#     summarize(NOx = sum(NOx.x, NOx.y),
+#               SO2 = sum(SO2.x, SO2.y),
+#               PM10 = sum(PM10.x, PM10.y),
+#               PM2.5 = sum(PM2.5.x, PM2.5.y),
+#               NMVOC = sum(NMVOC.x, NMVOC.y),
+#               NH3 = sum(NH3.x + NH3.y)) %>%
+#     mutate(ID = ID.x) %>%
+#     select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+#   print(paste("NOx:",sum(sf_data$NOx))) 
+#   print(paste("SO2:",sum(sf_data$SO2)))
+#   print(paste("PM10:",sum(sf_data$PM10)))
+#   print(paste("PM2.5:",sum(sf_data$PM2.5)))
+#   print(paste("NMVOC:",sum(sf_data$NMVOC)))
+#   print(paste("NH3:",sum(sf_data$NH3)))
+# }
+# 
+# sf_data
+# 
+# st_write(sf_data, dsn="Products/Sum-up_By_category/3 - Agriculture.gpkg", layer='Agriculture')
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_energy <- st_read(dsn = "Products/Sum-up_By_category/1A1 - Energy.gpkg")
+
+classes.NOx <- classIntervals(sf_data_energy$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_energy$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_energy$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_energy$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_energy$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_energy$NH3, n = 30, style = "fisher")
+
+sf_data_energy <- sf_data_energy %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+#+ include = FALSE 
+a<-ggplot() +
+  geom_sf(data = sf_data_energy,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_energy,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_energy,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_energy,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_energy,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_energy,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+energy_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = energy_map, 
+       filename = "Maps/Map_energy.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_industry <- st_read(dsn = "Products/Sum-up_By_category/1A2 - Industry.gpkg")
+
+classes.NOx <- classIntervals(sf_data_industry$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_industry$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_industry$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_industry$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_industry$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_industry$NH3, n = 30, style = "fisher")
+
+sf_data_industry <- sf_data_industry %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+#+ include = FALSE 
+a<-ggplot() +
+  geom_sf(data = sf_data_industry,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_industry,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_industry,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_industry,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_industry,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_industry,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+industry_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = industry_map, 
+       filename = "Maps/Map_industry.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_transport <- st_read(dsn = "Products/Sum-up_By_category/1A3 - Transport.gpkg")
+
+classes.NOx <- classIntervals(sf_data_transport$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_transport$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_transport$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_transport$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_transport$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_transport$NH3, n = 30, style = "fisher")
+
+sf_data_transport <- sf_data_transport %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+#+ include = FALSE 
+a<-ggplot() +
+  geom_sf(data = sf_data_transport,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_transport,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_transport,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_transport,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_transport,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_transport,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+transport_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = transport_map, 
+       filename = "Maps/Map_transport.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_residential <- st_read(dsn = "Products/Sum-up_By_category/1A4 - Residential-Tertiary.gpkg")
+
+classes.NOx <- classIntervals(sf_data_residential$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_residential$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_residential$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_residential$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_residential$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_residential$NH3, n = 30, style = "fisher")
+
+sf_data_residential <- sf_data_residential %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+#+ include = FALSE 
+a<-ggplot() +
+  geom_sf(data = sf_data_residential,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_residential,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_residential,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_residential,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_residential,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_residential,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+residential_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = residential_map, 
+       filename = "Maps/Map_residential.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_fugitive <- st_read(dsn = "Products/Sum-up_By_category/1B - Fugitive emissions.gpkg")
+
+classes.NOx <- classIntervals(sf_data_fugitive$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_fugitive$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_fugitive$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_fugitive$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_fugitive$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_fugitive$NH3, n = 30, style = "fisher")
+
+sf_data_fugitive <- sf_data_fugitive %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+#+ include = FALSE 
+a<-ggplot() +
+  geom_sf(data = sf_data_fugitive,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_fugitive,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_fugitive,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_fugitive,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_fugitive,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_fugitive,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+fugitive_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = fugitive_map, 
+       filename = "Maps/Map_fugitive.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_other <- st_read(dsn = "Products/Sum-up_By_category/2 - Other processes.gpkg")
+
+classes.NOx <- classIntervals(sf_data_other$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_other$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_other$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_other$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_other$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_other$NH3, n = 30, style = "fisher")
+
+sf_data_other <- sf_data_other %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+
+a<-ggplot() +
+  geom_sf(data = sf_data_other,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_other,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_other,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_other,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_other,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_other,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+other_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = other_map, 
+       filename = "Maps/Map_other.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_agriculture <- st_read(dsn = "Products/Sum-up_By_category/3 - Agriculture.gpkg")
+
+classes.NOx <- classIntervals(sf_data_agriculture$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_agriculture$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_agriculture$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_agriculture$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_agriculture$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_agriculture$NH3, n = 30, style = "fisher")
+
+sf_data_agriculture <- sf_data_agriculture %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+
+a<-ggplot() +
+  geom_sf(data = sf_data_agriculture,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_agriculture,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_agriculture,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_agriculture,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_agriculture,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_agriculture,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+agriculture_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = agriculture_map, 
+       filename = "Maps/Map_agriculture.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_data_waste <- st_read(dsn = "Products/Sum-up_By_category/5 - Waste.gpkg")
+
+classes.NOx <- classIntervals(sf_data_waste$NOx, n = 30, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_waste$SO2, n = 30, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_waste$PM10, n = 30, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_waste$PM2.5, n = 30, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_waste$NMVOC, n = 30, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_waste$NH3, n = 30, style = "fisher")
+
+sf_data_waste <- sf_data_waste %>%
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  )
+
+pal1 <- viridisLite::viridis(30)
+pal2 <- viridisLite::viridis(30)
+pal3 <- viridisLite::viridis(30)
+pal4 <- viridisLite::viridis(30)
+pal5 <- viridisLite::viridis(30)
+pal6 <- viridisLite::viridis(30)
+
+
+a<-ggplot() +
+  geom_sf(data = sf_data_waste,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NOx",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+b<-ggplot() +
+  geom_sf(data = sf_data_waste,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal2,
+                    name = "SO2") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - SO2",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+c<-ggplot() +
+  geom_sf(data = sf_data_waste,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal3,
+                    name = "PM10") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM10",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+d<-ggplot() +
+  geom_sf(data = sf_data_waste,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal4,
+                    name = "PM2.5") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - PM2.5",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+e<-ggplot() +
+  geom_sf(data = sf_data_waste,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal5,
+                    name = "NMVOC") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NMVOC",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+f<-ggplot() +
+  geom_sf(data = sf_data_waste,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal6,
+                    name = "NH3") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization - NH3",
+       subtitle = "Spatial resolution 5x5km, Teritory of Serbia",
+       caption = "© GiLab (2019)") +
+  theme(line = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "None", ###################### legend
+        axis.title = element_blank(),
+        panel.background = element_blank()) +
+  coord_sf(datum = NA)
+
+waste_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
+
+
+ggsave(plot = waste_map, 
+       filename = "Maps/Map_waste.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+
+
+
+
+
+
+
+
+
 
