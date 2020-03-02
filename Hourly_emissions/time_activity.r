@@ -4,8 +4,8 @@ library(magrittr)
 library(ggplot2)
 library(ggforce)
 
-#library(devtools)
-#install_github("duplisea/dublogistic")
+# ibrary(devtools)
+# install_github("duplisea/dublogistic")
 library(dublogistic)
 
 times <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -286,7 +286,8 @@ dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)
 
 timesS <- c(t1, t2, t3, t4, t5)
 
-activity_df$indS[activity_df$times %in% t1] <- 1 
+activity_df$indS[activity_df$times %in% t1] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=T)$selectivity
+ 
 activity_df$indS[activity_df$times %in% t2] <- 2 
 activity_df$indS[activity_df$times %in% t3] <- 3 
 activity_df$indS[activity_df$times %in% t4] <- 4 
