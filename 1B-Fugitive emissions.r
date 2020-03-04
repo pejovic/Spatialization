@@ -213,7 +213,7 @@ sf.1B1a <- corsum2sf(source.1B1a) %>%
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
-clc131 <- subset(sf_clc18, CODE_18 == "131") %>% # Mine, dump and construction sites
+clc131 <- subset(sf_clc18, CODE_18 == "131") %>% # Mine sites
   st_set_crs(32634)
 clc131[,vars] <- NA
 
