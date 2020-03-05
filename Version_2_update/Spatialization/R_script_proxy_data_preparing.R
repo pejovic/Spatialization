@@ -14,14 +14,12 @@ library(stringr)
 
 
 
-
-
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
 
 # Urban areas
-#sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
-#  st_transform(crs = "+init=epsg:32634")
+sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
+  st_transform(crs = "+init=epsg:32634")
 
 
 # Old rural areas
@@ -53,13 +51,45 @@ sf_clc18_industrial <- subset(sf_clc18, CODE_18 == "121") %>%
 osm_commercial <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/OSM_commercial_Serbia.gpkg") %>%
   select(osm_id, fclass)
 
+mapview(sf_clc18_industrial) + mapview(osm_commercial, col.regions = "red")
+?mapview
+
 #st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 
-sf_industrial.int <- st_difference(sf_clc18_industrial, osm_commercial)
+sf_industrial.int <- st_intersection(sf_clc18_industrial, osm_commercial)
+sf_industrial.int <- st_sym_difference(sf_clc18_industrial, osm_commercial)
 
-mapview(sf_industrial.int) + mapview(osm_commercial)
+mapview(sf_industrial.int) + mapview(osm_commercial, col.regions = "red")
 
 st_write(sf_industrial.int, dsn="Version_2_update/Spatialization/Proxy_data_new/industrial_int.gpkg", layer='industrial')
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Population density grid 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+library(raster)
+library(stars)
+pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/osgl_2-popdens_2006.tif")
+pop_star <- st_as_stars(pop_raster)
+
+
+ggplot()+
+  geom_stars(pop_star)
+
+
+
+
+
+mapview(sf_clc18_urb) + mapview(osm_commercial, col.regions = "red")
+
+
+
+
+
+sf_clc18_airports <- subset(sf_clc18, CODE_18 == "124" ) %>% # CLC rural zones
+  st_transform(crs = "+init=epsg:32634")
+
+mapview(sf_clc18_airports)
+
 
 
 
