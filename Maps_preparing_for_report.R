@@ -225,19 +225,22 @@ ggsave(plot = map_river,
 # Rural and urban areas
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-sf_rur <- st_read(dsn = "GIS_layers/Rural_areas.gpkg")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+
+sf_rur %<>% dplyr::mutate(`Area [ha]` = st_area(.)/10000) %>% mutate(`Area [ha]` = unclass(`Area [ha]`))
 
 map_rur <- ggplot()+
-  geom_sf(data = sf_rur, fill = "#c994c7")+
-  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  geom_sf(data = sf_rur, aes(fill = `Area [ha]`), colour = NA)+
+  #geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
   labs(x = NULL, y = NULL,
        title = "Map of Rurual areas",
        subtitle = "Territory of the Repubic of Serbia",
        caption = "© GiLab (2019/20)")+
-  theme_bw()
+  theme_bw()+
+  scale_fill_gradientn(colours=c("#fde0dd", "#7a0177"))
 
 ggsave(plot = map_rur, 
-        filename = "Maps/Map_Rurual_areas.jpg", 
+        filename = "Maps/Map_Rurual_areas_new.jpg", 
         width = 30, 
         height = 30, 
         units = "cm", 
@@ -245,18 +248,107 @@ ggsave(plot = map_rur,
         dpi = 300)
 
 sf_urb <- st_read(dsn = "GIS_layers/Urban_areas.gpkg")
+sf_urb %<>% dplyr::mutate(`Area [ha]` = st_area(.)/10000) %>% mutate(`Area [ha]` = unclass(`Area [ha]`))
 
 map_urb <- ggplot()+
-  geom_sf(data = sf_urb, fill = "red", colour = "orange")+
-  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  geom_sf(data = sf_urb, aes(fill = `Area [ha]`), colour = "red")+
+  #geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
   labs(x = NULL, y = NULL,
        title = "Map of Urban areas",
        subtitle = "Territory of the Repubic of Serbia",
        caption = "© GiLab (2019/20)")+
-  theme_bw()
+  theme_bw()+
+  scale_fill_gradientn(colours=c("#bcbddc", "#54278f"))
+
 
 ggsave(plot = map_urb, 
        filename = "Maps/Map_Urban_areas.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 300)
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Industrial and commercial sites
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_ind <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") 
+
+sf_ind %<>% dplyr::mutate(`Area [ha]` = unclass(st_area(.)/10000)) %>%
+  dplyr::select(`Area [ha]`)
+
+sf_comm <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/OSM_commercial_Serbia.gpkg")
+sf_NS <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Poligon_za_primer_uvecani.gpkg")
+
+sf_ind.int <- sf_ind %>% 
+  sf::st_intersection(., sf_NS) %>%
+  dplyr::mutate(`Idustrial sites - Area [ha]` = unclass(st_area(.)/10000))
+sf_comm.int <- sf_comm %>% 
+  sf::st_intersection(., sf_NS) %>%
+  dplyr::mutate(`Commercial units - Area [ha]` = unclass(st_area(.)/10000))
+
+library(ggnewscale)
+
+indcomm <- ggplot()+
+  geom_sf(data = sf_ind.int, aes(fill = `Idustrial sites - Area [ha]`), colour = NA)+
+  scale_fill_gradientn(colours=c("#c7e9b4", "#41b6c4"))+
+  new_scale_fill() +
+  geom_sf(data = sf_comm.int, aes(fill = `Commercial units - Area [ha]`), colour = NA)+
+  scale_fill_gradientn(colours=c("#fa9fb5", "#c51b8a"))+
+  labs(x = NULL, y = NULL,
+       title = "Map of Industrial sites and Commercial units",
+       subtitle = "Territory of the Repubic of Serbia - Example for the city of Novi Sad",
+       caption = "© GiLab (2019/20)")+
+  theme_bw()
+
+
+ggsave(plot = indcomm, 
+       filename = "Maps/Map_Industrial_Commercial.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 300)
+
+
+# ggplot()+
+#   geom_sf(data = sf_ind, colour = "red")+
+#   geom_sf(data = sf_comm, colour = "blue")+
+#   scale_fill_gradientn(colours=c("#c7e9b4", "#41b6c4"))+
+#   labs(x = NULL, y = NULL,
+#        title = "Map of Industrial sites",
+#        subtitle = "Territory of the Repubic of Serbia - Example for the city of Novi Sad",
+#        caption = "© GiLab (2019/20)")+
+#   theme_bw()
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Population density grid 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+library(raster)
+library(stars)
+pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/popdens_32634.tif")
+pop_star <- st_as_stars(pop_raster)
+
+mapview(pop_raster)
+
+popdens.map <- ggplot()+
+  geom_stars(data = pop_star)+
+  labs(x = "Easting [m]", y = "Northing [m]",
+       title = "Population density map",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2019/20)\n
+       CRS: WGS84/UTM34N")+
+  theme_bw()+
+  scale_fill_viridis(option = "B", limits = c(0,250), na.value = NA)+
+  guides(fill=guide_legend(title="Population density\n[575 m/pix]"))
+
+
+ggsave(plot = popdens.map, 
+       filename = "Maps/Map_Population_density.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 

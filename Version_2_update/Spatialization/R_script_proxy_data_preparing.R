@@ -49,19 +49,17 @@ sf_clc18_industrial <- subset(sf_clc18, CODE_18 == "121") %>%
 
 
 osm_commercial <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/OSM_commercial_Serbia.gpkg") %>%
-  select(osm_id, fclass)
+  dplyr::select(osm_id, fclass)
 
-mapview(sf_clc18_industrial) + mapview(osm_commercial, col.regions = "red")
-?mapview
 
-#st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
+# Uradjeno geometry differnce u qgis-u
+# - Prvo fix geometries na commercial polygons
+# - Zatim differnce
 
-sf_industrial.int <- st_intersection(sf_clc18_industrial, osm_commercial)
-sf_industrial.int <- st_sym_difference(sf_clc18_industrial, osm_commercial)
+industrial_new <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") 
 
-mapview(sf_industrial.int) + mapview(osm_commercial, col.regions = "red")
-
-st_write(sf_industrial.int, dsn="Version_2_update/Spatialization/Proxy_data_new/industrial_int.gpkg", layer='industrial')
+industrial_new %<>% dplyr::mutate(`Area [ha]` = unclass(st_area(.)/10000)) %>%
+  dplyr::select(`Area [ha]`)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Population density grid 
@@ -72,19 +70,15 @@ pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/osgl_2-popd
 pop_star <- st_as_stars(pop_raster)
 
 
-ggplot()+
-  geom_stars(pop_star)
 
 
 
 
 
-mapview(sf_clc18_urb) + mapview(osm_commercial, col.regions = "red")
 
-
-
-
-
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Airports - polygons from CLC 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 sf_clc18_airports <- subset(sf_clc18, CODE_18 == "124" ) %>% # CLC rural zones
   st_transform(crs = "+init=epsg:32634")
 

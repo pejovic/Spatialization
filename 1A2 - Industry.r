@@ -720,7 +720,7 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2g, total.1A2g, d
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
-clc121 <- subset(sf_clc18, CODE_18 == "121") %>%
+clc121 <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") %>%
   st_set_crs(32634)
 #+ include = FALSE
 # Combine all known points into one sf object
@@ -731,6 +731,8 @@ clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
 
 #+ include = FALSE
 # Polygon Centroid
+clc121.otherIndustries %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+
 clc121.oI.cen <- st_centroid(clc121.otherIndustries) %>%
   select(ID, Area_Ha, SHAPE_Area, NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
   rename(ID_CLC = ID)
@@ -748,8 +750,8 @@ clc121.oI.cen <- clc121.oI.cen %>%
          PM2.5 = ((diff.1A2g$PM2.5/sum_Area)*SHAPE_Area),
          NMVOC = ((diff.1A2g$NMVOC/sum_Area)*SHAPE_Area),
          NH3 = ((diff.1A2g$NH3/sum_Area)*SHAPE_Area))
-sf.1A2g %<>% select(vars)
-clc121.oI.cen %<>% select(vars)
+sf.1A2g %<>% select(vars) 
+clc121.oI.cen %<>% select(vars) %>% dplyr::rename(geometry = geom)
 sf.1A2g <- rbind(sf.1A2g, clc121.oI.cen)
 
 #'
@@ -922,8 +924,18 @@ source.1A2gvii$total$inventory <- readxl::read_xlsx(path = source.file, range = 
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
-clc133 <- subset(sf_clc18, CODE_18 == "133" | CODE_18 == "121") %>% # Construction sites and industrial sites
+
+
+clc133 <- subset(sf_clc18, CODE_18 == "133") %>% # Construction sites
   st_set_crs(32634)
+
+clc121 <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") %>%
+  sf::st_set_crs(32634) %>%
+  dplyr::rename(geometry = geom)
+
+clc133 <- rbind(clc133, clc121)
+clc133 %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+
 clc133[,vars] <- NA
 clc133.int <- st_intersection(clc133, sf.grid.5km) %>%
   select(.,vars)
