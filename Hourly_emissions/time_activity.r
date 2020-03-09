@@ -93,6 +93,26 @@ dplyr::mutate(WT0816 = dplyr::case_when(working_time_8_16h == TRUE ~ 0.5*sin(((2
                                         working_time_8_16h == FALSE ~ 0))
 
 
+
+# NOVO
+activity_df %<>% 
+  dplyr::mutate(WT0816 = dplyr::case_when(working_time_8_16h == TRUE ~ 1,
+                                          working_time_8_16h == FALSE ~ 0))
+
+
+
+p <- ggplot(activity_df, aes(x = times, y = WT0816, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-31 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Working hours from 16 - 24h
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -101,6 +121,24 @@ activity_df %<>%
   #dplyr::filter(working_time_16_24h == TRUE) %>% 
   dplyr::mutate(WT1624 = dplyr::case_when(working_time_16_24h == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-15)) + 0.5,
                                           working_time_16_24h == FALSE ~ 0))
+
+
+# Novo
+activity_df %<>% 
+  dplyr::mutate(WT1624 = dplyr::case_when(working_time_16_24h == TRUE ~ 1,
+                                          working_time_16_24h == FALSE ~ 0))
+
+p <- ggplot(activity_df, aes(x = times, y = WT1624, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-31 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Working hours from 00 - 24h
@@ -139,6 +177,29 @@ activity_df %<>%
                                           indhs == TRUE & working_time_06_22h == FALSE ~ 0,
                                           indhs == FALSE & working_time_06_22h == FALSE ~ 0,
                                           indhs == FALSE & working_time_06_22h == TRUE ~ 0))
+
+
+# NOVO
+activity_df %<>% 
+  dplyr::mutate(WT0622 = dplyr::case_when(indhs == TRUE & working_time_06_22h == TRUE ~ 1,
+                                          indhs == TRUE & working_time_06_22h == FALSE ~ 0.2,
+                                          indhs == FALSE & working_time_06_22h == FALSE ~ 0,
+                                          indhs == FALSE & working_time_06_22h == TRUE ~ 0))
+
+
+p <- ggplot(activity_df, aes(x = times, y = WT0622, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-31 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Daylength from data
@@ -212,6 +273,26 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 activity_df %<>% 
   dplyr::mutate(WW = dplyr::case_when(weekends == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + 0.5, 
                                       weekends == FALSE ~ 0))
+
+
+
+# NOVO 
+
+activity_df %<>% 
+  dplyr::mutate(WW = dplyr::case_when(weekends == TRUE ~ 1, 
+                                      weekends == FALSE ~ 0))
+
+p <- ggplot(activity_df, aes(x = times, y = WW, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-01-31 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
