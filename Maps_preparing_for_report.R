@@ -230,14 +230,14 @@ sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_ar
 sf_rur %<>% dplyr::mutate(`Area [ha]` = st_area(.)/10000) %>% mutate(`Area [ha]` = unclass(`Area [ha]`))
 
 map_rur <- ggplot()+
-  geom_sf(data = sf_rur, aes(fill = `Area [ha]`), colour = NA)+
+  geom_sf(data = sf_rur, fill = "#fcc5c0", colour = NA)+
   #geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
   labs(x = NULL, y = NULL,
        title = "Map of Rurual areas",
        subtitle = "Territory of the Repubic of Serbia",
        caption = "© GiLab (2019/20)")+
-  theme_bw()+
-  scale_fill_gradientn(colours=c("#fde0dd", "#7a0177"))
+  theme_bw()
+  #scale_fill_gradientn(colours=c("#fde0dd", "#7a0177"))
 
 ggsave(plot = map_rur, 
         filename = "Maps/Map_Rurual_areas_new.jpg", 
