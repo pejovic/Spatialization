@@ -148,7 +148,7 @@ working_time_00_24h <- day_hours %in% c(00:24)
 activity_df$working_time_00_24h <- working_time_00_24h
 activity_df %<>% 
   # dplyr::filter(working_time_00_24h == TRUE) %>% 
-  dplyr::mutate(WT0024 = dplyr::case_when(working_time_00_24h == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + 0.5, 
+  dplyr::mutate(WT0024 = dplyr::case_when(working_time_00_24h == TRUE ~ 1, 
                                           working_time_00_24h == FALSE ~ 0))
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -367,7 +367,7 @@ dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)
 
 timesS <- c(t1, t2, t3, t4, t5)
 
-activity_df$indS[activity_df$times %in% t1] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=T)$selectivity
+activity_df$indS[activity_df$times %in% t1] <- 1
  
 activity_df$indS[activity_df$times %in% t2] <- 2 
 activity_df$indS[activity_df$times %in% t3] <- 3 
@@ -378,8 +378,6 @@ activity_df$indS <- as.numeric(activity_df$indS)
 
 activity_df %<>% 
   dplyr::mutate(SA = 0.5*sin(((2*pi)/4)*(indS)) + 0.5)
-
-
 
 
 p <- ggplot(activity_df, aes(x = times, y = SA, colour = "red")) +
@@ -432,25 +430,105 @@ dublogistic.f(L=as.numeric(times1), inflection1=as.numeric(quantile(times1, prob
 # Agriculture Season
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-timesAg <- c(t2, t3, t4)
+# timesAg <- c(t2, t3, t4)
+# 
+# activity_df$indAg[activity_df$times %in% timesAg] <- TRUE 
+# activity_df$indAg[!(activity_df$times %in% timesAg)] <- FALSE 
+# 
+# activity_df %<>% 
+#   dplyr::mutate(SAAG = sin(((2*pi)/4)*(indAg)))
+# 
+# 
+# p <- ggplot(activity_df, aes(x = times, y = SAAG, colour = "red")) +
+#   geom_point(size = 0.5) +
+#   geom_line() + 
+#   theme_bw()
+# 
+# time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+#                        to   = ymd_h("2015-01-03 24"),
+#                        by   = dhours(1)) 
+# 
+# p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
 
-activity_df$indAg[activity_df$times %in% timesAg] <- TRUE 
-activity_df$indAg[!(activity_df$times %in% timesAg)] <- FALSE 
 
-activity_df %<>% 
-  dplyr::mutate(SAAG = sin(((2*pi)/4)*(indAg)))
+# :::::::::::::::::::::::::::::::::::::::::::: Fertilizing 
 
 
-p <- ggplot(activity_df, aes(x = times, y = SAAG, colour = "red")) +
+t1 <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
+                 to   = ymd_h("2015-03-31 24"),
+                 by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-05-01 00"),
+                 to   = ymd_h("2015-07-31 24"),
+                 by   = dhours(1)) 
+
+dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.2)), inflection2=as.numeric(quantile(t1, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=T)$selectivity
+
+activity_df$indSAAG.f[activity_df$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.2)), inflection2=as.numeric(quantile(t1, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity_df$indSAAG.f[activity_df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=F)$selectivity 
+activity_df$SAAG.f
+
+activity_df %<>%
+  dplyr::mutate(indSAAG.f = tidyr::replace_na(indSAAG.f, 0)) %>%
+  dplyr::rename(SAAG.f = indSAAG.f)
+
+
+p <- ggplot(activity_df, aes(x = times, y = SAAG.f, colour = "red")) +
   geom_point(size = 0.5) +
   geom_line() + 
   theme_bw()
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-03 24"),
+                       to   = ymd_h("2015-04-15 24"),
                        by   = dhours(1)) 
 
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::: Farm level 
+
+t11 <- seq.POSIXt(from = ymd_h("2015-05-01 00"),
+                 to   = ymd_h("2015-06-30 24"),
+                 by   = dhours(1)) 
+t22 <- seq.POSIXt(from = ymd_h("2015-09-01 00"),
+                 to   = ymd_h("2015-10-31 24"),
+                 by   = dhours(1)) 
+
+dublogistic.f(L=as.numeric(t11), inflection1=as.numeric(quantile(t11, probs = 0.2)), inflection2=as.numeric(quantile(t11, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=T)$selectivity
+
+activity_df$indSAAG.fl[activity_df$times %in% t11] <- dublogistic.f(L=as.numeric(t11), inflection1=as.numeric(quantile(t11, probs = 0.2)), inflection2=as.numeric(quantile(t11, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity_df$indSAAG.fl[activity_df$times %in% t22] <- dublogistic.f(L=as.numeric(t22), inflection1=as.numeric(quantile(t22, probs = 0.2)), inflection2=as.numeric(quantile(t22, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=F)$selectivity 
+
+
+activity_df %<>%
+  dplyr::mutate(indSAAG.fl = tidyr::replace_na(indSAAG.fl, 0)) %>%
+  dplyr::rename(SAAG.fl = indSAAG.fl)
+
+
+p <- ggplot(activity_df, aes(x = times, y = SAAG.fl, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-04-15 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+ggplot() +
+  geom_line(data = activity_df, aes(x = times, y = SAAG.f, colour = "red"))+
+  geom_line(data = activity_df, aes(x = times, y = SAAG.fl, colour = "blue"))+
+  geom_point(data = activity_df, aes(x = times, y = SAAG.f, colour = "red")) +
+  geom_point(data = activity_df, aes(x = times, y = SAAG.fl, colour = "blue")) +
+  theme_bw()+
+  scale_colour_discrete(name = "Colour", labels = c("SAAG.feritilizers", "SAAG.farmlevel"))
+
+
+
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -619,13 +697,16 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
 
 
+
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # FINAL DATA FRAME
 
-# saveRDS(activity_df, file = "Hourly_emissions/Data/activity_df.rds")
-# rm(list = ls())
-activity.df <- readRDS(file = "Hourly_emissions/Data/activity_df.rds")
+saveRDS(activity_df, file = "Version_2_update/Temporalization/activity_df_new.rds")
+rm(list = ls())
+activity.df <- readRDS(file = "Version_2_update/Temporalization/activity_df_new.rds")
 names(activity.df)
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -638,16 +719,8 @@ names(activity.df)
 
 
 
-p <- ggplot(activity_df, aes(x = times, y = DL, colour = "red")) +
-  geom_point(size = 0.5) +
-  geom_line() + 
-  theme_bw()#+
-#geom_smooth(formula =  ~ dayl, colour = "blue")
-time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-03 24"),
-                       by   = dhours(1)) 
 
-p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
 
 
 

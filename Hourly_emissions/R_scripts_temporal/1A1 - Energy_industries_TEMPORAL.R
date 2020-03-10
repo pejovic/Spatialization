@@ -68,7 +68,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
 
 summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
                                     "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
@@ -104,7 +104,6 @@ summary_tab %>%
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
 
 sigmoid = function(x) {
   1 / (1 + exp(-x))
@@ -153,14 +152,14 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)) %>%
+  dplyr::mutate(he_1A1a = ((WT0024+0.5) + (WT0622+0.5))  * (30+TEMP)  * (HS2) * RP2 * (PH2)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1a_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a = he_sig) %>%
   dplyr::select(times, he_1A1a, he_1A1a_n)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
-                       to   = ymd_h("2015-02-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-04-05 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
