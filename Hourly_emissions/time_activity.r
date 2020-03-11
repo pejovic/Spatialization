@@ -700,14 +700,89 @@ p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size =
 
 
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Electricity production
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+activity_df <- readRDS(file = "Version_2_update/Temporalization/activity_df_new.rds")
+
+elp_2018 <- readxl::read_xlsx(path ="Version_2_update/Temporalization/Electricity_production_by_month_2018.xlsx")
+
+
+
+
+t1 <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                     to   = ymd_h("2015-01-31 23"),
+                     by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
+                     to   = ymd_h("2015-02-28 23"),
+                     by   = dhours(1)) 
+t3 <- seq.POSIXt(from = ymd_h("2015-03-01 00"),
+                 to   = ymd_h("2015-03-31 23"),
+                 by   = dhours(1)) 
+t4 <- seq.POSIXt(from = ymd_h("2015-04-01 00"),
+                 to   = ymd_h("2015-04-30 23"),
+                 by   = dhours(1)) 
+t5 <- seq.POSIXt(from = ymd_h("2015-05-01 00"),
+                 to   = ymd_h("2015-05-31 23"),
+                 by   = dhours(1)) 
+t6 <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
+                 to   = ymd_h("2015-06-30 23"),
+                 by   = dhours(1)) 
+t7 <- seq.POSIXt(from = ymd_h("2015-07-01 00"),
+                 to   = ymd_h("2015-07-31 23"),
+                 by   = dhours(1)) 
+t8 <- seq.POSIXt(from = ymd_h("2015-08-01 00"),
+                 to   = ymd_h("2015-08-31 23"),
+                 by   = dhours(1)) 
+t9 <- seq.POSIXt(from = ymd_h("2015-09-01 00"),
+                 to   = ymd_h("2015-09-30 23"),
+                 by   = dhours(1)) 
+t10 <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
+                 to   = ymd_h("2015-10-31 23"),
+                 by   = dhours(1)) 
+t11 <- seq.POSIXt(from = ymd_h("2015-11-01 00"),
+                 to   = ymd_h("2015-11-30 23"),
+                 by   = dhours(1)) 
+t12 <- seq.POSIXt(from = ymd_h("2015-12-01 00"),
+                 to   = ymd_h("2015-12-31 23"),
+                 by   = dhours(1)) 
+
+
+activity_df$indE[activity_df$times %in% t1] <- elp_2018$`Distribucije [MWh]`[1] 
+activity_df$indE[(activity_df$times %in% t2)] <-  elp_2018$`Distribucije [MWh]`[2]
+activity_df$indE[activity_df$times %in% t3] <- elp_2018$`Distribucije [MWh]`[3] 
+activity_df$indE[(activity_df$times %in% t4)] <-  elp_2018$`Distribucije [MWh]`[4]
+activity_df$indE[activity_df$times %in% t5] <- elp_2018$`Distribucije [MWh]`[5] 
+activity_df$indE[(activity_df$times %in% t6)] <-  elp_2018$`Distribucije [MWh]`[6]
+activity_df$indE[activity_df$times %in% t7] <- elp_2018$`Distribucije [MWh]`[7] 
+activity_df$indE[(activity_df$times %in% t8)] <-  elp_2018$`Distribucije [MWh]`[8]
+activity_df$indE[activity_df$times %in% t9] <- elp_2018$`Distribucije [MWh]`[9] 
+activity_df$indE[(activity_df$times %in% t10)] <-  elp_2018$`Distribucije [MWh]`[10]
+activity_df$indE[activity_df$times %in% t11] <- elp_2018$`Distribucije [MWh]`[11] 
+activity_df$indE[(activity_df$times %in% t12)] <-  elp_2018$`Distribucije [MWh]`[12]
+
+
+activity_df %<>% dplyr::mutate(EP = indE)
+
+ggplot()+
+  geom_line(data = activity_df, aes(x = times, y = EP), colour = "red")+
+  geom_point(size = 0.5) +
+  theme_bw()
+
+
+
+
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # FINAL DATA FRAME
 
 saveRDS(activity_df, file = "Version_2_update/Temporalization/activity_df_new.rds")
 rm(list = ls())
-activity.df <- readRDS(file = "Version_2_update/Temporalization/activity_df_new.rds")
-names(activity.df)
+activity_df <- readRDS(file = "Version_2_update/Temporalization/activity_df_new.rds")
+names(activity_df)
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

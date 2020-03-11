@@ -752,28 +752,28 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3c, total.2D3c
 
 #'
 #'
-#' ## 2D3d - Coating application
+#' ## 2D3d - Coating application - paint for construction
 #'
 #'
 #'
 #+ include = FALSE
-source.2D3d <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.2D3d.pfc <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2D3d$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3d$total$inventory <- readxl::read_xlsx(path = source.file, range = "D80:I80", sheet = source.sheet, col_names = vars)
+source.2D3d.pfc$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3d.pfc$total$inventory <- readxl::read_xlsx(path = source.file, range = "D75:I75", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-source.2D3d$sources$lines <- roads.int
-sf.2D3d <- corsum2sf_lines(source.2D3d, distribute = FALSE) %>%
+source.2D3d.pfc$sources$lines <- roads.int
+sf.2D3d.pfc <- corsum2sf_lines(source.2D3d.pfc, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.2D3d %>% 
+sf.2D3d.pfc %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 4: sf.2D3d',
+  datatable(., caption = 'Table 4: sf.2D3d.pfc',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -788,41 +788,41 @@ sf.2D3d %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.2D3d <- sf.2D3d %>% 
+sum.2D3d.pfc <- sf.2D3d.pfc %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-total.2D3d <- source.2D3d[[2]][[2]][, vars] %>% 
+total.2D3d.pfc <- source.2D3d.pfc[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3d, total.2D3d, data.frame(total.2D3d - sum.2D3d))) %>%
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3d.pfc, total.2D3d.pfc, data.frame(total.2D3d.pfc - sum.2D3d.pfc))) %>%
   datatable(., caption = 'Table 5: Summary differences',
             options = list(pageLength = 5)
   )
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-sf.2D3d %<>% dplyr::mutate(Length = st_length(.))
-sum_Length <- sum(sf.2D3d$Length)
-diff.2D3d <- data.frame(total.2D3d - sum.2D3d)
-sf.2D3d <- sf.2D3d %>%
-  mutate(NOx = ((diff.2D3d$NOx/sum_Length)*Length),
-         SO2 = ((diff.2D3d$SO2/sum_Length)*Length),
-         PM10 = ((diff.2D3d$PM10/sum_Length)*Length),
-         PM2.5 = ((diff.2D3d$PM2.5/sum_Length)*Length),
-         NMVOC = ((diff.2D3d$NMVOC/sum_Length)*Length),
-         NH3 = ((diff.2D3d$NH3/sum_Length)*Length))
-sf.2D3d %<>% select(vars)
+sf.2D3d.pfc %<>% dplyr::mutate(Length = st_length(.))
+sum_Length <- sum(sf.2D3d.pfc$Length)
+diff.2D3d.pfc <- data.frame(total.2D3d.pfc - sum.2D3d.pfc)
+sf.2D3d.pfc <- sf.2D3d.pfc %>%
+  mutate(NOx = ((diff.2D3d.pfc$NOx/sum_Length)*Length),
+         SO2 = ((diff.2D3d.pfc$SO2/sum_Length)*Length),
+         PM10 = ((diff.2D3d.pfc$PM10/sum_Length)*Length),
+         PM2.5 = ((diff.2D3d.pfc$PM2.5/sum_Length)*Length),
+         NMVOC = ((diff.2D3d.pfc$NMVOC/sum_Length)*Length),
+         NH3 = ((diff.2D3d.pfc$NH3/sum_Length)*Length))
+sf.2D3d.pfc %<>% select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-p.2D3d <- sf.grid.5km %>%
-  st_join(sf.2D3d, join = st_contains) %>% 
+p.2D3d.pfc <- sf.grid.5km %>%
+  st_join(sf.2D3d.pfc, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -832,48 +832,50 @@ p.2D3d <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-spatialised.mapview(sf.sources = sf.2D3d, layer.name.1 = "Sources 2D3d", sf.spatialised = p.2D3d, layer.name.2 = "Spatialised 2D3d", vars = vars, source.lines = TRUE) 
+spatialised.mapview(sf.sources = sf.2D3d.pfc, layer.name.1 = "Sources 2D3d.pfc", sf.spatialised = p.2D3d.pfc, layer.name.2 = "Spatialised 2D3d.pfc", vars = vars, source.lines = TRUE) 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.2D3d <- p.2D3d %>% 
+sum.p.2D3d.pfc <- p.2D3d.pfc %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3d, total.2D3d, data.frame(sum.p.2D3d == total.2D3d)-1)) %>%
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3d.pfc, total.2D3d.pfc, data.frame(sum.p.2D3d.pfc == total.2D3d.pfc)-1)) %>%
   datatable(., caption = 'Table 6: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE
-# st_write(p.2D3d, dsn="Products/2 - Other processes/2D3d.gpkg", layer='2D3d')
+# st_write(p.2D3d.pfc, dsn="Products/2 - Other processes/2D3d.pfc.gpkg", layer='2D3d.pfc')
+
+
+
 
 #'
 #'
-#' ## 2D3g - Chemical products
+#' ## 2D3d - Coating application - Car/bus/truck/van coating + leather finishing
 #'
 #'
 #'
 #+ include = FALSE
-source.2D3g <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.2D3d.cbtlf <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2D3g$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3g$total$inventory <- readxl::read_xlsx(path = source.file, range = "D85:I85", sheet = source.sheet, col_names = vars)
+source.2D3d.cbtlf$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3d.cbtlf$total$inventory <- readxl::read_xlsx(path = source.file, range = "U79:Z79", sheet = source.sheet, col_names = vars)
 
-source.2D3g$sources$polygon <- sf_clc18_urb.int
-
-sf.2D3g <- corsum2sf_polygon(source.2D3g, distribute = FALSE) %>%
+#+ include = FALSE
+source.2D3d.cbtlf$sources$lines <- roads.int
+sf.2D3d.cbtlf <- corsum2sf_lines(source.2D3d.cbtlf, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.2D3g %>% 
-  st_drop_geometry() %>%
-  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+sf.2D3d.cbtlf %>% 
+  st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.2D3g',
+  datatable(., caption = 'Table 4: sf.2D3d.cbtlf',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -888,43 +890,41 @@ sf.2D3g %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.2D3g <- sf.2D3g %>% 
+sum.2D3d.cbtlf <- sf.2D3d.cbtlf %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-total.2D3g <- source.2D3g[[2]][[2]][, vars] %>% 
+total.2D3d.cbtlf <- source.2D3d.cbtlf[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3g, total.2D3g, data.frame(total.2D3g - sum.2D3g))) %>%
-  datatable(., caption = 'Table 8: Summary differences',
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3d.cbtlf, total.2D3d.cbtlf, data.frame(total.2D3d.cbtlf - sum.2D3d.cbtlf))) %>%
+  datatable(., caption = 'Table 5: Summary differences',
             options = list(pageLength = 5)
   )
-
-
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-
-sum_s <- sum(sf.2D3g$Br_stanovnistvo)
-diff.2D3g <- data.frame(total.2D3g - sum.2D3g)
-sf.2D3g <- sf.2D3g %>%
-  mutate(NOx = ((diff.2D3g$NOx/sum_s)*Br_stanovnistvo),
-         SO2 = ((diff.2D3g$SO2/sum_s)*Br_stanovnistvo),
-         PM10 = ((diff.2D3g$PM10/sum_s)*Br_stanovnistvo),
-         PM2.5 = ((diff.2D3g$PM2.5/sum_s)*Br_stanovnistvo),
-         NMVOC = ((diff.2D3g$NMVOC/sum_s)*Br_stanovnistvo),
-         NH3 = ((diff.2D3g$NH3/sum_s)*Br_stanovnistvo))
-sf.2D3g %<>% select(vars)
+sf.2D3d.cbtlf %<>% dplyr::mutate(Length = st_length(.))
+sum_Length <- sum(sf.2D3d.cbtlf$Length)
+diff.2D3d.cbtlf <- data.frame(total.2D3d.cbtlf - sum.2D3d.cbtlf)
+sf.2D3d.cbtlf <- sf.2D3d.cbtlf %>%
+  mutate(NOx = ((diff.2D3d.cbtlf$NOx/sum_Length)*Length),
+         SO2 = ((diff.2D3d.cbtlf$SO2/sum_Length)*Length),
+         PM10 = ((diff.2D3d.cbtlf$PM10/sum_Length)*Length),
+         PM2.5 = ((diff.2D3d.cbtlf$PM2.5/sum_Length)*Length),
+         NMVOC = ((diff.2D3d.cbtlf$NMVOC/sum_Length)*Length),
+         NH3 = ((diff.2D3d.cbtlf$NH3/sum_Length)*Length))
+sf.2D3d.cbtlf %<>% select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-p.2D3g <- sf.grid.5km %>%
-  st_join(sf.2D3g, join = st_contains) %>% 
+p.2D3d.cbtlf <- sf.grid.5km %>%
+  st_join(sf.2D3d.cbtlf, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -934,49 +934,51 @@ p.2D3g <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-spatialised.mapview(sf.sources = sf.2D3g, layer.name.1 = "Sources 2D3g", sf.spatialised = p.2D3g, layer.name.2 = "Spatialised 2D3g", vars = vars)
-
+spatialised.mapview(sf.sources = sf.2D3d.cbtlf, layer.name.1 = "Sources 2D3d.cbtlf", sf.spatialised = p.2D3d.cbtlf, layer.name.2 = "Spatialised 2D3d.cbtlf", vars = vars, source.lines = TRUE) 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.2D3g <- p.2D3g %>% 
+sum.p.2D3d.cbtlf <- p.2D3d.cbtlf %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g, total.2D3g, data.frame(sum.p.2D3g == total.2D3g)-1)) %>%
-  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3d.cbtlf, total.2D3d.cbtlf, data.frame(sum.p.2D3d.cbtlf == total.2D3d.cbtlf)-1)) %>%
+  datatable(., caption = 'Table 6: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE
-# st_write(p.2D3g, dsn="Products/2 - Other processes/2D3g.gpkg", layer='2D3g')
+# st_write(p.2D3d.cbtlf, dsn="Products/2 - Other processes/2D3d.cbtlf.gpkg", layer='2D3d.cbtlf')
+
+
+
 
 #'
 #'
-#' ## 2D3i - Other solvent and product use
+#' ## 2D3g - Chemical products - Rubber processing
 #'
 #'
 #'
 #+ include = FALSE
-source.2D3i <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.2D3g.rp <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2D3i$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3i$total$inventory <- readxl::read_xlsx(path = source.file, range = "D91:I91", sheet = source.sheet, col_names = vars)
+source.2D3g.rp$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3g.rp$total$inventory <- readxl::read_xlsx(path = source.file, range = "D81:I81", sheet = source.sheet, col_names = vars)
 
-source.2D3i$sources$polygon <- sf_clc18_urb.int
+source.2D3g.rp$sources$polygon <- sf_clc18_urb.int
 
-sf.2D3i <- corsum2sf_polygon(source.2D3i, distribute = FALSE) %>%
+sf.2D3g.rp <- corsum2sf_polygon(source.2D3g.rp, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.2D3i %>% 
+sf.2D3g.rp %>% 
   st_drop_geometry() %>%
   dplyr::rename(Population_weight = Br_stanovnistvo) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.2D3i',
+  datatable(., caption = 'Table 7: sf.2D3g.rp',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -991,19 +993,19 @@ sf.2D3i %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.2D3i <- sf.2D3i %>% 
+sum.2D3g.rp <- sf.2D3g.rp %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-total.2D3i <- source.2D3i[[2]][[2]][, vars] %>% 
+total.2D3g.rp <- source.2D3g.rp[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i, total.2D3i, data.frame(total.2D3i - sum.2D3i))) %>%
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3g.rp, total.2D3g.rp, data.frame(total.2D3g.rp - sum.2D3g.rp))) %>%
   datatable(., caption = 'Table 8: Summary differences',
             options = list(pageLength = 5)
   )
@@ -1013,21 +1015,21 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i, total.2D3i, d
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.2D3i$Br_stanovnistvo)
-diff.2D3i <- data.frame(total.2D3i - sum.2D3i)
-sf.2D3i <- sf.2D3i %>%
-  mutate(NOx = ((diff.2D3i$NOx/sum_s)*Br_stanovnistvo),
-         SO2 = ((diff.2D3i$SO2/sum_s)*Br_stanovnistvo),
-         PM10 = ((diff.2D3i$PM10/sum_s)*Br_stanovnistvo),
-         PM2.5 = ((diff.2D3i$PM2.5/sum_s)*Br_stanovnistvo),
-         NMVOC = ((diff.2D3i$NMVOC/sum_s)*Br_stanovnistvo),
-         NH3 = ((diff.2D3i$NH3/sum_s)*Br_stanovnistvo))
-sf.2D3i %<>% select(vars)
+sum_s <- sum(sf.2D3g.rp$Br_stanovnistvo)
+diff.2D3g.rp <- data.frame(total.2D3g.rp - sum.2D3g.rp)
+sf.2D3g.rp <- sf.2D3g.rp %>%
+  mutate(NOx = ((diff.2D3g.rp$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3g.rp$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3g.rp$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3g.rp$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3g.rp$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3g.rp$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3g.rp %<>% select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-p.2D3i <- sf.grid.5km %>%
-  st_join(sf.2D3i, join = st_contains) %>% 
+p.2D3g.rp <- sf.grid.5km %>%
+  st_join(sf.2D3g.rp, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -1037,23 +1039,911 @@ p.2D3i <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-spatialised.mapview(sf.sources = sf.2D3i, layer.name.1 = "Sources 2D3i", sf.spatialised = p.2D3i, layer.name.2 = "Spatialised 2D3i", vars = vars)
+spatialised.mapview(sf.sources = sf.2D3g.rp, layer.name.1 = "Sources 2D3g.rp", sf.spatialised = p.2D3g.rp, layer.name.2 = "Spatialised 2D3g.rp", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.2D3i <- p.2D3i %>% 
+sum.p.2D3g.rp <- p.2D3g.rp %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i, total.2D3i, data.frame(sum.p.2D3i == total.2D3i)-1)) %>%
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.rp, total.2D3g.rp, data.frame(sum.p.2D3g.rp == total.2D3g.rp)-1)) %>%
   datatable(., caption = 'Table 9: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE
-# st_write(p.2D3i, dsn="Products/2 - Other processes/2D3i.gpkg", layer='2D3i')
+# st_write(p.2D3g.rp, dsn="Products/2 - Other processes/2D3g.rp.gpkg", layer='2D3g.rp')
+
+
+
+
+#'
+#'
+#' ## 2D3g - Chemical products - Paint/ink/glue manufacturing
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3g.pigm <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3g.pigm$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3g.pigm$total$inventory <- readxl::read_xlsx(path = source.file, range = "D82:I82", sheet = source.sheet, col_names = vars)
+
+source.2D3g.pigm$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3g.pigm <- corsum2sf_polygon(source.2D3g.pigm, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3g.pigm %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3g.pigm',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3g.pigm <- sf.2D3g.pigm %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3g.pigm <- source.2D3g.pigm[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3g.pigm, total.2D3g.pigm, data.frame(total.2D3g.pigm - sum.2D3g.pigm))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3g.pigm$Br_stanovnistvo)
+diff.2D3g.pigm <- data.frame(total.2D3g.pigm - sum.2D3g.pigm)
+sf.2D3g.pigm <- sf.2D3g.pigm %>%
+  mutate(NOx = ((diff.2D3g.pigm$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3g.pigm$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3g.pigm$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3g.pigm$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3g.pigm$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3g.pigm$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3g.pigm %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3g.pigm <- sf.grid.5km %>%
+  st_join(sf.2D3g.pigm, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3g.pigm, layer.name.1 = "Sources 2D3g.pigm", sf.spatialised = p.2D3g.pigm, layer.name.2 = "Spatialised 2D3g.pigm", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3g.pigm <- p.2D3g.pigm %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.pigm, total.2D3g.pigm, data.frame(sum.p.2D3g.pigm == total.2D3g.pigm)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3g.pigm, dsn="Products/2 - Other processes/2D3g.pigm.gpkg", layer='2D3g.pigm')
+
+
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3g - Chemical products - Manufacture of shoes
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3g.ms <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3g.ms$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3g.ms$total$inventory <- readxl::read_xlsx(path = source.file, range = "D83:I83", sheet = source.sheet, col_names = vars)
+
+source.2D3g.ms$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3g.ms <- corsum2sf_polygon(source.2D3g.ms, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3g.ms %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3g.ms',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3g.ms <- sf.2D3g.ms %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3g.ms <- source.2D3g.ms[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3g.ms, total.2D3g.ms, data.frame(total.2D3g.ms - sum.2D3g.ms))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3g.ms$Br_stanovnistvo)
+diff.2D3g.ms <- data.frame(total.2D3g.ms - sum.2D3g.ms)
+sf.2D3g.ms <- sf.2D3g.ms %>%
+  mutate(NOx = ((diff.2D3g.ms$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3g.ms$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3g.ms$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3g.ms$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3g.ms$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3g.ms$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3g.ms %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3g.ms <- sf.grid.5km %>%
+  st_join(sf.2D3g.ms, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3g.ms, layer.name.1 = "Sources 2D3g.ms", sf.spatialised = p.2D3g.ms, layer.name.2 = "Spatialised 2D3g.ms", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3g.ms <- p.2D3g.ms %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.ms, total.2D3g.ms, data.frame(sum.p.2D3g.ms == total.2D3g.ms)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3g.ms, dsn="Products/2 - Other processes/2D3g.ms.gpkg", layer='2D3g.ms')
+
+
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3g - Chemical products - Leather tanning
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3g.lt <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3g.lt$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3g.lt$total$inventory <- readxl::read_xlsx(path = source.file, range = "D84:I84", sheet = source.sheet, col_names = vars)
+
+source.2D3g.lt$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3g.lt <- corsum2sf_polygon(source.2D3g.lt, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3g.lt %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3g.lt',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3g.lt <- sf.2D3g.lt %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3g.lt <- source.2D3g.lt[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3g.lt, total.2D3g.lt, data.frame(total.2D3g.lt - sum.2D3g.lt))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3g.lt$Br_stanovnistvo)
+diff.2D3g.lt <- data.frame(total.2D3g.lt - sum.2D3g.lt)
+sf.2D3g.lt <- sf.2D3g.lt %>%
+  mutate(NOx = ((diff.2D3g.lt$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3g.lt$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3g.lt$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3g.lt$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3g.lt$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3g.lt$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3g.lt %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3g.lt <- sf.grid.5km %>%
+  st_join(sf.2D3g.lt, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3g.lt, layer.name.1 = "Sources 2D3g.lt", sf.spatialised = p.2D3g.lt, layer.name.2 = "Spatialised 2D3g.lt", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3g.lt <- p.2D3g.lt %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.lt, total.2D3g.lt, data.frame(sum.p.2D3g.lt == total.2D3g.lt)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3g.lt, dsn="Products/2 - Other processes/2D3g.lt.gpkg", layer='2D3g.lt')
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3i - Other solvent and product use - Fat, edible and non-edible oil extraction (kg seed)
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3i.feneox <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3i.feneox$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3i.feneox$total$inventory <- readxl::read_xlsx(path = source.file, range = "D86:I86", sheet = source.sheet, col_names = vars)
+
+source.2D3i.feneox$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3i.feneox <- corsum2sf_polygon(source.2D3i.feneox, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3i.feneox %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3i.feneox',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3i.feneox <- sf.2D3i.feneox %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3i.feneox <- source.2D3i.feneox[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i.feneox, total.2D3i.feneox, data.frame(total.2D3i.feneox - sum.2D3i.feneox))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3i.feneox$Br_stanovnistvo)
+diff.2D3i.feneox <- data.frame(total.2D3i.feneox - sum.2D3i.feneox)
+sf.2D3i.feneox <- sf.2D3i.feneox %>%
+  mutate(NOx = ((diff.2D3i.feneox$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3i.feneox$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3i.feneox$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3i.feneox$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3i.feneox$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3i.feneox$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3i.feneox %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3i.feneox <- sf.grid.5km %>%
+  st_join(sf.2D3i.feneox, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3i.feneox, layer.name.1 = "Sources 2D3i.feneox", sf.spatialised = p.2D3i.feneox, layer.name.2 = "Spatialised 2D3i.feneox", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3i.feneox <- p.2D3i.feneox %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.feneox, total.2D3i.feneox, data.frame(sum.p.2D3i.feneox == total.2D3i.feneox)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3i.feneox, dsn="Products/2 - Other processes/2D3i.feneox.gpkg", layer='2D3i.feneox')
+
+
+
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3i - Other solvent and product use - Preservation of wood
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3i.pow <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3i.pow$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3i.pow$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
+
+source.2D3i.pow$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3i.pow <- corsum2sf_polygon(source.2D3i.pow, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3i.pow %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3i.pow',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3i.pow <- sf.2D3i.pow %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3i.pow <- source.2D3i.pow[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i.pow, total.2D3i.pow, data.frame(total.2D3i.pow - sum.2D3i.pow))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3i.pow$Br_stanovnistvo)
+diff.2D3i.pow <- data.frame(total.2D3i.pow - sum.2D3i.pow)
+sf.2D3i.pow <- sf.2D3i.pow %>%
+  mutate(NOx = ((diff.2D3i.pow$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3i.pow$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3i.pow$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3i.pow$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3i.pow$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3i.pow$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3i.pow %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3i.pow <- sf.grid.5km %>%
+  st_join(sf.2D3i.pow, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3i.pow, layer.name.1 = "Sources 2D3i.pow", sf.spatialised = p.2D3i.pow, layer.name.2 = "Spatialised 2D3i.pow", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3i.pow <- p.2D3i.pow %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.pow, total.2D3i.pow, data.frame(sum.p.2D3i.pow == total.2D3i.pow)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3i.pow, dsn="Products/2 - Other processes/2D3i.pow.gpkg", layer='2D3i.pow')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3i - Other solvent and product use - Underseal treatment and conservation of vehicles
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3i.utcv <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3i.utcv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3i.utcv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D88:I88", sheet = source.sheet, col_names = vars)
+
+source.2D3i.utcv$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3i.utcv <- corsum2sf_polygon(source.2D3i.utcv, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3i.utcv %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3i.utcv',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3i.utcv <- sf.2D3i.utcv %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3i.utcv <- source.2D3i.utcv[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i.utcv, total.2D3i.utcv, data.frame(total.2D3i.utcv - sum.2D3i.utcv))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3i.utcv$Br_stanovnistvo)
+diff.2D3i.utcv <- data.frame(total.2D3i.utcv - sum.2D3i.utcv)
+sf.2D3i.utcv <- sf.2D3i.utcv %>%
+  mutate(NOx = ((diff.2D3i.utcv$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3i.utcv$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3i.utcv$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3i.utcv$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3i.utcv$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3i.utcv$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3i.utcv %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3i.utcv <- sf.grid.5km %>%
+  st_join(sf.2D3i.utcv, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3i.utcv, layer.name.1 = "Sources 2D3i.utcv", sf.spatialised = p.2D3i.utcv, layer.name.2 = "Spatialised 2D3i.utcv", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3i.utcv <- p.2D3i.utcv %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.utcv, total.2D3i.utcv, data.frame(sum.p.2D3i.utcv == total.2D3i.utcv)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3i.utcv, dsn="Products/2 - Other processes/2D3i.utcv.gpkg", layer='2D3i.utcv')
+
+
+
+
+
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3i - Other solvent and product use - Tobacco (t tobacco)
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3i.t <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3i.t$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3i.t$total$inventory <- readxl::read_xlsx(path = source.file, range = "D89:I89", sheet = source.sheet, col_names = vars)
+
+source.2D3i.t$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3i.t <- corsum2sf_polygon(source.2D3i.t, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3i.t %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3i.t',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3i.t <- sf.2D3i.t %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3i.t <- source.2D3i.t[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i.t, total.2D3i.t, data.frame(total.2D3i.t - sum.2D3i.t))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3i.t$Br_stanovnistvo)
+diff.2D3i.t <- data.frame(total.2D3i.t - sum.2D3i.t)
+sf.2D3i.t <- sf.2D3i.t %>%
+  mutate(NOx = ((diff.2D3i.t$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3i.t$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3i.t$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3i.t$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3i.t$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3i.t$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3i.t %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3i.t <- sf.grid.5km %>%
+  st_join(sf.2D3i.t, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3i.t, layer.name.1 = "Sources 2D3i.t", sf.spatialised = p.2D3i.t, layer.name.2 = "Spatialised 2D3i.t", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3i.t <- p.2D3i.t %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.t, total.2D3i.t, data.frame(sum.p.2D3i.t == total.2D3i.t)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3i.t, dsn="Products/2 - Other processes/2D3i.t.gpkg", layer='2D3i.t')
+
+
+
+
+
+
+#'
+#'
+#' ## 2D3i - Other solvent and product use - Use of shoes
+#'
+#'
+#'
+#+ include = FALSE
+source.2D3i.uos <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.2D3i.uos$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.2D3i.uos$total$inventory <- readxl::read_xlsx(path = source.file, range = "D90:I90", sheet = source.sheet, col_names = vars)
+
+source.2D3i.uos$sources$polygon <- sf_clc18_urb.int
+
+sf.2D3i.uos <- corsum2sf_polygon(source.2D3i.uos, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2D3i.uos %>% 
+  st_drop_geometry() %>%
+  dplyr::rename(Population_weight = Br_stanovnistvo) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 7: sf.2D3i.uos',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2D3i.uos <- sf.2D3i.uos %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2D3i.uos <- source.2D3i.uos[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3i.uos, total.2D3i.uos, data.frame(total.2D3i.uos - sum.2D3i.uos))) %>%
+  datatable(., caption = 'Table 8: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sum_s <- sum(sf.2D3i.uos$Br_stanovnistvo)
+diff.2D3i.uos <- data.frame(total.2D3i.uos - sum.2D3i.uos)
+sf.2D3i.uos <- sf.2D3i.uos %>%
+  mutate(NOx = ((diff.2D3i.uos$NOx/sum_s)*Br_stanovnistvo),
+         SO2 = ((diff.2D3i.uos$SO2/sum_s)*Br_stanovnistvo),
+         PM10 = ((diff.2D3i.uos$PM10/sum_s)*Br_stanovnistvo),
+         PM2.5 = ((diff.2D3i.uos$PM2.5/sum_s)*Br_stanovnistvo),
+         NMVOC = ((diff.2D3i.uos$NMVOC/sum_s)*Br_stanovnistvo),
+         NH3 = ((diff.2D3i.uos$NH3/sum_s)*Br_stanovnistvo))
+sf.2D3i.uos %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2D3i.uos <- sf.grid.5km %>%
+  st_join(sf.2D3i.uos, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.2D3i.uos, layer.name.1 = "Sources 2D3i.uos", sf.spatialised = p.2D3i.uos, layer.name.2 = "Spatialised 2D3i.uos", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.2D3i.uos <- p.2D3i.uos %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.uos, total.2D3i.uos, data.frame(sum.p.2D3i.uos == total.2D3i.uos)-1)) %>%
+  datatable(., caption = 'Table 9: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.2D3i.uos, dsn="Products/2 - Other processes/2D3i.uos.gpkg", layer='2D3i.uos')
+
+
+
+
+
+
 
 #'
 #'
