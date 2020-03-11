@@ -71,13 +71,12 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #+ include = FALSE
 activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
 
-summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
-                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP", "EC"),
                           Description = c("Working days", 
                                           "Working days, working weekends", 
                                           "Working time 08-16h",
                                           "working time 16-24h",
-                                          "Working time 00-24h",
                                           "Working time 06-22h",
                                           "Day light", 
                                           "Weekends",
@@ -92,7 +91,8 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
                                           "Sea Level Pressure",
                                           "Vehicles Trend Activity",
                                           "Number of Flights per Hour",
-                                          "Repair - overhaul period"))
+                                          "Repair - overhaul period",
+                                          "Electricity consumption"))
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
@@ -142,14 +142,14 @@ data.frame(t.1A2a%>%
 he.1A2a <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A2a = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  dplyr::mutate(he_1A2a = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30) ) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2a = he_sig) %>%
   dplyr::mutate(he_1A2a_n = he_sig/sum(he_sig))%>%
@@ -162,7 +162,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2a, aes(x = times, y = he_1A2a)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2a = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2* (TEMP+30)")+
@@ -262,13 +262,13 @@ data.frame(t.1A2b%>%
 he.1A2b <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2* (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2b = he_sig) %>%
@@ -282,7 +282,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2b, aes(x = times, y = he_1A2b)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2b = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -381,13 +381,13 @@ data.frame(t.1A2c%>%
 he.1A2c <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2c = he_sig) %>%
@@ -401,7 +401,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2c, aes(x = times, y = he_1A2c)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2c = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -500,13 +500,13 @@ data.frame(t.1A2d%>%
 he.1A2d <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2d = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2d))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2d = he_sig) %>%
@@ -520,7 +520,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2d, aes(x = times, y = he_1A2d)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2d = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -622,13 +622,13 @@ data.frame(t.1A2e%>%
 he.1A2e <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2e = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2e))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2e = he_sig) %>%
@@ -642,7 +642,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2e, aes(x = times, y = he_1A2e)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2e = (WDWW *(WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -742,13 +742,13 @@ data.frame(t.1A2f%>%
 he.1A2f <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2f = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2f))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2f = he_sig) %>%
@@ -762,7 +762,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2f, aes(x = times, y = he_1A2f)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2f = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -861,13 +861,13 @@ data.frame(t.1A2g%>%
 he.1A2g <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2g = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2g))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2g = he_sig) %>%
@@ -881,7 +881,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2g, aes(x = times, y = he_1A2g)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2g = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -980,13 +980,13 @@ data.frame(t.1A2gvi%>%
 he.1A2gvi <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2gvi = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2gvi))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2gvi = he_sig) %>%
@@ -1000,7 +1000,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2gvi, aes(x = times, y = he_1A2gvi)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2gvi = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
@@ -1100,13 +1100,13 @@ data.frame(t.1A2gvii%>%
 he.1A2gvii <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
   dplyr::mutate(he_1A2gvii = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A2gvii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A2gvii = he_sig) %>%
@@ -1120,7 +1120,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A2gvii, aes(x = times, y = he_1A2gvii)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "tomato") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
   labs( caption = "he_1A2gvii = (WDWW * (WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30))")+

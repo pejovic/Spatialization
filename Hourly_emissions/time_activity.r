@@ -763,10 +763,11 @@ activity_df$indE[activity_df$times %in% t11] <- elp_2018$`Distribucije [MWh]`[11
 activity_df$indE[(activity_df$times %in% t12)] <-  elp_2018$`Distribucije [MWh]`[12]
 
 
-activity_df %<>% dplyr::mutate(EP = indE)
+activity_df %<>% dplyr::mutate(EC = indE)
 
 ggplot()+
-  geom_line(data = activity_df, aes(x = times, y = EP), colour = "red")+
+  geom_line(data = activity_df, aes(x = times, y = EC), colour = "red")+
+  ggtitle("Monthly consumption of electricity in the Republic of Serbia in 2018 in MWh")+
   geom_point(size = 0.5) +
   theme_bw()
 

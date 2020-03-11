@@ -70,13 +70,12 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #+ include = FALSE
 activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
 
-summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
-                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP", "EC"),
                           Description = c("Working days", 
                                           "Working days, working weekends", 
                                           "Working time 08-16h",
                                           "working time 16-24h",
-                                          "Working time 00-24h",
                                           "Working time 06-22h",
                                           "Day light", 
                                           "Weekends",
@@ -91,7 +90,8 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
                                           "Sea Level Pressure",
                                           "Vehicles Trend Activity",
                                           "Number of Flights per Hour",
-                                          "Repair - overhaul period"))
+                                          "Repair - overhaul period", 
+                                          "Electricity consumption"))
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
@@ -152,7 +152,7 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a = ((WT0024+0.5) + (WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  dplyr::mutate(he_1A1a = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1a_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a = he_sig) %>%
@@ -168,7 +168,7 @@ ggplot(he.1A1a, aes(x = times, y = he_1A1a)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs(caption = "he_1A1a = (WDWW * (WT0024+0.5) + (WT0622+0.5))  * (30+TEMP*(-1))  * (HS2) * RP2 * (PH2)")+
+  labs(caption = "he_1A1a = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -268,8 +268,8 @@ data.frame(t.1A1b%>%
 he.1A1b <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1A1b =  (WT0024+0.5) * RP2 * (TEMP+30)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
+  dplyr::mutate(he_1A1b =   RP2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1b = he_sig) %>%
   dplyr::mutate(he_1A1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
@@ -383,8 +383,8 @@ data.frame(t.1B2aiv%>%
 he.1B2aiv <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1B2aiv = (WT0024+0.5) * RP2 * (TEMP+30)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
+  dplyr::mutate(he_1B2aiv = RP2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2aiv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2aiv = he_sig) %>%
   dplyr::mutate(he_1B2aiv_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
@@ -400,7 +400,7 @@ ggplot(he.1B2aiv, aes(x = times, y = he_1B2aiv)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "(WT0024+0.5) * RP2 * (TEMP+30)")+
+  labs( caption = "RP2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -496,8 +496,8 @@ data.frame(t.1B2c%>%
 he.1B2c <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1B2c = (WT0024+0.5) * RP2 * (TEMP + 30)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
+  dplyr::mutate(he_1B2c = RP2 * (TEMP + 30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2c = he_sig) %>%
   dplyr::mutate(he_1B2c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
@@ -513,7 +513,7 @@ ggplot(he.1B2c, aes(x = times, y = he_1B2c)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1B2c = (WT0024+0.5) * RP2 * (TEMP+30)")+
+  labs( caption = "he_1B2c = RP2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -610,11 +610,11 @@ data.frame(t.1A1c%>%
 he.1A1c <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
-  dplyr::mutate(he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
+  dplyr::mutate(he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2* (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1c = he_sig) %>%
   dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
@@ -729,10 +729,10 @@ data.frame(t.1B1b%>%
 he.1B1b <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(he_1B1b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B1b = he_sig) %>%
