@@ -148,11 +148,11 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(PH1))+0.5)) %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a = ((WT0024+0.5) + (WT0622+0.5))  * (30+TEMP)  * (HS2) * RP2 * (PH2)) %>%
+  dplyr::mutate(he_1A1a = ((WT0024+0.5) + (WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1a_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a = he_sig) %>%
