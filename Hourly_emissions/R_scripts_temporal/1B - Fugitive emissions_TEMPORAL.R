@@ -70,19 +70,18 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
 load(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/counters_df.rds")
 counters.df <- counters_df %>% 
   mutate(ALL_mean = (IA_mean + IIA_mean + IB_mean)/3)
 activity.df$VA <- counters.df$ALL_mean
 
-summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
-                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP", "EC"),
                           Description = c("Working days", 
                                           "Working days, working weekends", 
                                           "Working time 08-16h",
                                           "working time 16-24h",
-                                          "Working time 00-24h",
                                           "Working time 06-22h",
                                           "Day light", 
                                           "Weekends",
@@ -97,7 +96,8 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
                                           "Sea Level Pressure",
                                           "Vehicles Trend Activity",
                                           "Number of Flights per Hour",
-                                          "Repair - overhaul period"))
+                                          "Repair - overhaul period", 
+                                          "Electricity consumption"))
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
@@ -146,21 +146,21 @@ data.frame(t.1B1a%>%
 he.1B1a <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1B1a = (WDWW * (WT0024+0.5)) * PH2 * (TEMP+30) * RP2) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  dplyr::mutate(he_1B1a = ((WT0024+0.5)) * PH2 * (TEMP+30) * RP2) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B1a = he_sig) %>%
   dplyr::mutate(he_1B1a_n = he_sig/sum(he_sig))%>%
   select(times, he_1B1a, he_1B1a_n)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -170,7 +170,7 @@ ggplot(he.1B1a, aes(x = times, y = he_1B1a)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1B1a = (WDWW * (WT0024+0.5)) * PH2 * (TEMP+30) * RP2")+
+  labs( caption = "he_1B1a = (WDWW * PH2 * (TEMP+30) * RP2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -214,19 +214,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1B1a_df <- sf.1B1a %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1B1a.tl <- lapply(sf.1B1a_df[,-1], function(x) t((x %o% he.1B1a$he_1B1a_n)[,,1]))
-
-sf.1B1a.tl <- lapply(sf.1B1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1B1a.tle, "sf.1B1a.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1B1a_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1B1a.tl[[i]], file = paste("sf.1B1a", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1B1a_df <- sf.1B1a %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1B1a.tl <- lapply(sf.1B1a_df[,-1], function(x) t((x %o% he.1B1a$he_1B1a_n)[,,1]))
+# 
+# sf.1B1a.tl <- lapply(sf.1B1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1B1a.tle, "sf.1B1a.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1B1a_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1B1a.tl[[i]], file = paste("sf.1B1a", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #'
@@ -265,21 +265,21 @@ data.frame(t.1B2ai%>%
 he.1B2ai <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1B2ai = (WDWW * (WT0816+0.5) * (WT1624+0.5)) * PH2) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  dplyr::mutate(he_1B2ai = ((WT0816+0.5) * (WT1624+0.5)) * PH2 *VA) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2ai = he_sig) %>%
   dplyr::mutate(he_1B2ai_n = he_sig/sum(he_sig))%>%
   select(times, he_1B2ai, he_1B2ai_n)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -289,7 +289,7 @@ ggplot(he.1B2ai, aes(x = times, y = he_1B2ai)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1B2ai = (WDWW * (WT0816+0.5) * (WT1624+0.5)) * PH2")+
+  labs( caption = "he_1B2ai = ((WT0816+0.5) * (WT1624+0.5)) * PH2 * VA")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -333,19 +333,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1B2ai_df <- sf.1B2ai %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1B2ai.tl <- lapply(sf.1B2ai_df[,-1], function(x) t((x %o% he.1B2ai$he_1B2ai_n)[,,1]))
-
-sf.1B2ai.tl <- lapply(sf.1B2ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1B2ai.tle, "sf.1B2ai.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1B2ai_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1B2ai.tl[[i]], file = paste("sf.1B2ai", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1B2ai_df <- sf.1B2ai %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1B2ai.tl <- lapply(sf.1B2ai_df[,-1], function(x) t((x %o% he.1B2ai$he_1B2ai_n)[,,1]))
+# 
+# sf.1B2ai.tl <- lapply(sf.1B2ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1B2ai.tle, "sf.1B2ai.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1B2ai_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1B2ai.tl[[i]], file = paste("sf.1B2ai", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #'
@@ -384,21 +384,21 @@ data.frame(t.1B2av%>%
 he.1B2av <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1B2av = (WDWW * (WT0024+0.5)) * PH2) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  dplyr::mutate(he_1B2av = ((WT0024+0.5)) * (PH2)*(TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2av))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2av = he_sig) %>%
   dplyr::mutate(he_1B2av_n = he_sig/sum(he_sig))%>%
   select(times, he_1B2av, he_1B2av_n)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -408,7 +408,7 @@ ggplot(he.1B2av, aes(x = times, y = he_1B2av)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1B2av = (WDWW * (WT0024+0.5)) * PH2")+
+  labs( caption = "he_1B2av = ((WT0024+0.5)) * PH2 * TEMP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -452,19 +452,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1B2av_df <- sf.1B2av %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1B2av.tl <- lapply(sf.1B2av_df[,-1], function(x) t((x %o% he.1B2av$he_1B2av_n)[,,1]))
-
-sf.1B2av.tl <- lapply(sf.1B2av.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1B2av.tle, "sf.1B2av.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1B2av_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1B2av.tl[[i]], file = paste("sf.1B2av", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1B2av_df <- sf.1B2av %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1B2av.tl <- lapply(sf.1B2av_df[,-1], function(x) t((x %o% he.1B2av$he_1B2av_n)[,,1]))
+# 
+# sf.1B2av.tl <- lapply(sf.1B2av.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1B2av.tle, "sf.1B2av.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1B2av_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1B2av.tl[[i]], file = paste("sf.1B2av", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #'
 #'
@@ -502,21 +502,21 @@ data.frame(t.1B2b%>%
 he.1B2b <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
-  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
-  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+0.5)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
-  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1B2b = (WDWW * (WT0024+0.5)) * PH2) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  dplyr::mutate(he_1B2b = ((WT0024+0.5)) * PH2 * (TEMP+30)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B2b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B2b = he_sig) %>%
   dplyr::mutate(he_1B2b_n = he_sig/sum(he_sig))%>%
   select(times, he_1B2b, he_1B2b_n)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -570,19 +570,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1B2b_df <- sf.1B2b %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1B2b.tl <- lapply(sf.1B2b_df[,-1], function(x) t((x %o% he.1B2b$he_1B2b_n)[,,1]))
-
-sf.1B2b.tl <- lapply(sf.1B2b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1B2b.tle, "sf.1B2b.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1B2b_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1B2b.tl[[i]], file = paste("sf.1B2b", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1B2b_df <- sf.1B2b %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1B2b.tl <- lapply(sf.1B2b_df[,-1], function(x) t((x %o% he.1B2b$he_1B2b_n)[,,1]))
+# 
+# sf.1B2b.tl <- lapply(sf.1B2b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1B2b.tle, "sf.1B2b.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1B2b_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1B2b.tl[[i]], file = paste("sf.1B2b", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #  temporalProfile_Fugitive_emissions <- activity.df$times %>% cbind(he.1B1a[,1:6], 
 #                                                             he.1B2ai[,1:6], 

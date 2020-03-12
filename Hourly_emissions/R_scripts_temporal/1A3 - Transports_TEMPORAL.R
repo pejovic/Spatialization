@@ -70,7 +70,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/activity_df.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
 load(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/counters_df.rds")
 counters.df <- counters_df %>% 
   mutate(ALL_mean = (IA_mean + IIA_mean + IB_mean)/3,
@@ -79,13 +79,12 @@ activity.df$VA <- counters.df$ALL_mean
 activity.df$VA_H <- counters.df$IA_mean # Highway
 activity.df$VA_R <- counters.df$RURAL_mean # Rural
 
-summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", "WT0622", "DL", 
-                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP"),
+summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0622", "DL", 
+                                    "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP", "EC"),
                           Description = c("Working days", 
                                           "Working days, working weekends", 
                                           "Working time 08-16h",
                                           "working time 16-24h",
-                                          "Working time 00-24h",
                                           "Working time 06-22h",
                                           "Day light", 
                                           "Weekends",
@@ -100,7 +99,9 @@ summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0024", 
                                           "Sea Level Pressure",
                                           "Vehicles Trend Activity",
                                           "Number of Flights per Hour",
-                                          "Repair - overhaul period"))
+                                          "Repair - overhaul period", 
+                                          "Electricity consumption"))
+
 #+ echo = FALSE, result = TRUE, eval = TRUE
 summary_tab %>%
   datatable(., caption = 'Table: Label description',
@@ -156,14 +157,14 @@ he.1A3ai <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3ai = DL+0.5) %>%
+  dplyr::mutate(he_1A3ai = NFH+0.5) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3ai = he_sig) %>%
   dplyr::mutate(he_1A3ai_n = he_sig/sum(he_sig))%>%
   select(times, he_1A3ai, he_1A3ai_n)
 
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -217,19 +218,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3ai_df <- sf.1A3ai %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3ai.tl <- lapply(sf.1A3ai_df[,-1], function(x) t((x %o% he.1A3ai$he_1A3ai_n)[,,1]))
-
-sf.1A3ai.tl <- lapply(sf.1A3ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3ai.tle, "sf.1A3ai.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3ai_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3ai.tl[[i]], file = paste("sf.1A3ai", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3ai_df <- sf.1A3ai %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3ai.tl <- lapply(sf.1A3ai_df[,-1], function(x) t((x %o% he.1A3ai$he_1A3ai_n)[,,1]))
+# 
+# sf.1A3ai.tl <- lapply(sf.1A3ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3ai.tle, "sf.1A3ai.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3ai_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3ai.tl[[i]], file = paste("sf.1A3ai", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #'
@@ -281,8 +282,8 @@ he.1A3aii <- activity.df %>%
   dplyr::mutate(he_1A3aii_n = he_sig/sum(he_sig))%>%
   select(times, he_1A3aii, he_1A3aii_n)
 # ((SA * (-1.5))+2.5)
-time_seq <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
-                       to   = ymd_h("2015-06-06 24"),
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -336,19 +337,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3aii_df <- sf.1A3aii %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3aii.tl <- lapply(sf.1A3aii_df[,-1], function(x) t((x %o% he.1A3aii$he_1A3aii_n)[,,1]))
-
-sf.1A3aii.tl <- lapply(sf.1A3aii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3aii.tle, "sf.1A3aii.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3aii_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3aii.tl[[i]], file = paste("sf.1A3aii", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3aii_df <- sf.1A3aii %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3aii.tl <- lapply(sf.1A3aii_df[,-1], function(x) t((x %o% he.1A3aii$he_1A3aii_n)[,,1]))
+# 
+# sf.1A3aii.tl <- lapply(sf.1A3aii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3aii.tle, "sf.1A3aii.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3aii_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3aii.tl[[i]], file = paste("sf.1A3aii", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #'
 #'
@@ -403,7 +404,7 @@ he.1A3bi_U <- activity.df %>%
   select(times, he_1A3bi_U, he_1A3bi_U_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -458,19 +459,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bi_U_df <- sf.1A3bi_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bi_U.tl <- lapply(sf.1A3bi_U_df[,-1], function(x) t((x %o% he.1A3bi_U$he_1A3bi_U_n)[,,1]))
-
-sf.1A3bi_U.tl <- lapply(sf.1A3bi_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bi_U.tle, "sf.1A3bi_U.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bi_U_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bi_U.tl[[i]], file = paste("sf.1A3bi_U", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bi_U_df <- sf.1A3bi_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bi_U.tl <- lapply(sf.1A3bi_U_df[,-1], function(x) t((x %o% he.1A3bi_U$he_1A3bi_U_n)[,,1]))
+# 
+# sf.1A3bi_U.tl <- lapply(sf.1A3bi_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bi_U.tle, "sf.1A3bi_U.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bi_U_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bi_U.tl[[i]], file = paste("sf.1A3bi_U", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #' ### Rural transport
 #+ include = FALSE
@@ -518,7 +519,7 @@ he.1A3bi_R <- activity.df %>%
   select(times, he_1A3bi_R, he_1A3bi_R_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -573,19 +574,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bi_R_df <- sf.1A3bi_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bi_R.tl <- lapply(sf.1A3bi_R_df[,-1], function(x) t((x %o% he.1A3bi_R$he_1A3bi_R_n)[,,1]))
-
-sf.1A3bi_R.tl <- lapply(sf.1A3bi_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bi_R.tle, "sf.1A3bi_R.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bi_R_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bi_R.tl[[i]], file = paste("sf.1A3bi_R", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bi_R_df <- sf.1A3bi_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bi_R.tl <- lapply(sf.1A3bi_R_df[,-1], function(x) t((x %o% he.1A3bi_R$he_1A3bi_R_n)[,,1]))
+# 
+# sf.1A3bi_R.tl <- lapply(sf.1A3bi_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bi_R.tle, "sf.1A3bi_R.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bi_R_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bi_R.tl[[i]], file = paste("sf.1A3bi_R", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #' 
 #' ### Highways transport
 #+ include = FALSE
@@ -632,7 +633,7 @@ he.1A3bi_H <- activity.df %>%
   select(times, he_1A3bi_H, he_1A3bi_H_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -686,19 +687,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bi_H_df <- sf.1A3bi_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bi_H.tl <- lapply(sf.1A3bi_H_df[,-1], function(x) t((x %o% he.1A3bi_H$he_1A3bi_H_n)[,,1]))
-
-sf.1A3bi_H.tl <- lapply(sf.1A3bi_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bi_H.tle, "sf.1A3bi_H.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bi_H_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bi_H.tl[[i]], file = paste("sf.1A3bi_H", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bi_H_df <- sf.1A3bi_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bi_H.tl <- lapply(sf.1A3bi_H_df[,-1], function(x) t((x %o% he.1A3bi_H$he_1A3bi_H_n)[,,1]))
+# 
+# sf.1A3bi_H.tl <- lapply(sf.1A3bi_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bi_H.tle, "sf.1A3bi_H.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bi_H_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bi_H.tl[[i]], file = paste("sf.1A3bi_H", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #'
@@ -754,7 +755,7 @@ he.1A3bii_U <- activity.df %>%
   select(times, he_1A3bii_U, he_1A3bii_U_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -809,19 +810,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bii_U_df <- sf.1A3bii_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bii_U.tl <- lapply(sf.1A3bii_U_df[,-1], function(x) t((x %o% he.1A3bii_U$he_1A3bii_U_n)[,,1]))
-
-sf.1A3bii_U.tl <- lapply(sf.1A3bii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bii_U.tle, "sf.1A3bii_U.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bii_U_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bii_U.tl[[i]], file = paste("sf.1A3bii_U", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bii_U_df <- sf.1A3bii_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bii_U.tl <- lapply(sf.1A3bii_U_df[,-1], function(x) t((x %o% he.1A3bii_U$he_1A3bii_U_n)[,,1]))
+# 
+# sf.1A3bii_U.tl <- lapply(sf.1A3bii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bii_U.tle, "sf.1A3bii_U.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bii_U_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bii_U.tl[[i]], file = paste("sf.1A3bii_U", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #' ### Rural transport
 #+ include = FALSE
@@ -869,7 +870,7 @@ he.1A3bii_R <- activity.df %>%
   select(times, he_1A3bii_R, he_1A3bii_R_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -923,19 +924,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bii_R_df <- sf.1A3bii_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bii_R.tl <- lapply(sf.1A3bii_R_df[,-1], function(x) t((x %o% he.1A3bii_R$he_1A3bii_R_n)[,,1]))
-
-sf.1A3bii_R.tl <- lapply(sf.1A3bii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bii_R.tle, "sf.1A3bii_R.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bii_R_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bii_R.tl[[i]], file = paste("sf.1A3bii_R", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bii_R_df <- sf.1A3bii_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bii_R.tl <- lapply(sf.1A3bii_R_df[,-1], function(x) t((x %o% he.1A3bii_R$he_1A3bii_R_n)[,,1]))
+# 
+# sf.1A3bii_R.tl <- lapply(sf.1A3bii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bii_R.tle, "sf.1A3bii_R.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bii_R_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bii_R.tl[[i]], file = paste("sf.1A3bii_R", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #' 
 #' ### Highways transport
@@ -983,7 +984,7 @@ he.1A3bii_H <- activity.df %>%
   select(times, he_1A3bii_H, he_1A3bii_H_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1037,19 +1038,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bii_H_df <- sf.1A3bii_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bii_H.tl <- lapply(sf.1A3bii_H_df[,-1], function(x) t((x %o% he.1A3bii_H$he_1A3bii_H_n)[,,1]))
-
-sf.1A3bii_H.tl <- lapply(sf.1A3bii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bii_H.tle, "sf.1A3bii_H.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bii_H_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bii_H.tl[[i]], file = paste("sf.1A3bii_H", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bii_H_df <- sf.1A3bii_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bii_H.tl <- lapply(sf.1A3bii_H_df[,-1], function(x) t((x %o% he.1A3bii_H$he_1A3bii_H_n)[,,1]))
+# 
+# sf.1A3bii_H.tl <- lapply(sf.1A3bii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bii_H.tle, "sf.1A3bii_H.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bii_H_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bii_H.tl[[i]], file = paste("sf.1A3bii_H", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #'
@@ -1106,7 +1107,7 @@ he.1A3biii_U <- activity.df %>%
   select(times, he_1A3biii_U, he_1A3biii_U_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1161,19 +1162,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biii_U_df <- sf.1A3biii_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biii_U.tl <- lapply(sf.1A3biii_U_df[,-1], function(x) t((x %o% he.1A3biii_U$he_1A3biii_U_n)[,,1]))
-
-sf.1A3biii_U.tl <- lapply(sf.1A3biii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biii_U.tle, "sf.1A3biii_U.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biii_U_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biii_U.tl[[i]], file = paste("sf.1A3biii_U", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biii_U_df <- sf.1A3biii_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biii_U.tl <- lapply(sf.1A3biii_U_df[,-1], function(x) t((x %o% he.1A3biii_U$he_1A3biii_U_n)[,,1]))
+# 
+# sf.1A3biii_U.tl <- lapply(sf.1A3biii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biii_U.tle, "sf.1A3biii_U.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biii_U_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biii_U.tl[[i]], file = paste("sf.1A3biii_U", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #' ### Rural transport
@@ -1222,7 +1223,7 @@ he.1A3biii_R <- activity.df %>%
   select(times, he_1A3biii_R, he_1A3biii_R_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1276,19 +1277,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biii_R_df <- sf.1A3biii_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biii_R.tl <- lapply(sf.1A3biii_R_df[,-1], function(x) t((x %o% he.1A3biii_R$he_1A3biii_R_n)[,,1]))
-
-sf.1A3biii_R.tl <- lapply(sf.1A3biii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biii_R.tle, "sf.1A3biii_R.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biii_R_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biii_R.tl[[i]], file = paste("sf.1A3biii_R", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biii_R_df <- sf.1A3biii_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biii_R.tl <- lapply(sf.1A3biii_R_df[,-1], function(x) t((x %o% he.1A3biii_R$he_1A3biii_R_n)[,,1]))
+# 
+# sf.1A3biii_R.tl <- lapply(sf.1A3biii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biii_R.tle, "sf.1A3biii_R.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biii_R_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biii_R.tl[[i]], file = paste("sf.1A3biii_R", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #' 
 #' ### Highways transport
@@ -1336,7 +1337,7 @@ he.1A3biii_H <- activity.df %>%
   select(times, he_1A3biii_H, he_1A3biii_H_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1390,19 +1391,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biii_H_df <- sf.1A3biii_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biii_H.tl <- lapply(sf.1A3biii_H_df[,-1], function(x) t((x %o% he.1A3biii_H$he_1A3biii_H_n)[,,1]))
-
-sf.1A3biii_H.tl <- lapply(sf.1A3biii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biii_H.tle, "sf.1A3biii_H.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biii_H_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biii_H.tl[[i]], file = paste("sf.1A3biii_H", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biii_H_df <- sf.1A3biii_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biii_H.tl <- lapply(sf.1A3biii_H_df[,-1], function(x) t((x %o% he.1A3biii_H$he_1A3biii_H_n)[,,1]))
+# 
+# sf.1A3biii_H.tl <- lapply(sf.1A3biii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biii_H.tle, "sf.1A3biii_H.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biii_H_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biii_H.tl[[i]], file = paste("sf.1A3biii_H", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #'
 #'
@@ -1458,7 +1459,7 @@ he.1A3biii_bc_U <- activity.df %>%
   select(times, he_1A3biii_bc_U, he_1A3biii_bc_U_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1513,19 +1514,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biii_bc_U_df <- sf.1A3biii_bc_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U_df[,-1], function(x) t((x %o% he.1A3biii_bc_U$he_1A3biii_bc_U_n)[,,1]))
-
-sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biii_bc_U.tle, "sf.1A3biii_bc_U.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biii_bc_U_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biii_bc_U.tl[[i]], file = paste("sf.1A3biii_bc_U", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biii_bc_U_df <- sf.1A3biii_bc_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U_df[,-1], function(x) t((x %o% he.1A3biii_bc_U$he_1A3biii_bc_U_n)[,,1]))
+# 
+# sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biii_bc_U.tle, "sf.1A3biii_bc_U.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biii_bc_U_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biii_bc_U.tl[[i]], file = paste("sf.1A3biii_bc_U", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #' ### Rural transport
 #+ include = FALSE
@@ -1573,7 +1574,7 @@ he.1A3biii_bc_R <- activity.df %>%
   select(times, he_1A3biii_bc_R, he_1A3biii_bc_R_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1628,19 +1629,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biii_bc_R_df <- sf.1A3biii_bc_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R_df[,-1], function(x) t((x %o% he.1A3biii_bc_R$he_1A3biii_bc_R_n)[,,1]))
-
-sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biii_bc_R.tle, "sf.1A3biii_bc_R.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biii_bc_R_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biii_bc_R.tl[[i]], file = paste("sf.1A3biii_bc_R", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biii_bc_R_df <- sf.1A3biii_bc_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R_df[,-1], function(x) t((x %o% he.1A3biii_bc_R$he_1A3biii_bc_R_n)[,,1]))
+# 
+# sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biii_bc_R.tle, "sf.1A3biii_bc_R.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biii_bc_R_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biii_bc_R.tl[[i]], file = paste("sf.1A3biii_bc_R", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #' 
 #' ### Highways transport
 #+ include = FALSE
@@ -1687,7 +1688,7 @@ he.1A3biii_bc_H <- activity.df %>%
   select(times, he_1A3biii_bc_H, he_1A3biii_bc_H_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1742,19 +1743,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biii_bc_H_df <- sf.1A3biii_bc_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H_df[,-1], function(x) t((x %o% he.1A3biii_bc_H$he_1A3biii_bc_H_n)[,,1]))
-
-sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biii_bc_H.tle, "sf.1A3biii_bc_H.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biii_bc_H_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biii_bc_H.tl[[i]], file = paste("sf.1A3biii_bc_H", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biii_bc_H_df <- sf.1A3biii_bc_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H_df[,-1], function(x) t((x %o% he.1A3biii_bc_H$he_1A3biii_bc_H_n)[,,1]))
+# 
+# sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biii_bc_H.tle, "sf.1A3biii_bc_H.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biii_bc_H_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biii_bc_H.tl[[i]], file = paste("sf.1A3biii_bc_H", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 
 #'
@@ -1812,7 +1813,7 @@ he.1A3biv_U <- activity.df %>%
   select(times, he_1A3biv_U, he_1A3biv_U_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1867,19 +1868,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biv_U_df <- sf.1A3biv_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biv_U.tl <- lapply(sf.1A3biv_U_df[,-1], function(x) t((x %o% he.1A3biv_U$he_1A3biv_U_n)[,,1]))
-
-sf.1A3biv_U.tl <- lapply(sf.1A3biv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biv_U.tle, "sf.1A3biv_U.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biv_U_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biv_U.tl[[i]], file = paste("sf.1A3biv_U", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biv_U_df <- sf.1A3biv_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biv_U.tl <- lapply(sf.1A3biv_U_df[,-1], function(x) t((x %o% he.1A3biv_U$he_1A3biv_U_n)[,,1]))
+# 
+# sf.1A3biv_U.tl <- lapply(sf.1A3biv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biv_U.tle, "sf.1A3biv_U.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biv_U_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biv_U.tl[[i]], file = paste("sf.1A3biv_U", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #' ### Rural transport
@@ -1928,7 +1929,7 @@ he.1A3biv_R <- activity.df %>%
   select(times, he_1A3biv_R, he_1A3biv_R_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -1983,19 +1984,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biv_R_df <- sf.1A3biv_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biv_R.tl <- lapply(sf.1A3biv_R_df[,-1], function(x) t((x %o% he.1A3biv_R$he_1A3biv_R_n)[,,1]))
-
-sf.1A3biv_R.tl <- lapply(sf.1A3biv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biv_R.tle, "sf.1A3biv_R.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biv_R_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biv_R.tl[[i]], file = paste("sf.1A3biv_R", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biv_R_df <- sf.1A3biv_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biv_R.tl <- lapply(sf.1A3biv_R_df[,-1], function(x) t((x %o% he.1A3biv_R$he_1A3biv_R_n)[,,1]))
+# 
+# sf.1A3biv_R.tl <- lapply(sf.1A3biv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biv_R.tle, "sf.1A3biv_R.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biv_R_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biv_R.tl[[i]], file = paste("sf.1A3biv_R", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #' 
 #' ### Highways transport
@@ -2043,7 +2044,7 @@ he.1A3biv_H <- activity.df %>%
   select(times, he_1A3biv_H, he_1A3biv_H_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2098,19 +2099,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3biv_H_df <- sf.1A3biv_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3biv_H.tl <- lapply(sf.1A3biv_H_df[,-1], function(x) t((x %o% he.1A3biv_H$he_1A3biv_H_n)[,,1]))
-
-sf.1A3biv_H.tl <- lapply(sf.1A3biv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3biv_H.tle, "sf.1A3biv_H.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3biv_H_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3biv_H.tl[[i]], file = paste("sf.1A3biv_H", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3biv_H_df <- sf.1A3biv_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3biv_H.tl <- lapply(sf.1A3biv_H_df[,-1], function(x) t((x %o% he.1A3biv_H$he_1A3biv_H_n)[,,1]))
+# 
+# sf.1A3biv_H.tl <- lapply(sf.1A3biv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3biv_H.tle, "sf.1A3biv_H.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3biv_H_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3biv_H.tl[[i]], file = paste("sf.1A3biv_H", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 
 #'
@@ -2167,7 +2168,7 @@ he.1A3bv_U <- activity.df %>%
   select(times, he_1A3bv_U, he_1A3bv_U_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2222,19 +2223,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bv_U_df <- sf.1A3bv_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bv_U.tl <- lapply(sf.1A3bv_U_df[,-1], function(x) t((x %o% he.1A3bv_U$he_1A3bv_U_n)[,,1]))
-
-sf.1A3bv_U.tl <- lapply(sf.1A3bv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bv_U.tle, "sf.1A3bv_U.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bv_U_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bv_U.tl[[i]], file = paste("sf.1A3bv_U", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bv_U_df <- sf.1A3bv_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bv_U.tl <- lapply(sf.1A3bv_U_df[,-1], function(x) t((x %o% he.1A3bv_U$he_1A3bv_U_n)[,,1]))
+# 
+# sf.1A3bv_U.tl <- lapply(sf.1A3bv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bv_U.tle, "sf.1A3bv_U.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bv_U_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bv_U.tl[[i]], file = paste("sf.1A3bv_U", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #' ### Rural transport
 #+ include = FALSE
@@ -2282,7 +2283,7 @@ he.1A3bv_R <- activity.df %>%
   select(times, he_1A3bv_R, he_1A3bv_R_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2337,19 +2338,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bv_R_df <- sf.1A3bv_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bv_R.tl <- lapply(sf.1A3bv_R_df[,-1], function(x) t((x %o% he.1A3bv_R$he_1A3bv_R_n)[,,1]))
-
-sf.1A3bv_R.tl <- lapply(sf.1A3bv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bv_R.tle, "sf.1A3bv_R.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bv_R_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bv_R.tl[[i]], file = paste("sf.1A3bv_R", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bv_R_df <- sf.1A3bv_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bv_R.tl <- lapply(sf.1A3bv_R_df[,-1], function(x) t((x %o% he.1A3bv_R$he_1A3bv_R_n)[,,1]))
+# 
+# sf.1A3bv_R.tl <- lapply(sf.1A3bv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bv_R.tle, "sf.1A3bv_R.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bv_R_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bv_R.tl[[i]], file = paste("sf.1A3bv_R", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #' 
 #' ### Highways transport
 #+ include = FALSE
@@ -2396,7 +2397,7 @@ he.1A3bv_H <- activity.df %>%
   select(times, he_1A3bv_H, he_1A3bv_H_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2450,19 +2451,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bv_H_df <- sf.1A3bv_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bv_H.tl <- lapply(sf.1A3bv_H_df[,-1], function(x) t((x %o% he.1A3bv_H$he_1A3bv_H_n)[,,1]))
-
-sf.1A3bv_H.tl <- lapply(sf.1A3bv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bv_H.tle, "sf.1A3bv_H.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bv_H_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bv_H.tl[[i]], file = paste("sf.1A3bv_H", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bv_H_df <- sf.1A3bv_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bv_H.tl <- lapply(sf.1A3bv_H_df[,-1], function(x) t((x %o% he.1A3bv_H$he_1A3bv_H_n)[,,1]))
+# 
+# sf.1A3bv_H.tl <- lapply(sf.1A3bv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bv_H.tle, "sf.1A3bv_H.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bv_H_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bv_H.tl[[i]], file = paste("sf.1A3bv_H", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #'
 #'
@@ -2518,7 +2519,7 @@ he.1A3bvi <- activity.df %>%
   select(times, he_1A3bvi, he_1A3bvi_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2575,19 +2576,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bvi_df <- sf.1A3bvi %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bvi.tl <- lapply(sf.1A3bvi_df[,-1], function(x) t((x %o% he.1A3bvi$he_1A3bvi_n)[,,1]))
-
-sf.1A3bvi.tl <- lapply(sf.1A3bvi.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bvi.tle, "sf.1A3bvi.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bvi_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bvi.tl[[i]], file = paste("sf.1A3bvi", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bvi_df <- sf.1A3bvi %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bvi.tl <- lapply(sf.1A3bvi_df[,-1], function(x) t((x %o% he.1A3bvi$he_1A3bvi_n)[,,1]))
+# 
+# sf.1A3bvi.tl <- lapply(sf.1A3bvi.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bvi.tle, "sf.1A3bvi.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bvi_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bvi.tl[[i]], file = paste("sf.1A3bvi", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 
 #'
@@ -2644,7 +2645,7 @@ he.1A3bvii <- activity.df %>%
   select(times, he_1A3bvii, he_1A3bvii_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2700,19 +2701,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3bvii_df <- sf.1A3bvii %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3bvii.tl <- lapply(sf.1A3bvii_df[,-1], function(x) t((x %o% he.1A3bvii$he_1A3bvii_n)[,,1]))
-
-sf.1A3bvii.tl <- lapply(sf.1A3bvii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3bvii.tle, "sf.1A3bvii.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3bvii_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3bvii.tl[[i]], file = paste("sf.1A3bvii", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3bvii_df <- sf.1A3bvii %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3bvii.tl <- lapply(sf.1A3bvii_df[,-1], function(x) t((x %o% he.1A3bvii$he_1A3bvii_n)[,,1]))
+# 
+# sf.1A3bvii.tl <- lapply(sf.1A3bvii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3bvii.tle, "sf.1A3bvii.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3bvii_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3bvii.tl[[i]], file = paste("sf.1A3bvii", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 
 
@@ -2768,7 +2769,7 @@ he.1A3c <- activity.df %>%
   select(times, he_1A3c, he_1A3c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2822,19 +2823,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3c_df <- sf.1A3c %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3c.tl <- lapply(sf.1A3c_df[,-1], function(x) t((x %o% he.1A3c$he_1A3c_n)[,,1]))
-
-sf.1A3c.tl <- lapply(sf.1A3c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3c.tle, "sf.1A3c.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3c_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3c.tl[[i]], file = paste("sf.1A3c", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3c_df <- sf.1A3c %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3c.tl <- lapply(sf.1A3c_df[,-1], function(x) t((x %o% he.1A3c$he_1A3c_n)[,,1]))
+# 
+# sf.1A3c.tl <- lapply(sf.1A3c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3c.tle, "sf.1A3c.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3c_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3c.tl[[i]], file = paste("sf.1A3c", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 #'
 #'
 #'
@@ -2886,7 +2887,7 @@ he.1A3dii <- activity.df %>%
   select(times, he_1A3dii, he_1A3dii_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-01-06 24"),
+                       to   = ymd_h("2015-03-31 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -2941,19 +2942,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-sf.1A3dii_df <- sf.1A3dii %>% st_drop_geometry() #%>% dplyr::select(NOx)
-
-sf.1A3dii.tl <- lapply(sf.1A3dii_df[,-1], function(x) t((x %o% he.1A3dii$he_1A3dii_n)[,,1]))
-
-sf.1A3dii.tl <- lapply(sf.1A3dii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-
-# writexl::write_xlsx(sf.1A3dii.tle, "sf.1A3dii.tle.xlsx") # Mnogo traje...
-
-vars <- names(sf.1A3dii_df)[-1]
-
-for(i in 1:length(vars)){
-  fwrite(sf.1A3dii.tl[[i]], file = paste("sf.1A3dii", paste(vars[i],"csv", sep = "."), sep = "_"))
-}
+# sf.1A3dii_df <- sf.1A3dii %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A3dii.tl <- lapply(sf.1A3dii_df[,-1], function(x) t((x %o% he.1A3dii$he_1A3dii_n)[,,1]))
+# 
+# sf.1A3dii.tl <- lapply(sf.1A3dii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A3dii.tle, "sf.1A3dii.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A3dii_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A3dii.tl[[i]], file = paste("sf.1A3dii", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
 
 #  temporalProfile_Transports<- activity.df$times %>% cbind(he.1A3ai[,1:6], 
 #                                                             he.1A3aii[,1:6], 
