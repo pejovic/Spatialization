@@ -273,7 +273,7 @@ sf.5A <- sf.5A %>% # Calculating weights and distibute data
          PM2.5 = ((diff.5A$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.5A$NMVOC/sum_Area)*Area),
          NH3 = ((diff.5A$NH3/sum_Area)*Area))
-sf.5A %<>% select(vars)
+sf.5A %<>% dplyr::select(vars)
 #'
 #'
 #+ include = TRUE, message= FALSE, warning = FALSE
@@ -495,7 +495,7 @@ sf.5D1 <- sf.5D1 %>% # Calculate weights and distribute data
          PM2.5 = ((diff.5D1$PM2.5/sum_s)*Otpadne_vode),
          NMVOC = ((diff.5D1$NMVOC/sum_s)*Otpadne_vode),
          NH3 = ((diff.5D1$NH3/sum_s)*Otpadne_vode))
-sf.5D1 %<>% select(vars)
+sf.5D1 %<>% dplyr::select(vars)
 #'
 #'
 #+ include = TRUE, message = FALSE, warning = FALSE
@@ -541,14 +541,20 @@ source.5D2$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D5
 source.5D2$total$inventory <- readxl::read_xlsx(path = source.file, range = "D59:I59", sheet = source.sheet, col_names = vars)
 
 #+ include = TRUE, message = FALSE, warning = FALSE
-clc121 <- subset(sf_clc18, CODE_18 == "121") %>% # Industrial sites
-  st_transform(32634) # Transform to UTM projection
-clc121[,vars] <- NA
+sf.ind <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") %>%
+  dplyr::rename(geometry = geom) %>%
+  dplyr::select(geometry)
+sf.waste <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Wastewater_plants_OSM_32634.gpkg") %>%
+  dplyr::rename(geometry = geom) %>%
+  dplyr::select(geometry)
 
-clc121.int <- st_intersection(clc121, sf.grid.5km) %>% # Intersection with grid cells
-  select(.,vars)
 
-source.5D2$sources$polygon <- clc121.int
+sf.final <- rbind(sf.ind, sf.waste)
+sf.final[, vars] <- NA
+sf.final.int <- st_intersection(sf.final, sf.grid.5km) %>% # Intersection with grid cells
+  dplyr::select(.,vars)
+
+source.5D2$sources$polygon <- sf.final.int
 sf.5D2 <- corsum2sf_polygon(source.5D2, distribute = FALSE) %>% # Preparing data for final spatialization
   st_transform(crs = "+init=epsg:32634")
 
@@ -605,7 +611,7 @@ sf.5D2 <- sf.5D2 %>% # Calculate weights and distibute data
          PM2.5 = ((diff.5D2$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.5D2$NMVOC/sum_Area)*Area),
          NH3 = ((diff.5D2$NH3/sum_Area)*Area))
-sf.5D2 %<>% select(vars)
+sf.5D2 %<>% dplyr::select(vars)
 #'
 #'
 #+ include = TRUE, message = FALSE, warning = FALSE

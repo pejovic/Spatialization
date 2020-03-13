@@ -164,7 +164,38 @@ corsum2sf_lines <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
-
+corsum2sf_point.sf <- function(source.list, distribute = FALSE){
+  source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
+  source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
+  
+  points.sum <- source.list$sources$points %>% 
+    st_drop_geometry() %>%
+    dplyr::select(., vars) %>% 
+    apply(., 2, sum) %>% 
+    t(.) %>% 
+    as.data.frame() %>%
+    dplyr::mutate_if(is.numeric, round, 2)
+  
+  points.total <- source.list[[2]][[2]][, vars] %>% 
+    dplyr::mutate_if(is.numeric, round, 2) %>%
+    as.data.frame()
+  
+  if(!identical(points.sum, points.total) & distribute == TRUE){
+    d <- (points.total - points.sum)[1, ]
+    zero.ind <- source.list$sources$points[, vars] %>% st_drop_geometry() == 0
+    w <- replace(source.list$sources$points[, vars] %>% st_drop_geometry(), zero.ind, 1) %>% 
+      apply(., 2, function(x) x/sum(x)) %>%
+      as.data.frame() %>%
+      dplyr::mutate_all(~replace(., is.na(.), 0))
+    
+    cor.data <- as.matrix(w) %*% diag(d) + source.list$sources$points[, vars]%>% st_drop_geometry()
+    source.list$sources$points[, vars] <- cor.data
+    source.sf <- source.list$sources$points
+  }else{
+    source.sf <- source.list$sources$points
+  }
+  return(source.sf)
+}
 
 # Function for spatial data visualisation at web maps
 # Parameters:
@@ -223,7 +254,7 @@ clc131_buff <- st_join(clc131, st_sf(buf_131) %>% mutate(id = seq(1:dim(.))), jo
   filter(!is.na(id))
 
 clc131.int <- st_intersection(clc131_buff, sf.grid.5km) %>%
-  select(.,vars)
+  dplyr::select(.,vars)
 
 source.1B1a$sources$polygon <- clc131.int
 source.1B1a$sources$points <- NA
@@ -284,7 +315,7 @@ sf.1B1a <- sf.1B1a %>%
          PM2.5 = ((diff.1B1a$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.1B1a$NMVOC/sum_Area)*Area),
          NH3 = ((diff.1B1a$NH3/sum_Area)*Area))
-sf.1B1a %<>% select(vars)
+sf.1B1a %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -476,7 +507,7 @@ sf_opstine$ind[sf_opstine$NAME_2 == "Surčin"] <- 1
 sf_opstine$ind[sf_opstine$NAME_2 == "Kragujevac"] <- 1
 sf_opstine$ind[sf_opstine$NAME_2 == "Žitorađa"] <- 0
 
-sf_opstine %<>% select(NAME_2, ind) %>%
+sf_opstine %<>% dplyr::select(NAME_2, ind) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #+ include = FALSE
@@ -502,15 +533,23 @@ sf_opstine[,vars] <- NA
 
 sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km)  
 
-source.1B2av$sources$polygon <- sf_opstine.int
 
-sf.1B2av <- corsum2sf_polygon(source.1B2av, distribute = FALSE) %>%
+
+fuel.s <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Fuel_stations_OSM_32634.gpkg")
+
+fuel.s %<>% st_intersection(., sf_opstine.int) %>%
+  dplyr::select(Br_stanovnistvo)
+
+fuel.s[,vars] <- NA
+source.1B2av$sources$points <- fuel.s
+
+sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf_opstine %>% 
+fuel.s %>% 
   st_drop_geometry() %>%
   mutate_all(~replace_na(., 0)) %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
@@ -560,7 +599,7 @@ sf.1B2av <- sf.1B2av %>%
          PM2.5 = ((diff.1B2av$PM2.5/sum_s)*Br_stanovnistvo),
          NMVOC = ((diff.1B2av$NMVOC/sum_s)*Br_stanovnistvo),
          NH3 = ((diff.1B2av$NH3/sum_s)*Br_stanovnistvo))
-sf.1B2av %<>% select(vars)
+sf.1B2av %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE

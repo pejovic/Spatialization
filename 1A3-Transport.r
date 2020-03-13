@@ -169,6 +169,41 @@ corsum2sf_polygon <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
+
+
+corsum2sf_point.sf <- function(source.list, distribute = FALSE){
+  source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
+  source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
+  
+  points.sum <- source.list$sources$points %>% 
+    st_drop_geometry() %>%
+    dplyr::select(., vars) %>% 
+    apply(., 2, sum) %>% 
+    t(.) %>% 
+    as.data.frame() %>%
+    dplyr::mutate_if(is.numeric, round, 2)
+  
+  points.total <- source.list[[2]][[2]][, vars] %>% 
+    dplyr::mutate_if(is.numeric, round, 2) %>%
+    as.data.frame()
+  
+  if(!identical(points.sum, points.total) & distribute == TRUE){
+    d <- (points.total - points.sum)[1, ]
+    zero.ind <- source.list$sources$points[, vars] %>% st_drop_geometry() == 0
+    w <- replace(source.list$sources$points[, vars] %>% st_drop_geometry(), zero.ind, 1) %>% 
+      apply(., 2, function(x) x/sum(x)) %>%
+      as.data.frame() %>%
+      dplyr::mutate_all(~replace(., is.na(.), 0))
+    
+    cor.data <- as.matrix(w) %*% diag(d) + source.list$sources$points[, vars]%>% st_drop_geometry()
+    source.list$sources$points[, vars] <- cor.data
+    source.sf <- source.list$sources$points
+  }else{
+    source.sf <- source.list$sources$points
+  }
+  return(source.sf)
+}
+
 # source.list = source.1A3c
 corsum2sf_lines <- function(source.list, distribute = FALSE){
   source.list$sources$lines[, vars] <- source.list$sources$lines[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
@@ -244,8 +279,28 @@ source.1A3ai$sources$points <- readxl::read_xlsx(path = source.file, range = "D1
 source.1A3ai$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D19:I19", sheet = source.sheet, col_names = vars)
 source.1A3ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D20:I20", sheet = source.sheet, col_names = vars)
 
+
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+sf_clc18_air <- subset(sf_clc18, CODE_18 == "124") %>% # CLC urban zones
+  st_transform(crs = "+init=epsg:32634") %>%
+  dplyr::select(geometry)
+
 sf.1A3ai <- corsum2sf(source.1A3ai, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
+
+
+sf.air <- sf::st_join(sf_clc18_air, sf.1A3ai)
+sf.air %<>% filter(`...10` == 'Aerodrom "Konstantin Veliki" Nis' | `...10` == 'Aerodorm "Nikola Tesla" Beograd') %>% dplyr::select(geometry)
+sf.air[, vars] <- NA
+
+sf.air.int <- st_intersection(sf.air, sf.grid.5km)
+source.1A3ai$sources$points <- NA
+source.1A3ai$sources$polygon <- sf.air.int
+
+sf.1A3ai <- corsum2sf_polygon(source.1A3ai, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
 
 #'
 #'
@@ -291,22 +346,25 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A3ai, total.1A3ai,
 
 sf.1A3ai$Passangers <- NA
 sf.1A3ai$Passangers[1] <- 4776110
-sf.1A3ai$Passangers[2] <- 36258 
+sf.1A3ai$Passangers[2] <- 4776110
+sf.1A3ai$Passangers[3] <- 36258 
+sf.1A3ai$Passangers[4] <- 36258 
+sf.1A3ai %<>% dplyr::mutate(Weight = unclass(st_area(.)) * Passangers)
 
-sum_Passangers <- sum(sf.1A3ai$Passangers)
+sum_Weight <- sum(sf.1A3ai$Weight)
 diff.1A3ai <- data.frame(total.1A3ai - sum.1A3ai)
 sf.1A3ai <- sf.1A3ai %>% # Calculating weights and distibute data
-  mutate(NOx = ((diff.1A3ai$NOx/sum_Passangers)*Passangers),
-         SO2 = ((diff.1A3ai$SO2/sum_Passangers)*Passangers),
-         PM10 = ((diff.1A3ai$PM10/sum_Passangers)*Passangers),
-         PM2.5 = ((diff.1A3ai$PM2.5/sum_Passangers)*Passangers),
-         NMVOC = ((diff.1A3ai$NMVOC/sum_Passangers)*Passangers),
-         NH3 = ((diff.1A3ai$NH3/sum_Passangers)*Passangers))
-sf.1A3ai %<>% select(vars)
+  mutate(NOx = ((diff.1A3ai$NOx/sum_Weight)*Weight),
+         SO2 = ((diff.1A3ai$SO2/sum_Weight)*Weight),
+         PM10 = ((diff.1A3ai$PM10/sum_Weight)*Weight),
+         PM2.5 = ((diff.1A3ai$PM2.5/sum_Weight)*Weight),
+         NMVOC = ((diff.1A3ai$NMVOC/sum_Weight)*Weight),
+         NH3 = ((diff.1A3ai$NH3/sum_Weight)*Weight))
+sf.1A3ai %<>% dplyr::select(vars)
 
 #+ include = FALSE, echo = FALSE, result = FALSE
 p.1A3ai <- sf.grid.5km %>%
-  st_join(sf.1A3ai) %>%
+  st_join(sf.1A3ai, join = st_contains) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),

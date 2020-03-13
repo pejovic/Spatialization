@@ -207,11 +207,6 @@ source.3B3$total$inventory <- readxl::read_xlsx(path = source.file, range = "D63
 sf.3B3 <- corsum2sf(source.3B3, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
-
-
-
-
-
 #+ include = FALSE
 Sys.setlocale(locale = 'Serbian (Latin)')
 opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
@@ -243,7 +238,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -447,7 +442,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -644,7 +639,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -889,7 +884,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -1025,7 +1020,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -1161,7 +1156,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -1297,7 +1292,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
@@ -1433,7 +1428,7 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 

@@ -210,7 +210,14 @@ source.1A4ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
 sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(crs = "+init=epsg:32634") %>%
+  dplyr::select(geometry)
+
+sf.comm <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/OSM_commercial_Serbia.gpkg") %>%
+  dplyr::select(geom) %>%
+  rename(geometry = geom)
+  
+sf.final <- rbind(sf_clc18_urb, sf.comm)
 
 #+ include = FALSE
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -223,21 +230,22 @@ sf_opstine <- st_as_sf(opstine)
 toplane <- readxl::read_xls(path = "Data/toplane/Toplane_2015.xls") %>%
   mutate(GRAD = str_to_title(GRAD))
 
-sf_opstine$Toplane <- toplane$`Ukupna grejna povrsina (m2)`[match(sf_opstine$NAME_2, toplane$GRAD)] 
+sf_opstine$Toplane <- toplane$`Ukupna grejna povrsina ostalih ustanova, institucija i poslovnih jedininica (m2)`[match(sf_opstine$NAME_2, toplane$GRAD)] 
 
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634") %>% 
   mutate_all(~replace(., is.na(.), 0))
 
-sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
+sf_final <- sf.final
+sf_final <- st_join(sf_final, sf_opstine, largest = TRUE) 
 
-sf_clc18_urb %<>% dplyr::select(.,Toplane, NAME_2)
-sf_clc18_urb[,vars] <- NA
+sf_final %<>% dplyr::select(.,Toplane, NAME_2)
+sf_final[,vars] <- NA
 
-sf_clc18_urb.int <- st_intersection(sf_clc18_urb, sf.grid.5km) %>% 
+sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>% 
   filter(!is.na(Toplane))
 
-source.1A4ai$sources$polygon <- sf_clc18_urb.int
+source.1A4ai$sources$polygon <- sf_final.int
 
 sf.1A4ai <- corsum2sf_polygon(source.1A4ai, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -295,7 +303,7 @@ sf.1A4ai <- sf.1A4ai %>%
          PM2.5 = ((diff.1A4ai$PM2.5/sum_s)*Toplane),
          NMVOC = ((diff.1A4ai$NMVOC/sum_s)*Toplane),
          NH3 = ((diff.1A4ai$NH3/sum_s)*Toplane))
-sf.1A4ai %<>% select(vars)
+sf.1A4ai %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -447,7 +455,7 @@ sf.1A4bi <- sf.1A4bi %>%
          PM2.5 = ((diff.1A4bi$PM2.5/sum_s)*Br_domacinstva),
          NMVOC = ((diff.1A4bi$NMVOC/sum_s)*Br_domacinstva),
          NH3 = ((diff.1A4bi$NH3/sum_s)*Br_domacinstva))
-sf.1A4bi %<>% select(vars)
+sf.1A4bi %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -493,8 +501,7 @@ source.1A4ci$total$spatialize <- readxl::read_xlsx(path = source.file, range = "
 source.1A4ci$total$inventory <- readxl::read_xlsx(path = source.file, range = "D51:I51", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-sf_clc18_polj <- subset(sf_clc18, CODE_18 == "211" | CODE_18 == "221" | CODE_18 == "222" | CODE_18 == "231" | CODE_18 == "242" | CODE_18 == "243") %>% # CLC agricultural areas
-  st_transform(crs = "+init=epsg:32634")
+sf_clc18_polj <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 sf_clc18_polj[,vars] <- NA
 sf_clc18_polj.int <- st_intersection(sf_clc18_polj, sf.grid.5km)
 
@@ -556,7 +563,7 @@ sf.1A4ci <- sf.1A4ci %>%
          PM2.5 = ((diff.1A4ci$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.1A4ci$NMVOC/sum_Area)*Area),
          NH3 = ((diff.1A4ci$NH3/sum_Area)*Area))
-sf.1A4ci %<>% select(vars)
+sf.1A4ci %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -602,10 +609,7 @@ source.1A4cii$total$spatialize <- readxl::read_xlsx(path = source.file, range = 
 source.1A4cii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D64:I64", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
-sf_clc18 <- st_as_sf(clc_18)
-sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
-  st_transform(crs = "+init=epsg:32634")
+sf_rur <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
 #+ include = FALSE
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -637,8 +641,8 @@ sf_opstine$Br_traktori <- traktori$Traktori[match(sf_opstine$NAME_2, traktori$Op
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634")
 
-# sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur %<>% st_intersection(., sf_opstine)
+
 
 sf_rur %<>% dplyr::select(.,Br_traktori, NAME_2) %>% 
   filter(!is.na(Br_traktori))
@@ -704,7 +708,7 @@ sf.1A4cii <- sf.1A4cii %>%
          PM2.5 = ((diff.1A4cii$PM2.5/sum_s)*Br_traktori),
          NMVOC = ((diff.1A4cii$NMVOC/sum_s)*Br_traktori),
          NH3 = ((diff.1A4cii$NH3/sum_s)*Br_traktori))
-sf.1A4cii %<>% select(vars)
+sf.1A4cii %<>% dplyr::select(vars)
 
 #'
 #'
