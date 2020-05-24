@@ -122,12 +122,14 @@ Map_roads <- ggplot()+
        title = "Road network with VCD values",
        subtitle = "Territory of the Repubic of Serbia",
        caption = "© GiLab (2019/20)")+
+  geom_sf(data=sf_brojaci)+
   theme_bw()
 
 ggsave(plot = Map_roads, filename = "Maps/Map_Roads.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+<<<<<<< HEAD
 # Roads
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -141,6 +143,35 @@ brojaci <- readOGR("Data/brojaci/Polozaj_automatskih_brojaca_bez_duplikata.shp",
 sf_brojaci <- st_as_sf(brojaci) %>% mutate_at(vars(starts_with("PGDS")), .funs = as.numeric) %>% dplyr::rename(ID = ID_BROJAÄ)
 
 
+=======
+# Map of VCDs
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+library(ggspatial)
+sf_roads <- st_read(dsn = "Data/Roads_PGDS_intersected_with_SRB_boundary.gpkg")
+sf_roads.4326 <- st_transform(sf_roads, 4326)
+vcds <- st_read(dsn = "Data/brojaci/VCDs.gpkg")
+vcds %<>% st_zm(., drop = TRUE)
+vcds %<>% dplyr::filter(Kategorija != "nije u mrezi") %>%
+  dplyr::mutate(Category = Kategorija)
+
+vcds_map <- ggplot(data = vcds)+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Territory of the Repubic of Serbia",
+       title = "Spatial locations of Vehicle Counting Devices")+#,
+  geom_sf(aes(color = Category), size= 2.5)+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                        pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)+
+  geom_sf(data = sf_roads.4326)
+
+ggsave(plot = vcds_map, filename = "Maps/Map_vcds.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+>>>>>>> 1b1d3d6b845af22572bfcd0b4cab61787be11b49
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Urban roads
@@ -375,6 +406,35 @@ ggsave(plot = popdens.map,
        units = "cm", 
        device = "jpeg", 
        dpi = 300)
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Airports and domestic airports
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ia_sf <- st_read(dsn = "GIS_layers/International_aviation_airports.gpkg")%>% st_transform(., 4326)
+da_sf <- st_read(dsn =  "GIS_layers/Domestic_aviation_airports.gpkg") %>% st_transform(., 4326)
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg") %>% st_transform(., 4326) 
+
+  
+a_map <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "International (blue) and Domestic aviation (red)",
+       title = "Spatial locations of Airports")+#,
+  geom_sf(data = ia_sf, aes(color = "red"), size= 3.5)+
+  geom_sf(data = da_sf, aes(color = "blue"), size= 3)+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"),
+        legend.position = "None")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+a_map
+ggsave(plot = a_map, filename = "Maps/Map_airports.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
