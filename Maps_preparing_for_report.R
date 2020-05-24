@@ -20,13 +20,15 @@ library(ggsflabel)
 # Map of grid
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-sf_grid <- st_read(dsn = "Grid/Grid_5km_Serbia.gpkg")
+# sf_grid <- st_read(dsn = "Grid/Grid_5km_Serbia.gpkg")
+sf.grid.4326 <- st_read(dsn = "Grid/Grid_Serbia_0.05deg.gpkg")
 
+mapview(sf.grid.4326)
 grid_map <- ggplot() +
-  geom_sf(data = sf_grid, colour = "black", fill = "#43a2ca") + 
+  geom_sf(data = sf.grid.4326, colour = "red", fill = "orange", alpha = 0.2) + 
   labs(x = NULL, y = NULL,
        title = "Grid for the Pollutant inventory spatialization",
-       subtitle = "Spatial resolution: 5x5 km, Territory of the Repubic of Serbia",
+       subtitle = "Spatial resolution: 0.05°x0.05°, Territory of the Repubic of Serbia",
        caption = "© GiLab (2019/20)")+
   theme_bw()
   #theme(line = element_blank(),
@@ -37,7 +39,7 @@ grid_map <- ggplot() +
   #coord_sf(datum = NA)
 
 
-ggsave(plot = grid_map,filename = "Maps/Map_grid.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+ggsave(plot = grid_map,filename = "Maps/Map_grid_0.05deg.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
 
@@ -129,7 +131,6 @@ ggsave(plot = Map_roads, filename = "Maps/Map_Roads.jpg", width = 30, height = 3
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-<<<<<<< HEAD
 # Roads
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -143,7 +144,7 @@ brojaci <- readOGR("Data/brojaci/Polozaj_automatskih_brojaca_bez_duplikata.shp",
 sf_brojaci <- st_as_sf(brojaci) %>% mutate_at(vars(starts_with("PGDS")), .funs = as.numeric) %>% dplyr::rename(ID = ID_BROJAÄ)
 
 
-=======
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Map of VCDs
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 library(ggspatial)
@@ -171,7 +172,7 @@ vcds_map <- ggplot(data = vcds)+
   geom_sf(data = sf_roads.4326)
 
 ggsave(plot = vcds_map, filename = "Maps/Map_vcds.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
->>>>>>> 1b1d3d6b845af22572bfcd0b4cab61787be11b49
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Urban roads

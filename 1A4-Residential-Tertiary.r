@@ -504,11 +504,16 @@ source.1A4ci$total$spatialize <- readxl::read_xlsx(path = source.file, range = "
 source.1A4ci$total$inventory <- readxl::read_xlsx(path = source.file, range = "D51:I51", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-sf_clc18_polj <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
-sf_clc18_polj[,vars] <- NA
-sf_clc18_polj.int <- st_intersection(sf_clc18_polj, sf.grid.5km)
+# sf_clc18_polj <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+# sf_clc18_polj[,vars] <- NA
+# sf_clc18_polj.int <- st_intersection(sf_clc18_polj, sf.grid.5km)
 
-source.1A4ci$sources$polygon <- sf_clc18_polj.int
+# source.1A4ci$sources$polygon <- sf_clc18_polj.int
+rural_art_zones <- st_read(dsn = "Data/seoska_podrucja_naseljena/rural_artificial_zones.gpkg")
+rural_art_zones[,vars] <- NA
+rural_art_zones.int <- st_intersection(rural_art_zones, sf.grid.5km)
+
+source.1A4ci$sources$polygon <- rural_art_zones.int
 
 sf.1A4ci <- corsum2sf_polygon(source.1A4ci, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")

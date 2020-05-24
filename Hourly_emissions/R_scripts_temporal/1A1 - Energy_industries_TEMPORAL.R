@@ -152,7 +152,8 @@ he.1A1a_ep <- activity.df %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a_ep = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  # dplyr::mutate(he_1A1a_ep = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  dplyr::mutate(he_1A1a_ep = EP) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a_ep))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1a_ep_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a_ep = he_sig) %>%
@@ -168,7 +169,7 @@ ggplot(he.1A1a_ep, aes(x = times, y = he_1A1a_ep)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs(caption = "he_1A1a_ep = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
+  #labs(caption = "he_1A1a_ep = EP")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -242,7 +243,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #' ## 1A1a - Public heat production
 #+ include = FALSE
-sf.1A1a_hp <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a_hp.gpkg")
+sf.1A1a_hp <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -278,7 +279,8 @@ he.1A1a_hp <- activity.df %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a_hp = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  # dplyr::mutate(he_1A1a_hp = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  dplyr::mutate(he_1A1a_hp = (WT0622*HS2)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a_hp))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1a_hp_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a_hp = he_sig) %>%
@@ -294,7 +296,7 @@ ggplot(he.1A1a_hp, aes(x = times, y = he_1A1a_hp)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs(caption = "he_1A1a_hp = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
+  # labs(caption = "he_1A1a_hp = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -391,16 +393,17 @@ data.frame(t.1A1b%>%
 #
 # ---  HE = WDWW + WT0024 + !RP
 #
-
+activity.df$WDWW <- 1
 he.1A1b <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1A1b =   RP2 * (TEMP+30)) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_1A1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_1A1b = he_sig) %>%
-  dplyr::mutate(he_1A1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1A1b, he_1A1b_n)
+  # dplyr::mutate(he_1A1b =   RP2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1A1b =   WDWW) %>%
+  #dplyr::mutate(he_sig = sigmoid(scale(he_1A1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  #dplyr::mutate(he_1A1b = he_sig) %>%
+  #dplyr::mutate(he_1A1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1A1b) # , he_1A1b_n
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -412,7 +415,7 @@ ggplot(he.1A1b, aes(x = times, y = he_1A1b)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6) + 
-  labs( caption = "he_1A1b = (WT0024+0.5) * RP2 * (TEMP+30)")+
+  # labs( caption = "he_1A1b = (WT0024+0.5) * RP2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -511,11 +514,12 @@ he.1B2aiv <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1B2aiv = RP2 * (TEMP+30)) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_1B2aiv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_1B2aiv = he_sig) %>%
-  dplyr::mutate(he_1B2aiv_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1B2aiv, he_1B2aiv_n)
+  # dplyr::mutate(he_1B2aiv = RP2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1B2aiv = WDWW) %>%
+  #dplyr::mutate(he_sig = sigmoid(scale(he_1B2aiv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  #dplyr::mutate(he_1B2aiv = he_sig) %>%
+  #dplyr::mutate(he_1B2aiv_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1B2aiv)#, he_1B2aiv_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -624,11 +628,12 @@ he.1B2c <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
-  dplyr::mutate(he_1B2c = RP2 * (TEMP + 30)) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_1B2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_1B2c = he_sig) %>%
-  dplyr::mutate(he_1B2c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1B2c, he_1B2c_n)
+  # dplyr::mutate(he_1B2c = RP2 * (TEMP + 30)) %>%
+  dplyr::mutate(he_1B2c = WDWW) %>%
+  #dplyr::mutate(he_sig = sigmoid(scale(he_1B2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  #dplyr::mutate(he_1B2c = he_sig) %>%
+  #dplyr::mutate(he_1B2c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1B2c)#, he_1B2c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -741,11 +746,12 @@ he.1A1c <- activity.df %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
-  dplyr::mutate(he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2* (TEMP+30)) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_1A1c = he_sig) %>%
-  dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1A1c, he_1A1c_n)
+  # dplyr::mutate(he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2* (TEMP+30)) %>%
+  dplyr::mutate(he_1A1c = WDWW) %>%
+  #dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  #dplyr::mutate(he_1A1c = he_sig) %>%
+  #dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1A1c)#, he_1A1c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -860,11 +866,12 @@ he.1B1b <- activity.df %>%
   dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
-  dplyr::mutate(he_1B1b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_1B1b = he_sig) %>%
-  dplyr::mutate(he_1B1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1B1b, he_1B1b_n)
+  # dplyr::mutate(he_1B1b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1B1b = WDWW) %>%
+  # dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  # dplyr::mutate(he_1B1b = he_sig) %>%
+  # dplyr::mutate(he_1B1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  select(times, he_1B1b)#, he_1B1b_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),

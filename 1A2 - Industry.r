@@ -830,15 +830,17 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g
 #' ## 1A2g - Auto-production
 #'
 #+ include = FALSE
+# NIJE AUTOMOBILSKA INDUSTRIJA, DATE SU LOKACIJE, ZAMENI U INVENTORY FAJLU ---> ZAMENJENO
+
 source.1A2gvi <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S246", sheet = source.sheet, col_names = header)
+source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S240", sheet = source.sheet, col_names = header)
 source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D253:I253", sheet = source.sheet, col_names = vars)
 source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D258:I258", sheet = source.sheet, col_names = vars)
 
 sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
-
+mapview(sf.1A2gvi)
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
