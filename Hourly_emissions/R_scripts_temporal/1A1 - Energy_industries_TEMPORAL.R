@@ -114,23 +114,23 @@ sigmoid = function(x) {
 #'
 #'
 #'
-#' ## 1A1a - Public heat and electricity production
+#' ## 1A1a - Public electricity production
 #+ include = FALSE
-sf.1A1a <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
+sf.1A1a_ep <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a.gpkg")
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-t.1A1a <- sf.1A1a %>%
+t.1A1a_ep <- sf.1A1a_ep %>%
   summarize(NOx = sum(NOx),
             SO2 = sum(SO2),
             PM10 = sum(PM10),
             PM2.5 = sum(PM2.5),
             NMVOC = sum(NMVOC),
             NH3 = sum(NH3)) %>%
-  select(NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  dplyr::select(NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
   st_drop_geometry()
 
-data.frame(t.1A1a%>%
+data.frame(t.1A1a_ep%>%
              dplyr::mutate_if(is.numeric, round, 2)) %>%
   datatable(., caption = 'Table 1: Total spatialized inventory',
             options = list(pageLength = 5)
@@ -142,7 +142,7 @@ data.frame(t.1A1a%>%
 # ---  HE = WDWW + WT0024 + WT0622 + !PH + k*SA + k*HS + TEMP + !RP
 #
 
-he.1A1a <- activity.df %>%
+he.1A1a_ep <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
   dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
@@ -152,63 +152,63 @@ he.1A1a <- activity.df %>%
   dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
-  dplyr::mutate(he_1A1a = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_1A1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  dplyr::mutate(he_1A1a_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  dplyr::mutate(he_1A1a = he_sig) %>%
-  dplyr::select(times, he_1A1a, he_1A1a_n)
+  dplyr::mutate(he_1A1a_ep = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A1a_ep))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A1a_ep_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::mutate(he_1A1a_ep = he_sig) %>%
+  dplyr::select(times, he_1A1a_ep, he_1A1a_ep_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-04-05 24"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-ggplot(he.1A1a, aes(x = times, y = he_1A1a)) +
+ggplot(he.1A1a_ep, aes(x = times, y = he_1A1a_ep)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs(caption = "he_1A1a = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
+  labs(caption = "he_1A1a_ep = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
 
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1a$he_1A1a), max(he.1A1a$he_1A1a), sum(he.1A1a$he_1A1a))) %>%
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1a_ep$he_1A1a_ep), max(he.1A1a_ep$he_1A1a_ep), sum(he.1A1a_ep$he_1A1a_ep))) %>%
   datatable(., caption = 'Table 2: Function summary',
             options = list(pageLength = 5)
   ) # min mora biti veci od 0 !!!!!
 
 #'
 #+ include = FALSE
-t.1A1a$sumF <- sum(he.1A1a$he_1A1a)
-he.1A1a %<>% 
-  dplyr::mutate(NOx_1A1a = (t.1A1a$NOx/t.1A1a$sumF)*he_1A1a, 
-                NOx_1A1a_p = (NOx_1A1a/sum(NOx_1A1a))*100,
-                SO2_1A1a = (t.1A1a$SO2/t.1A1a$sumF)*he_1A1a, 
-                SO2_1A1a_p = (SO2_1A1a/sum(SO2_1A1a))*100,
-                PM10_1A1a = (t.1A1a$PM10/t.1A1a$sumF)*he_1A1a, 
-                PM10_1A1a_p = (PM10_1A1a/sum(PM10_1A1a))*100,
-                PM2.5_1A1a = (t.1A1a$PM2.5/t.1A1a$sumF)*he_1A1a, 
-                PM2.5_1A1a_p = (PM2.5_1A1a/sum(PM2.5_1A1a))*100,
-                NMVOC_1A1a = (t.1A1a$NMVOC/t.1A1a$sumF)*he_1A1a, 
-                NMVOC_1A1a_p = (NMVOC_1A1a/sum(NMVOC_1A1a))*100,
-                NH3_1A1a = (t.1A1a$NH3/t.1A1a$sumF)*he_1A1a, 
-                NH3_1A1a_p = (NH3_1A1a/sum(NH3_1A1a))*100) %>%
+t.1A1a_ep$sumF <- sum(he.1A1a_ep$he_1A1a_ep)
+he.1A1a_ep %<>% 
+  dplyr::mutate(NOx_1A1a_ep = (t.1A1a_ep$NOx/t.1A1a_ep$sumF)*he_1A1a_ep, 
+                NOx_1A1a_ep_p = (NOx_1A1a_ep/sum(NOx_1A1a_ep))*100,
+                SO2_1A1a_ep = (t.1A1a_ep$SO2/t.1A1a_ep$sumF)*he_1A1a_ep, 
+                SO2_1A1a_ep_p = (SO2_1A1a_ep/sum(SO2_1A1a_ep))*100,
+                PM10_1A1a_ep = (t.1A1a_ep$PM10/t.1A1a_ep$sumF)*he_1A1a_ep, 
+                PM10_1A1a_ep_p = (PM10_1A1a_ep/sum(PM10_1A1a_ep))*100,
+                PM2.5_1A1a_ep = (t.1A1a_ep$PM2.5/t.1A1a_ep$sumF)*he_1A1a_ep, 
+                PM2.5_1A1a_ep_p = (PM2.5_1A1a_ep/sum(PM2.5_1A1a_ep))*100,
+                NMVOC_1A1a_ep = (t.1A1a_ep$NMVOC/t.1A1a_ep$sumF)*he_1A1a_ep, 
+                NMVOC_1A1a_ep_p = (NMVOC_1A1a_ep/sum(NMVOC_1A1a_ep))*100,
+                NH3_1A1a_ep = (t.1A1a_ep$NH3/t.1A1a_ep$sumF)*he_1A1a_ep, 
+                NH3_1A1a_ep_p = (NH3_1A1a_ep/sum(NH3_1A1a_ep))*100) %>%
   #replace_all(., is.na(.), 0) %>%
-  select(NOx_1A1a_p, SO2_1A1a_p, PM10_1A1a_p, PM2.5_1A1a_p, NMVOC_1A1a_p, NH3_1A1a_p) %>%
-  rename(`1A1a_NOx` = NOx_1A1a_p,
-         `1A1a_SO2` = SO2_1A1a_p,
-         `1A1a_PM10` = PM10_1A1a_p,
-         `1A1a_PM2.5` = PM2.5_1A1a_p,
-         `1A1a_NMVOC` = NMVOC_1A1a_p,
-         `1A1a_NH3` = NH3_1A1a_p) %>% 
+  select(NOx_1A1a_ep_p, SO2_1A1a_ep_p, PM10_1A1a_ep_p, PM2.5_1A1a_ep_p, NMVOC_1A1a_ep_p, NH3_1A1a_ep_p) %>%
+  rename(`1A1a_ep_NOx` = NOx_1A1a_ep_p,
+         `1A1a_ep_SO2` = SO2_1A1a_ep_p,
+         `1A1a_ep_PM10` = PM10_1A1a_ep_p,
+         `1A1a_ep_PM2.5` = PM2.5_1A1a_ep_p,
+         `1A1a_ep_NMVOC` = NMVOC_1A1a_ep_p,
+         `1A1a_ep_NH3` = NH3_1A1a_ep_p) %>% 
   mutate_all(~replace_na(., 0))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]", "NH3 [%]"), 
-           Sum = rbind(sum(he.1A1a$`1A1a_NOx`), sum(he.1A1a$`1A1a_SO2`), sum(he.1A1a$`1A1a_PM10`), sum(he.1A1a$`1A1a_PM2.5`), sum(he.1A1a$`1A1a_NMVOC`), sum(he.1A1a$`1A1a_NH3`))) %>%
+           Sum = rbind(sum(he.1A1a_ep$`1A1a_ep_NOx`), sum(he.1A1a_ep$`1A1a_ep_SO2`), sum(he.1A1a_ep$`1A1a_ep_PM10`), sum(he.1A1a_ep$`1A1a_ep_PM2.5`), sum(he.1A1a_ep$`1A1a_ep_NMVOC`), sum(he.1A1a_ep$`1A1a_ep_NH3`))) %>%
   datatable(., caption = 'Table 3: Summary',
             options = list(pageLength = 5)
   )
@@ -217,19 +217,146 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #+
-# sf.1A1a_df <- sf.1A1a %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# sf.1A1a_ep_df <- sf.1A1a_ep %>% st_drop_geometry() #%>% dplyr::select(NOx)
 # 
-# sf.1A1a.tl <- lapply(sf.1A1a_df[,-1], function(x) t((x %o% he.1A1a$he_1A1a_n)[,,1]))
+# sf.1A1a_ep.tl <- lapply(sf.1A1a_ep_df[,-1], function(x) t((x %o% he.1A1a_ep$he_1A1a_ep_n)[,,1]))
 # 
-# sf.1A1a.tl <- lapply(sf.1A1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# sf.1A1a_ep.tl <- lapply(sf.1A1a_ep.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
 # 
-# # writexl::write_xlsx(sf.1A1a.tle, "sf.1A1a.tle.xlsx") # Mnogo traje...
+# # writexl::write_xlsx(sf.1A1a_ep.tle, "sf.1A1a_ep.tle.xlsx") # Mnogo traje...
 # 
-# vars <- names(sf.1A1a_df)[-1]
+# vars <- names(sf.1A1a_ep_df)[-1]
 # 
 # for(i in 1:length(vars)){
-#   fwrite(sf.1A1a.tl[[i]], file = paste("sf.1A1a", paste(vars[i],"csv", sep = "."), sep = "_"))
+#   fwrite(sf.1A1a_ep.tl[[i]], file = paste("sf.1A1a_ep", paste(vars[i],"csv", sep = "."), sep = "_"))
 # }
+
+
+
+
+#'
+#'
+#'
+#'
+#'
+#'
+#' ## 1A1a - Public heat production
+#+ include = FALSE
+sf.1A1a_hp <- st_read("D:/R_projects/Spatialization/Products/1A1 - Energy/1A1a_hp.gpkg")
+
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+t.1A1a_hp <- sf.1A1a_hp %>%
+  summarize(NOx = sum(NOx),
+            SO2 = sum(SO2),
+            PM10 = sum(PM10),
+            PM2.5 = sum(PM2.5),
+            NMVOC = sum(NMVOC),
+            NH3 = sum(NH3)) %>%
+  select(NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  st_drop_geometry()
+
+data.frame(t.1A1a_hp%>%
+             dplyr::mutate_if(is.numeric, round, 2)) %>%
+  datatable(., caption = 'Table 1: Total spatialized inventory',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# Building function for Hourly emissions - HE:
+#
+# ---  HE = WDWW + WT0024 + WT0622 + !PH + k*SA + k*HS + TEMP + !RP
+#
+
+he.1A1a_hp <- activity.df %>%
+  dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
+                                       RP == FALSE ~ 0)) %>%
+  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
+                                       PH == FALSE ~ 0)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(PH1))+0.5)) %>%
+  dplyr::mutate(HS1 = dplyr::case_when(HS == TRUE ~ 1,
+                                       HS == FALSE ~ 0)) %>%
+  dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
+  dplyr::mutate(he_1A1a_hp = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A1a_hp))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A1a_hp_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::mutate(he_1A1a_hp = he_sig) %>%
+  dplyr::select(times, he_1A1a_hp, he_1A1a_hp_n)
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-04-05 24"),
+                       by   = dhours(1)) 
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+ggplot(he.1A1a_hp, aes(x = times, y = he_1A1a_hp)) +
+  geom_point(size = 0.1) +
+  geom_line(colour = "deepskyblue") + 
+  theme_bw() + 
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  labs(caption = "he_1A1a_hp = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP)")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
+
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A1a_hp$he_1A1a_hp), max(he.1A1a_hp$he_1A1a_hp), sum(he.1A1a_hp$he_1A1a_hp))) %>%
+  datatable(., caption = 'Table 2: Function summary',
+            options = list(pageLength = 5)
+  ) # min mora biti veci od 0 !!!!!
+
+#'
+#+ include = FALSE
+t.1A1a_hp$sumF <- sum(he.1A1a_hp$he_1A1a_hp)
+he.1A1a_hp %<>% 
+  dplyr::mutate(NOx_1A1a_hp = (t.1A1a_hp$NOx/t.1A1a_hp$sumF)*he_1A1a_hp, 
+                NOx_1A1a_hp_p = (NOx_1A1a_hp/sum(NOx_1A1a_hp))*100,
+                SO2_1A1a_hp = (t.1A1a_hp$SO2/t.1A1a_hp$sumF)*he_1A1a_hp, 
+                SO2_1A1a_hp_p = (SO2_1A1a_hp/sum(SO2_1A1a_hp))*100,
+                PM10_1A1a_hp = (t.1A1a_hp$PM10/t.1A1a_hp$sumF)*he_1A1a_hp, 
+                PM10_1A1a_hp_p = (PM10_1A1a_hp/sum(PM10_1A1a_hp))*100,
+                PM2.5_1A1a_hp = (t.1A1a_hp$PM2.5/t.1A1a_hp$sumF)*he_1A1a_hp, 
+                PM2.5_1A1a_hp_p = (PM2.5_1A1a_hp/sum(PM2.5_1A1a_hp))*100,
+                NMVOC_1A1a_hp = (t.1A1a_hp$NMVOC/t.1A1a_hp$sumF)*he_1A1a_hp, 
+                NMVOC_1A1a_hp_p = (NMVOC_1A1a_hp/sum(NMVOC_1A1a_hp))*100,
+                NH3_1A1a_hp = (t.1A1a_hp$NH3/t.1A1a_hp$sumF)*he_1A1a_hp, 
+                NH3_1A1a_hp_p = (NH3_1A1a_hp/sum(NH3_1A1a_hp))*100) %>%
+  #replace_all(., is.na(.), 0) %>%
+  select(NOx_1A1a_hp_p, SO2_1A1a_hp_p, PM10_1A1a_hp_p, PM2.5_1A1a_hp_p, NMVOC_1A1a_hp_p, NH3_1A1a_hp_p) %>%
+  rename(`1A1a_hp_NOx` = NOx_1A1a_hp_p,
+         `1A1a_hp_SO2` = SO2_1A1a_hp_p,
+         `1A1a_hp_PM10` = PM10_1A1a_hp_p,
+         `1A1a_hp_PM2.5` = PM2.5_1A1a_hp_p,
+         `1A1a_hp_NMVOC` = NMVOC_1A1a_hp_p,
+         `1A1a_hp_NH3` = NH3_1A1a_hp_p) %>% 
+  mutate_all(~replace_na(., 0))
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]", "NH3 [%]"), 
+           Sum = rbind(sum(he.1A1a_hp$`1A1a_hp_NOx`), sum(he.1A1a_hp$`1A1a_hp_SO2`), sum(he.1A1a_hp$`1A1a_hp_PM10`), sum(he.1A1a_hp$`1A1a_hp_PM2.5`), sum(he.1A1a_hp$`1A1a_hp_NMVOC`), sum(he.1A1a_hp$`1A1a_hp_NH3`))) %>%
+  datatable(., caption = 'Table 3: Summary',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#'
+#'
+#+
+# sf.1A1a_hp_df <- sf.1A1a_hp %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A1a_hp.tl <- lapply(sf.1A1a_hp_df[,-1], function(x) t((x %o% he.1A1a_hp$he_1A1a_hp_n)[,,1]))
+# 
+# sf.1A1a_hp.tl <- lapply(sf.1A1a_hp.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A1a_hp.tle, "sf.1A1a_hp.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A1a_hp_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A1a_hp.tl[[i]], file = paste("sf.1A1a_hp", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
+
 
 
 #'

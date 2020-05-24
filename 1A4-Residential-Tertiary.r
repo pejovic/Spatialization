@@ -495,6 +495,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4bi, total.1A4
 #'
 #'
 #+ include = FALSE
+
+# RURAL ARTIFICIAL ZONES - napravljen je novi lejer
+
 source.1A4ci <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.1A4ci$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D47:I47", sheet = source.sheet, col_names = vars)

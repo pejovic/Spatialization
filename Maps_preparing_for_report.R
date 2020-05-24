@@ -65,8 +65,11 @@ colors <- distinct(sf_clc, CODE_18, rgb)
 pal <- colors$rgb
 names(pal) <- colors$CODE_18
 
+
+sf_clc_4326 <- st_transform(sf_clc, 4326)
+
 CLC_map <- ggplot() +
-  geom_sf(data = sf_clc, aes(fill = CODE_18)) + 
+  geom_sf(data = sf_clc_4326, aes(fill = CODE_18)) + 
   labs(x = NULL, y = NULL,
        title = "Corine Land Cover map [2012-2018]",
        subtitle = "Territory of the Repubic of Serbia",
@@ -122,6 +125,20 @@ Map_roads <- ggplot()+
   theme_bw()
 
 ggsave(plot = Map_roads, filename = "Maps/Map_Roads.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Roads
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+brojaci <- readOGR("Data/brojaci/Polozaj_automatskih_brojaca_bez_duplikata.shp", 
+                   use_iconv=TRUE,  
+                   encoding = "UTF-8",
+                   stringsAsFactors = FALSE)
+
+
+
+sf_brojaci <- st_as_sf(brojaci) %>% mutate_at(vars(starts_with("PGDS")), .funs = as.numeric) %>% dplyr::rename(ID = ID_BROJAÄ)
 
 
 
@@ -330,25 +347,29 @@ ggsave(plot = indcomm,
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 library(raster)
 library(stars)
+library(viridis)
+
 pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/popdens_32634.tif")
+pop_raster <- raster("Version_3_update/Spatialization/New_data/pop_dens_4326.tif")
+
 pop_star <- st_as_stars(pop_raster)
 
 mapview(pop_raster)
 
 popdens.map <- ggplot()+
   geom_stars(data = pop_star)+
-  labs(x = "Easting [m]", y = "Northing [m]",
+  labs(x = NULL, y = NULL,
        title = "Population density map",
        subtitle = "Territory of the Repubic of Serbia",
        caption = "© GiLab (2019/20)\n
-       CRS: WGS84/UTM34N")+
+       CRS: WGS84")+
   theme_bw()+
   scale_fill_viridis(option = "B", limits = c(0,250), na.value = NA)+
-  guides(fill=guide_legend(title="Population density\n[575 m/pix]"))
+  guides(fill=guide_legend(title="Population density\n[0.006°/pix]"))
 
 
 ggsave(plot = popdens.map, 
-       filename = "Maps/Map_Population_density.jpg", 
+       filename = "Maps/Map_Population_density_4326.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
