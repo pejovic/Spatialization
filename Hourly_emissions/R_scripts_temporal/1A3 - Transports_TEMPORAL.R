@@ -157,7 +157,7 @@ he.1A3ai <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3ai = NFH+0.5) %>%
+  dplyr::mutate(he_1A3ai = DL) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3ai = he_sig) %>%
   dplyr::mutate(he_1A3ai_n = he_sig/sum(he_sig))%>%
@@ -174,7 +174,7 @@ ggplot(he.1A3ai, aes(x = times, y = he_1A3ai)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A3ai = NFH")+
+  # labs( caption = "he_1A3ai = NFH")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -397,7 +397,7 @@ he.1A3bi_U <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3bi_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3bi_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3bi_U))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3bi_U = he_sig) %>%
   dplyr::mutate(he_1A3bi_U_n = he_sig/sum(he_sig))%>%
@@ -414,8 +414,8 @@ ggplot(he.1A3bi_U, aes(x = times, y = he_1A3bi_U)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A3bi_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
-        (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP")+
+  #labs( caption = "he_1A3bi_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
+  #     (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -748,7 +748,7 @@ he.1A3bii_U <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3bii_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3bii_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3bii_U))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3bii_U = he_sig) %>%
   dplyr::mutate(he_1A3bii_U_n = he_sig/sum(he_sig))%>%
@@ -1100,7 +1100,7 @@ he.1A3biii_U <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3biii_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3biii_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3biii_U))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3biii_U = he_sig) %>%
   dplyr::mutate(he_1A3biii_U_n = he_sig/sum(he_sig))%>%
@@ -1452,7 +1452,7 @@ he.1A3biii_bc_U <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3biii_bc_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3biii_bc_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3biii_bc_U))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3biii_bc_U = he_sig) %>%
   dplyr::mutate(he_1A3biii_bc_U_n = he_sig/sum(he_sig))%>%
@@ -1806,7 +1806,7 @@ he.1A3biv_U <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3biv_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3biv_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3biv_U))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3biv_U = he_sig) %>%
   dplyr::mutate(he_1A3biv_U_n = he_sig/sum(he_sig))%>%
@@ -2161,7 +2161,7 @@ he.1A3bv_U <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3bv_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3bv_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3bv_U))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3bv_U = he_sig) %>%
   dplyr::mutate(he_1A3bv_U_n = he_sig/sum(he_sig))%>%
@@ -2512,7 +2512,7 @@ he.1A3bvi <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3bvi = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3bvi = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3bvi))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3bvi = he_sig) %>%
   dplyr::mutate(he_1A3bvi_n = he_sig/sum(he_sig))%>%
@@ -2638,7 +2638,7 @@ he.1A3bvii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3bvii = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5) + (TEMP+30) + SLP) %>%
+  dplyr::mutate(he_1A3bvii = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * (RH0709+0.5) * (RH1517+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3bvii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3bvii = he_sig) %>%
   dplyr::mutate(he_1A3bvii_n = he_sig/sum(he_sig))%>%
@@ -2762,7 +2762,7 @@ he.1A3c <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3c = (WT0816+0.5) * (WT1624+0.5) * WE2 * PH2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1A3c = DL) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3c = he_sig) %>%
   dplyr::mutate(he_1A3c_n = he_sig/sum(he_sig))%>%
@@ -2779,7 +2779,7 @@ ggplot(he.1A3c, aes(x = times, y = he_1A3c)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A3c = (WT0816+0.5) * (WT1624+0.5) * WE2 * PH2 * (TEMP+30)")+
+  # labs( caption = "he_1A3c = (WT0816+0.5) * (WT1624+0.5) * WE2 * PH2 * (TEMP+30)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2880,7 +2880,7 @@ he.1A3dii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3dii = (DL+0.5) * WE2 * PH2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1A3dii = DL) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3dii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3dii = he_sig) %>%
   dplyr::mutate(he_1A3dii_n = he_sig/sum(he_sig))%>%
@@ -2897,7 +2897,7 @@ ggplot(he.1A3dii, aes(x = times, y = he_1A3dii)) +
   geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A3dii = (DL+0.5) * WE2 * PH2 * (TEMP+30)")+
+  # labs( caption = "he_1A3dii = (DL+0.5) * WE2 * PH2 * (TEMP+30)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE

@@ -149,7 +149,7 @@ he.1A4ai <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4ai = ((WT0622+0.5)) / PH2 * (TEMP*(-1)+30)) %>%
+  dplyr::mutate(he_1A4ai = (WT0622) * (DL) * HS) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A4ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A4ai = he_sig) %>%
   dplyr::mutate(he_1A4ai_n = he_sig/sum(he_sig))%>%
@@ -163,9 +163,10 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A4ai, aes(x = times, y = he_1A4ai)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
+  geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A4ai = ((WT0622+0.5)) / PH2 * (TEMP*(-1)+30)")+
+  # labs( caption = "he_1A4ai = ((WT0622+0.5)) / PH2 * (TEMP*(-1)+30)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -257,6 +258,31 @@ data.frame(t.1A4bi%>%
 # ---  WDWW + WT0622 + k*PH + HS + inverse(TEMP)
 #
 
+
+# PEAKS
+day_hours <- rep(c(1:24), 365)
+
+rush_hour0509 <- day_hours %in% c(6:10)
+activity.df$rush_hour0709 <- rush_hour0509
+
+activity.df %<>% 
+  dplyr::mutate(RH0509 = dplyr::case_when(rush_hour0509 == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-3)) + 0.5,
+                                          rush_hour0509 == FALSE ~ 0))
+
+
+rush_hour1821 <- day_hours %in% c(19:22)
+activity.df$rush_hour1821 <- rush_hour1821
+
+activity.df %<>% 
+  dplyr::mutate(RH1821 = dplyr::case_when(rush_hour1821 == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-11)) + 0.5,
+                                          rush_hour1821 == FALSE ~ 0))
+
+activity.df %<>%
+  dplyr::mutate(TEMP5 = dplyr::case_when(TEMP < 5 ~ TEMP,
+                                         TEMP > 5 ~ 0,
+                                         TEMP == 5 ~ 5))
+
+
 he.1A4bi <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
@@ -267,7 +293,7 @@ he.1A4bi <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A4bi = ((WT0622+0.5)) / PH2 * (TEMP*(-1)+30)) %>%
+  dplyr::mutate(he_1A4bi = HS * (TEMP5+30) * (DL+0.5) * (RH0509+0.5) * (RH1821+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A4bi))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A4bi = he_sig) %>%
   dplyr::mutate(he_1A4bi_n = he_sig/sum(he_sig))%>%
@@ -281,9 +307,10 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A4bi, aes(x = times, y = he_1A4bi)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
+  geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "HE = WT0622 + k*PH + HS + inverse(TEMP)")+
+  # labs( caption = "HE = WT0622 + k*PH + HS + inverse(TEMP)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -511,7 +538,7 @@ he.1A4cii <- activity.df %>%
   dplyr::mutate(SAAG1 = dplyr::case_when(WE == TRUE ~ 1,
                                          WE == FALSE ~ 0)) %>%
   dplyr::mutate(SAAG2 = (sin(((2*pi)/12)*(!SAAG1))+0.5)) %>%
-  dplyr::mutate(he_1A4cii = ((DL+0.5)) * PH2 * (-TEMP+30) + SAAG.f + SAAG.fl) %>%
+  dplyr::mutate(he_1A4cii = SAAG.f + SAAG.fl) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A4cii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A4cii = he_sig) %>%
   dplyr::mutate(he_1A4cii_n = he_sig/sum(he_sig))%>%
@@ -524,10 +551,11 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.1A4cii, aes(x = times, y = he_1A4cii)) +
   geom_point(size = 0.1) +
-  geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "deepskyblue", size = 2) + 
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A4cii = ((DL+0.5)) * PH2 * (-TEMP+30) + SAAG.f + SAAG.fl)")+
+  # labs( caption = "he_1A4cii = ((DL+0.5)) * PH2 * (-TEMP+30) + SAAG.f + SAAG.fl)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE

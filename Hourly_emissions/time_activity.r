@@ -530,6 +530,47 @@ ggplot() +
 
 
 
+# :::::::::::::::::::::::::::::::::::::::::::: Heating demand in agriculture
+
+
+t1 <- seq.POSIXt(from = ymd_h("2015-01-30 00"),
+                 to   = ymd_h("2015-07-30 24"),
+                 by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-07-30 00"),
+                 to   = ymd_h("2015-10-31 24"),
+                 by   = dhours(1)) 
+
+dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.2)), inflection2=as.numeric(quantile(t1, probs = 0.8)), slope1=0.00003, slope2=0.00000003, max.sel=1, minsel.upper=0, plot=T)$selectivity
+
+activity_df1 <- dplyr::filter(activity_df, times < ymd_h("2015-08-01 00"))
+activity_df2 <- dplyr::filter(activity_df, times >= ymd_h("2015-08-01 00"))
+
+activity_df1$indSAAG.hd[activity_df1$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.1)), inflection2=as.numeric(quantile(t1, probs = 0.3)), slope1=0.000003, slope2=0.00000003, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity_df$indSAAG.hd[activity_df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=F)$selectivity 
+# activity_df$SAAG.hd
+# activity_df1 <- activity_df1[, 1:13]
+activity_df1 %<>%
+  dplyr::mutate(indSAAG.hd1 = tidyr::replace_na(indSAAG.hd, 0)) %>%
+  dplyr::rename(SAAG_HD = indSAAG.hd1)
+
+head(activity_df)
+
+p <- ggplot(activity_df1, aes(x = times, y = SAAG_HD, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-04-15 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+
+
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Repair - overhaul period
@@ -588,7 +629,7 @@ temp_2015 %<>%
 
 temp_2015 <- temp_2015[rep(seq.int(1,nrow(temp_2015)), each = 24),]
 
-
+activity_df <- data.frame()
 activity_df$TEMP <- temp_2015$meanT
 
 # za profiniti - ideja ...
@@ -598,6 +639,10 @@ activity_df$TEMP <- temp_2015$meanT
 #  dplyr::mutate(DL = dplyr::case_when(day_light == TRUE ~ 0.5*sin(((2*pi)/24)*(day_hours-7)) + dayl,
 #                                      day_light == FALSE ~ 0)) #dayl
 
+m <- loess(TEMP~as.numeric(times), activity_df, span = 0.235)
+predict(m)
+
+activity_df$temp_smooth <- predict(m)
 
 p <- ggplot(activity_df, aes(x = times, y = TEMP)) +
   geom_point(size = 0.5) +
