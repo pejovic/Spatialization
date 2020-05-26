@@ -532,39 +532,179 @@ ggplot() +
 
 # :::::::::::::::::::::::::::::::::::::::::::: Heating demand in agriculture
 
+m <- loess(TEMP~as.numeric(times), activity_df, span = 0.5)
+predict(m)
+
+activity_df$temp_smooth <- predict(m)
+
+p <- ggplot(activity_df, aes(x = times, y = temp_smooth)) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw() +
+  geom_smooth(formula =  ~ TEMP, colour = "orange")
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-02-28 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
 
 t1 <- seq.POSIXt(from = ymd_h("2015-01-30 00"),
-                 to   = ymd_h("2015-07-30 24"),
+                 to   = ymd_h("2015-08-30 24"),
                  by   = dhours(1)) 
 t2 <- seq.POSIXt(from = ymd_h("2015-07-30 00"),
                  to   = ymd_h("2015-10-31 24"),
                  by   = dhours(1)) 
 
-dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.2)), inflection2=as.numeric(quantile(t1, probs = 0.8)), slope1=0.00003, slope2=0.00000003, max.sel=1, minsel.upper=0, plot=T)$selectivity
+activity_df <- activity_df[, 1:13]
+activity_df$temp_smooth <- predict(m)
+activity_df$indSAAG.fer[activity_df$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.1)), inflection2=as.numeric(quantile(t1, probs = 0.7)), slope1=0.000006, slope2=0.000002, max.sel=1, minsel.upper=0, plot=F)$selectivity
+#activity_df$indSAAG.fer[activity_df$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.08)), inflection2=as.numeric(quantile(t1, probs = 0.9)), slope1=0.000003, slope2=0.0000003, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity_df$indSAAG.fer[activity_df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=0.5, minsel.upper=0, plot=F)$selectivity 
 
-activity_df1 <- dplyr::filter(activity_df, times < ymd_h("2015-08-01 00"))
-activity_df2 <- dplyr::filter(activity_df, times >= ymd_h("2015-08-01 00"))
+activity_df %<>%
+  dplyr::mutate(indSAAG.fer = tidyr::replace_na(indSAAG.fer, 0)) %>%
+  dplyr::rename(SAAG.F = indSAAG.fer)
 
-activity_df1$indSAAG.hd[activity_df1$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.1)), inflection2=as.numeric(quantile(t1, probs = 0.3)), slope1=0.000003, slope2=0.00000003, max.sel=1, minsel.upper=0, plot=F)$selectivity
-activity_df$indSAAG.hd[activity_df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=1, minsel.upper=0, plot=F)$selectivity 
-# activity_df$SAAG.hd
-# activity_df1 <- activity_df1[, 1:13]
-activity_df1 %<>%
-  dplyr::mutate(indSAAG.hd1 = tidyr::replace_na(indSAAG.hd, 0)) %>%
-  dplyr::rename(SAAG_HD = indSAAG.hd1)
 
-head(activity_df)
 
-p <- ggplot(activity_df1, aes(x = times, y = SAAG_HD, colour = "red")) +
-  geom_point(size = 0.5) +
-  geom_line() + 
-  theme_bw()
+
+summary(activity_df)
+
+
+
+ggplot() +
+  geom_line(data = activity_df, aes(x = times, y = temp_smooth)) + 
+  geom_line(data = activity_df, aes(x = times, y = SAAG.F)) + 
+  theme_bw() 
+
+
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
+
+he <- activity_df %>%
+  dplyr::mutate(he_1A4ai = temp_smooth^-1 * SAAG.F) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A4ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A4ai = he_sig) %>%
+  dplyr::mutate(he_1A4ai_n = he_sig/sum(he_sig))%>%
+  select(times, he_1A4ai, he_1A4ai_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-04-15 24"),
+                       to   = ymd_h("2015-03-31 24"),
+                       by   = dhours(1)) 
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+ggplot(he, aes(x = times, y = he_1A4ai)) +
+  geom_point(size = 0.1) +
+  geom_line(colour = "deepskyblue") + 
+  #geom_smooth()+
+  theme_bw() + 
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # labs( caption = "he_1A4ai = ((WT0622+0.5)) / PH2 * (TEMP*(-1)+30)")+
+  theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::: SAAG.fertilizing NOVI GRAFIK 
+
+m <- loess(TEMP~as.numeric(times), activity_df, span = 0.5)
+predict(m)
+
+activity_df$temp_smooth <- predict(m)
+
+p <- ggplot(activity_df, aes(x = times, y = temp_smooth)) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw() +
+  geom_smooth(formula =  ~ TEMP, colour = "orange")
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-02-28 24"),
                        by   = dhours(1)) 
 
 p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+t1 <- seq.POSIXt(from = ymd_h("2015-03-01 00"),
+                 to   = ymd_h("2015-05-01 24"),
+                 by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-09-01 00"),
+                 to   = ymd_h("2015-11-01 24"),
+                 by   = dhours(1)) 
+
+activity_df <- activity_df[, 1:09]
+# activity_df$temp_smooth <- predict(m)
+
+
+
+activity_df$indSAAG.fert[activity_df$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.1)), inflection2=as.numeric(quantile(t1, probs = 0.7)), slope1=0.000006, slope2=0.000002, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity_df$indSAAG.fert[activity_df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=0.5, minsel.upper=0, plot=F)$selectivity 
+
+activity_df %<>%
+  dplyr::mutate(indSAAG.fert = tidyr::replace_na(indSAAG.fert, 0)) %>%
+  dplyr::rename(SAAG.F = indSAAG.fert)
+
+
+
+
+summary(activity_df)
+
+ggplot() +
+  geom_line(data = activity_df, aes(x = times, y = temp_smooth)) + 
+  geom_line(data = activity_df, aes(x = times, y = SAAG.F)) + 
+  theme_bw() 
+
+
+sigmoid = function(x) {
+  1 / (1 + exp(-x))
+}
+
+he <- activity_df %>%
+  dplyr::mutate(he_1A4ai = temp_smooth^-1 * SAAG.F) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A4ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A4ai = he_sig) %>%
+  dplyr::mutate(he_1A4ai_n = he_sig/sum(he_sig))%>%
+  select(times, he_1A4ai, he_1A4ai_n)
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
+                       by   = dhours(1)) 
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+ggplot(he, aes(x = times, y = he_1A4ai)) +
+  geom_point(size = 0.1) +
+  geom_line(colour = "deepskyblue") + 
+  #geom_smooth()+
+  theme_bw() + 
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # labs( caption = "he_1A4ai = ((WT0622+0.5)) / PH2 * (TEMP*(-1)+30)")+
+  theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
+
+
+
+
+
 
 
 

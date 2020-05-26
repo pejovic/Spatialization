@@ -42,6 +42,7 @@ library(ggplot2)
 library(ggforce)
 library(writexl)
 library(data.table)
+library(dublogistic)
 #' 
 #' 
 #+ include = FALSE
@@ -152,7 +153,7 @@ he.3B3 <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B3 = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B3 =(TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B3))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B3 = he_sig) %>%
   dplyr::mutate(he_3B3_n = he_sig/sum(he_sig))%>%
@@ -169,7 +170,7 @@ ggplot(he.3B3, aes(x = times, y = he_3B3)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B3 = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  # labs( caption = "he_3B3 = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -271,7 +272,7 @@ he.3B4gi_gii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B4gi_gii = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B4gi_gii = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B4gi_gii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B4gi_gii = he_sig) %>%
   dplyr::mutate(he_3B4gi_gii_n = he_sig/sum(he_sig))%>%
@@ -288,7 +289,7 @@ ggplot(he.3B4gi_gii, aes(x = times, y = he_3B4gi_gii)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B4gi_gii = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B4gi_gii = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -392,7 +393,7 @@ he.3B1a <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B1a = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B1a = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B1a = he_sig) %>%
   dplyr::mutate(he_3B1a_n = he_sig/sum(he_sig))%>%
@@ -409,7 +410,7 @@ ggplot(he.3B1a, aes(x = times, y = he_3B1a)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B1a = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B1a = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -512,7 +513,7 @@ he.3B1b <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B1b = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B1b = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B1b = he_sig) %>%
   dplyr::mutate(he_3B1b_n = he_sig/sum(he_sig))%>%
@@ -529,7 +530,7 @@ ggplot(he.3B1b, aes(x = times, y = he_3B1b)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B1b = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B1b = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -632,7 +633,7 @@ he.3B2 <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B2 = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B2 = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B2))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B2 = he_sig) %>%
   dplyr::mutate(he_3B2_n = he_sig/sum(he_sig))%>%
@@ -649,7 +650,7 @@ ggplot(he.3B2, aes(x = times, y = he_3B2)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B2 = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B2 = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -753,7 +754,7 @@ he.3B4d <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B4d = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B4d = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B4d))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B4d = he_sig) %>%
   dplyr::mutate(he_3B4d_n = he_sig/sum(he_sig))%>%
@@ -770,7 +771,7 @@ ggplot(he.3B4d, aes(x = times, y = he_3B4d)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B4d = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B4d = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -873,7 +874,7 @@ he.3B4e <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B4e = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B4e = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B4e))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B4e = he_sig) %>%
   dplyr::mutate(he_3B4e_n = he_sig/sum(he_sig))%>%
@@ -890,7 +891,7 @@ ggplot(he.3B4e, aes(x = times, y = he_3B4e)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B4e = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B4e = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -993,7 +994,7 @@ he.3B4giii <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B4giii = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B4giii = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B4giii))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B4giii = he_sig) %>%
   dplyr::mutate(he_3B4giii_n = he_sig/sum(he_sig))%>%
@@ -1010,7 +1011,7 @@ ggplot(he.3B4giii, aes(x = times, y = he_3B4giii)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B4giii = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B4giii = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1113,7 +1114,7 @@ he.3B4giv <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3B4giv = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)) %>%
+  dplyr::mutate(he_3B4giv = (TEMP+30) * (DL+0.5)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3B4giv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3B4giv = he_sig) %>%
   dplyr::mutate(he_3B4giv_n = he_sig/sum(he_sig))%>%
@@ -1130,7 +1131,7 @@ ggplot(he.3B4giv, aes(x = times, y = he_3B4giv)) +
   geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3B4giv = ((0.5+WT0024)) * (TEMP+30) * SLP * (DL+0.5)")+
+  labs( caption = "he_3B4giv = (TEMP+30) * (DL+0.5)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1223,6 +1224,22 @@ data.frame(t.3Da1%>%
 # ---  HE = WDWW + (k+DL) + !PH + (k+SAAG) + inverse(TEMP) + SLP
 #
 
+t1 <- seq.POSIXt(from = ymd_h("2015-03-01 00"),
+                 to   = ymd_h("2015-05-01 24"),
+                 by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-09-01 00"),
+                 to   = ymd_h("2015-11-01 24"),
+                 by   = dhours(1)) 
+
+activity.df$indSAAG.fert[activity.df$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.1)), inflection2=as.numeric(quantile(t1, probs = 0.7)), slope1=0.000006, slope2=0.000002, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity.df$indSAAG.fert[activity.df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=0.5, minsel.upper=0, plot=F)$selectivity 
+
+activity.df %<>%
+  dplyr::mutate(indSAAG.fert = tidyr::replace_na(indSAAG.fert, 0)) %>%
+  dplyr::rename(SAAG.F = indSAAG.fert)
+
+
+
 he.3Da1 <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
@@ -1233,7 +1250,7 @@ he.3Da1 <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3Da1 = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f)) %>%
+  dplyr::mutate(he_3Da1 = ((DL+0.5)) * (TEMP+30) * PH2 * (SAAG.F+0.1)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3Da1))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3Da1 = he_sig) %>%
   dplyr::mutate(he_3Da1_n = he_sig/sum(he_sig))%>%
@@ -1247,10 +1264,10 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3Da1, aes(x = times, y = he_3Da1)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  stat_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_3Da1 = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f)")+
+  # labs( caption = "he_3Da1 = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1356,7 +1373,7 @@ he.3Da2a <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3Da2a = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f)) %>%
+  dplyr::mutate(he_3Da2a = ((DL+0.5)) * (TEMP+30) * PH2 * (SAAG.F+0.1)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3Da2a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3Da2a = he_sig) %>%
   dplyr::mutate(he_3Da2a_n = he_sig/sum(he_sig))%>%

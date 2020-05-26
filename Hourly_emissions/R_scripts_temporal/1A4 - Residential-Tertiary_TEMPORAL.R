@@ -41,6 +41,7 @@ library(magrittr)
 library(ggplot2)
 library(ggforce)
 library(data.table)
+library(dublogistic)
 #' 
 #' 
 #+ include = FALSE
@@ -402,6 +403,25 @@ data.frame(t.1A4ci%>%
 # ---  HE = WDWW + DL + !PH + SA + SAAG
 #
 
+m <- loess(TEMP~as.numeric(times), activity.df, span = 0.5)
+activity.df$temp_smooth <- predict(m)
+
+t1 <- seq.POSIXt(from = ymd_h("2015-01-30 00"),
+                 to   = ymd_h("2015-08-30 24"),
+                 by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-07-30 00"),
+                 to   = ymd_h("2015-10-31 24"),
+                 by   = dhours(1)) 
+
+activity.df$indSAAG.fer[activity.df$times %in% t1] <- dublogistic.f(L=as.numeric(t1), inflection1=as.numeric(quantile(t1, probs = 0.1)), inflection2=as.numeric(quantile(t1, probs = 0.7)), slope1=0.000006, slope2=0.000002, max.sel=1, minsel.upper=0, plot=F)$selectivity
+activity.df$indSAAG.fer[activity.df$times %in% t2] <- dublogistic.f(L=as.numeric(t2), inflection1=as.numeric(quantile(t2, probs = 0.2)), inflection2=as.numeric(quantile(t2, probs = 0.8)), slope1=0.000003, slope2=0.000003, max.sel=0.5, minsel.upper=0, plot=F)$selectivity 
+
+activity.df %<>%
+  dplyr::mutate(indSAAG.fer = tidyr::replace_na(indSAAG.fer, 0)) %>%
+  dplyr::rename(SAAG.F = indSAAG.fer)
+
+
+
 he.1A4ci <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
@@ -415,7 +435,7 @@ he.1A4ci <- activity.df %>%
   dplyr::mutate(SAAG1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(SAAG2 = (sin(((2*pi)/12)*(!SAAG1))+0.5)) %>%
-  dplyr::mutate(he_1A4ci = ((DL+0.5)) * PH2 * (-TEMP+30) + SAAG.f + SAAG.fl) %>%
+  dplyr::mutate(he_1A4ci = temp_smooth^-1 * SAAG.F) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A4ci))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A4ci = he_sig) %>%
   dplyr::mutate(he_1A4ci_n = he_sig/sum(he_sig))%>%
@@ -429,7 +449,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A4ci, aes(x = times, y = he_1A4ci)) +
   # geom_point(size = 0.1) +
   # geom_smooth() +
-   geom_line(colour = "deepskyblue") + 
+  geom_line(colour = "deepskyblue", size = 2) + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A4ci = ((DL+0.5)) * PH2 * (-TEMP+30) + SAAG.f + SAAG.fl)")+
