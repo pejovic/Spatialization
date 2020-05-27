@@ -438,6 +438,80 @@ a_map
 ggsave(plot = a_map, filename = "Maps/Map_airports.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Fuel stations, wastewater treatment plants and cremation locations
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+# fuels - 1B - Fugitive emissions: 1B2av-Fugitive emissions from liquid fuels: Distribution of oil products
+
+fuel.s <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Fuel_stations_OSM_32634.gpkg")
+fuel.sf <- fuel.s %>% dplyr::select() %>% dplyr::mutate(class = "1-Fuel stations")
+# wastewater treatment plants - 5 - Waste: 5D2-Industrial wastewater handling
+
+sf.waste <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Wastewater_plants_OSM_32634.gpkg") %>%
+  dplyr::select() %>%
+  dplyr::mutate(class = "2-Wastewater treatment plants")
+
+
+#cremation - 5 - Waste: 5C1bv-Cremation
+source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.sheet =  "5-Waste"
+header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+vars <- header[1:6]
+source.5C1bv <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.5C1bv$sources$points <- readxl::read_xlsx(path = source.file, range = "D24:S25", sheet = source.sheet, col_names = header)
+source.5C1bv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D34:I34", sheet = source.sheet, col_names = vars)
+source.5C1bv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D35:I35", sheet = source.sheet, col_names = vars)
+sf.5C1bv <- corsum2sf(source.5C1bv, distribute = TRUE) %>% # Preparing data for final spatialization
+  st_transform(crs = "+init=epsg:32634")
+
+cremation <- sf.5C1bv %>% dplyr::mutate(geom = geometry, class = "3-Cremation locations") %>% dplyr::select(class) %>% dplyr::rename(geom = geometry)
+
+
+sf.final <- rbind(fuel.sf, sf.waste, cremation)
+
+unique(sf.final$class)
+
+
+library(ggspatial)
+
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg") %>% st_transform(., 4326) 
+
+
+f_map <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Fuel stations, wastewater treatment plants and cremation locations",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.final, aes(color = class), size= 2.5)+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  scale_color_manual(values=c("#999999", "#56B4E9", "red"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"))+#,
+        #legend.position = "None")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+f_map
+ggsave(plot = f_map, filename = "Maps/Map_fuel-waste-cremation.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Maps by category
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
