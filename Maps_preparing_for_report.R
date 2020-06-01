@@ -15,7 +15,7 @@ library(classInt)
 library(viridis)
 library(gridExtra)
 library(ggsflabel)
-
+library(ggspatial)
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Map of grid
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -505,8 +505,105 @@ ggsave(plot = f_map, filename = "Maps/Map_fuel-waste-cremation.jpg", width = 30,
 
 
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Map 1A1a - Public heat and electricity production
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_granica <- st_read(dsn = "Data/Granica_SRB.gpkg") %>% st_transform(., 4326) 
+
+source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.sheet =  "1A1-Energy"
+header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+vars <- header[1:6]
+
+source.1A1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S37", sheet = source.sheet, col_names = header)
+source.1A1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
+source.1A1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
 
 
+sf.1A1a <- corsum2sf(source.1A1a) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+
+sf.1A1a %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "1A1a - Public heat and electricity production")
+
+map.1A1a <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 1A1 - Energy",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.1A1a, aes(color = `Sub-category: `), size= 2)+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  scale_color_manual(values=c("blueviolet"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"))+#,
+        #legend.position = "None")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.1A1a
+ggsave(plot = map.1A1a, filename = "Maps/Subcategories/Map_1A1a.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Map 1A2c/2B (chemical), 1A2e/2H2 (food industry)
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.sheet =  "1A2-2-Industry"
+header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+vars <- header[1:6]
+
+# # 1A2c - Chemicals
+source.1A2c <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.1A2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D55:S69", sheet = source.sheet, col_names = header)
+source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D71:I71", sheet = source.sheet, col_names = vars)
+source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D86:I86", sheet = source.sheet, col_names = vars)
+
+sf.1A2c <- corsum2sf(source.1A2c) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+# 1A2e / 2H2 - Food, beverages and tobacco
+source.1A2e <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D110:S131", sheet = source.sheet, col_names = header)
+source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D137:I137", sheet = source.sheet, col_names = vars)
+source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "D151:I151", sheet = source.sheet, col_names = vars)
+
+sf.1A2e <- corsum2sf(source.1A2e, distribute = TRUE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+
+# =====================================================================================
+
+sf.1A2c %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "1A2c - Chemicals") 
+sf.1A2e %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "1A2e / 2H2 - Food, beverages and tobacco") 
+
+sf.ind <- rbind(sf.1A2c, sf.1A2e)
+
+map.ind <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 1A2-2-Industry",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.ind, aes(color = `Sub-category: `), size= 2)+
+  geom_sf(data = sf_granica, colour = "ForestGreen", fill = NA)+
+  scale_color_manual(values=c("#FE318B", "#FF8A47"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"))+#,
+        #legend.position = "None")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.ind
+ggsave(plot = map.ind, filename = "Maps/Subcategories/Map_1A2c-1A2e.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
 
