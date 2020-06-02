@@ -1854,7 +1854,7 @@ he.2D3i.t <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+1)) %>%
-  dplyr::mutate(he_2D3i.t = ((WT0816+0.5) * (WT1624+0.5)) * PH2)  %>%
+  dplyr::mutate(he_2D3i.t = ((DL+0.5)) * (TEMP+30))  %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_2D3i.t))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_2D3i.t = he_sig) %>%
   dplyr::mutate(he_2D3i.t_n = he_sig/sum(he_sig))%>%
@@ -1979,7 +1979,7 @@ he.2D3i.uos <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+1)) %>%
-  dplyr::mutate(he_2D3i.uos = ((WT0816+0.5) * (WT1624+0.5)) * PH2)  %>%
+  dplyr::mutate(he_2D3i.uos = ((DL+0.5)) * (TEMP+30))  %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_2D3i.uos))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_2D3i.uos = he_sig) %>%
   dplyr::mutate(he_2D3i.uos_n = he_sig/sum(he_sig))%>%
