@@ -167,7 +167,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B3, aes(x = times, y = he_3B3)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_3B3 = (TEMP+30) * (DL+0.5)")+
@@ -286,7 +286,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B4gi_gii, aes(x = times, y = he_3B4gi_gii)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B4gi_gii = (TEMP+30) * (DL+0.5)")+
@@ -407,7 +407,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B1a, aes(x = times, y = he_3B1a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B1a = (TEMP+30) * (DL+0.5)")+
@@ -527,7 +527,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B1b, aes(x = times, y = he_3B1b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B1b = (TEMP+30) * (DL+0.5)")+
@@ -647,7 +647,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B2, aes(x = times, y = he_3B2)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B2 = (TEMP+30) * (DL+0.5)")+
@@ -768,7 +768,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B4d, aes(x = times, y = he_3B4d)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B4d = (TEMP+30) * (DL+0.5)")+
@@ -888,7 +888,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B4e, aes(x = times, y = he_3B4e)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B4e = (TEMP+30) * (DL+0.5)")+
@@ -1008,7 +1008,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B4giii, aes(x = times, y = he_3B4giii)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B4giii = (TEMP+30) * (DL+0.5)")+
@@ -1128,7 +1128,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3B4giv, aes(x = times, y = he_3B4giv)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3B4giv = (TEMP+30) * (DL+0.5)")+
@@ -1264,7 +1264,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3Da1, aes(x = times, y = he_3Da1)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  stat_smooth() +
+  # stat_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_3Da1 = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f)")+
@@ -1387,7 +1387,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3Da2a, aes(x = times, y = he_3Da2a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3Da2a = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f)")+
@@ -1511,7 +1511,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3Da3, aes(x = times, y = he_3Da3)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3Da3 = (DL+0.5) * (TEMP+30) * SLP")+
@@ -1631,7 +1631,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3Dc, aes(x = times, y = he_3Dc)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3Dc = ((DL+0.5)) * (TEMP+30) * SLP * (0.5+SAAG.fl)")+
@@ -1750,7 +1750,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.3De, aes(x = times, y = he_3De)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_3De = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f) * (0.5+SAAG.fl)")+

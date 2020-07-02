@@ -484,8 +484,45 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2ai, total.1B2
 #+ include = FALSE
 source.1B2av <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
+source.1B2av$sources$points <- readxl::read_xlsx(path = source.file, range = "D42:S42", sheet = source.sheet, col_names = header)
 source.1B2av$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D52:I52", sheet = source.sheet, col_names = vars)
 source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D53:I53", sheet = source.sheet, col_names = vars)
+
+
+sf.1B2av <- corsum2sf(source.1B2av, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+
+# :::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::::::::::::
+
+# RAFINERIJE
+source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.sheet =  "1A1-Energy"
+header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+vars <- header[1:6]
+
+source.1A1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S37", sheet = source.sheet, col_names = header)
+source.1A1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
+source.1A1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
+
+
+sf.1A1a <- corsum2sf(source.1A1a) %>%
+  st_transform(crs = "+init=epsg:32634") %>%
+                 dplyr::select()
+
+# :::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::::::::::::
+
+source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.sheet =  "1B-Fugitive emissions"
+header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+vars <- header[1:6]
+
+# :::::::::::::::::::::::::::::::::::::::::::
+
 
 #+ include = FALSE
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -537,14 +574,42 @@ sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km)
 
 fuel.s <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Fuel_stations_OSM_32634.gpkg")
 
-fuel.s %<>% st_intersection(., sf_opstine.int) %>%
-  dplyr::select(Br_stanovnistvo)
+#fuel.s %<>% st_intersection(., sf_opstine.int) %>%
+#  dplyr::select(Br_stanovnistvo)
 
-fuel.s[,vars] <- NA
-source.1B2av$sources$points <- fuel.s
+sf.1B2av %<>% dplyr::select()
+sf.1B2av[, vars] <- NA
 
+sf.1A1a %<>% dplyr::select()
+sf.1A1a[, vars] <- NA
+
+
+sourcee <- rbind(sf.1B2av, sf.1A1a) # Banatski dvor, rafinerije
+sourcee %<>% st_intersection(., sf_opstine.int) %>%
+    dplyr::select(Br_stanovnistvo)
+
+sourcee[, vars] <- NA
+source.1B2av$sources$points <- sourcee
+source.1B2av$total$inventory <- source.1B2av$total$inventory/2 
 sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
+
+sf.1B2av1 <- sf.1B2av
+
+fuel.s %<>% dplyr::select() %>% dplyr::rename(geometry = geom)
+
+fuel.s %<>% st_intersection(., sf_opstine.int) %>%
+  dplyr::select(Br_stanovnistvo)
+fuel.s[, vars] <- NA
+
+source.1B2av$sources$points <- fuel.s
+sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+sf.1B2av2 <- sf.1B2av
+
+sf.1B2av <- rbind(sf.1B2av1, sf.1B2av2)
+source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D53:I53", sheet = source.sheet, col_names = vars)
 
 #'
 #'

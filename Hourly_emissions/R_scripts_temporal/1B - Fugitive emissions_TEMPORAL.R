@@ -167,7 +167,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1B1a, aes(x = times, y = he_1B1a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "purple") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B1a = (WDWW * PH2 * (TEMP+30) * RP2")+
@@ -288,7 +288,7 @@ ggplot(he.1B2ai, aes(x = times, y = he_1B2ai)) +
   geom_line(colour = "purple") + 
   # geom_smooth()+
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B2ai = ((WT0816+0.5) * (WT1624+0.5)) * PH2 * VA")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
@@ -405,7 +405,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1B2av, aes(x = times, y = he_1B2av)) +
   geom_point(size = 0.1) +
   geom_line(colour = "purple") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B2av = ((WT0024+0.5)) * PH2 * TEMP")+
@@ -525,7 +525,7 @@ ggplot(he.1B2b, aes(x = times, y = he_1B2b)) +
   geom_line(colour = "purple") + 
   # geom_smooth()+
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B2b = (WDWW * (WT0024+0.5)) * PH2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 

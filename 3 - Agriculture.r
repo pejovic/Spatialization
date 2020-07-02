@@ -204,98 +204,101 @@ source.3B3$sources$points <- readxl::read_xlsx(path = source.file, range = "D8:S
 source.3B3$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D62:I62", sheet = source.sheet, col_names = vars)
 source.3B3$total$inventory <- readxl::read_xlsx(path = source.file, range = "D63:I63", sheet = source.sheet, col_names = vars)
 
-sf.3B3 <- corsum2sf(source.3B3, distribute = FALSE) %>%
+sf.3B3 <- corsum2sf(source.3B3, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
+# mapview(sf.3B3) + mapview(sf.grid.5km)
+
+
 
 #+ include = FALSE
-Sys.setlocale(locale = 'Serbian (Latin)')
-opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
-                   use_iconv=TRUE,  
-                   encoding = "UTF-8")
-sf_opstine <- st_as_sf(opstine)
-
-#+ include = FALSE
-svinje <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
-lcl(loc = "C")
-svinje <- cyr_lat(svinje)
-names(svinje) <- cyr_lat(names(svinje)) 
-svinje <- svinje %>%
-  mutate_all(~replace_na(., 0))
-svinje$Opština[svinje$Opština == "Indjija"] <- "Inđija"
-svinje$Opština[svinje$Opština == "LJubovija"] <- "Ljubovija"
-svinje$Opština[svinje$Opština == "Mali Idjoš"] <- "Mali Iđoš"
-svinje$Opština[svinje$Opština == "Savski venac"] <- "Savski Venac"
-svinje$Opština[svinje$Opština == "Stari grad"] <- "Stari Grad"
-svinje$Opština[svinje$Opština == "Petrovac na Mlavi"] <- "Petrovac"
-svinje$Opština[svinje$Opština == "Arandjelovac"] <- "Aranđelovac"
-svinje$Opština[svinje$Opština == "LJig"] <- "Ljig"
-svinje$Opština[svinje$Opština == "Žitoradja"] <- "Žitorađa"
-svinje$Opština[svinje$Opština == "Medvedja"] <- "Medveđa"
-
-sf_opstine$Br_svinje <- svinje$Svinje[match(sf_opstine$NAME_2, svinje$Opština)]
-
-sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634")
-
-# sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
-
-sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
-
-sf_rural %<>% dplyr::select(.,Br_svinje, NAME_2.y) %>% 
-  filter(!is.na(Br_svinje))
-sf_rural[,vars] <- NA
-
-sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
-  filter(!is.na(Br_svinje))
-
-sum.3B3 <- sf.3B3 %>% 
-  st_drop_geometry() %>%
-  dplyr::select(., vars) %>% 
-  apply(., 2, sum) %>% 
-  t(.) %>% 
-  as.data.frame() %>%
-  dplyr::mutate_if(is.numeric, round, 2)
-total.3B3 <- source.3B3[[2]][[2]][, vars] %>% 
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  as.data.frame()
-
-sum_s <- sum(sf_rur.int$Br_svinje)
-diff.3B3 <- data.frame(total.3B3 - sum.3B3)
-sf_rur.int <- sf_rur.int %>%
-  mutate(NOx = ((diff.3B3$NOx/sum_s)*Br_svinje),
-         SO2 = ((diff.3B3$SO2/sum_s)*Br_svinje),
-         PM10 = ((diff.3B3$PM10/sum_s)*Br_svinje),
-         PM2.5 = ((diff.3B3$PM2.5/sum_s)*Br_svinje),
-         NMVOC = ((diff.3B3$NMVOC/sum_s)*Br_svinje),
-         NH3 = ((diff.3B3$NH3/sum_s)*Br_svinje))
-sf_rur.int %<>% select(vars)
-
-sf_rur.int$ID <- dplyr::row_number(sf_rur.int$NOx)
-
-sf_rur.int <- sf_rur.int %>%
-  st_join(sf.3B3) %>%
-  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
-  group_by(ID) %>%
-  dplyr::mutate(NOx = (NOx.x + NOx.y),
-            SO2 = (SO2.x + SO2.y),
-            PM10 = (PM10.x + PM10.y),
-            PM2.5 = (PM2.5.x + PM2.5.y),
-            NMVOC = (NMVOC.x + NMVOC.y),
-            NH3 = (NH3.x + NH3.y)) %>% 
-  #dplyr::mutate(ID = as.numeric(ID)) %>% 
-  dplyr::select(vars, ID) %>%
-  ungroup()
-
-
-
-source.3B3$sources$points <- NA
-source.3B3$sources$polygon <- sf_rur.int
-
-sf.3B3 <- corsum2sf_polygon(source.3B3, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
-
+# Sys.setlocale(locale = 'Serbian (Latin)')
+# opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+#                    use_iconv=TRUE,  
+#                    encoding = "UTF-8")
+# sf_opstine <- st_as_sf(opstine)
+# 
+# #+ include = FALSE
+# svinje <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
+# lcl(loc = "C")
+# svinje <- cyr_lat(svinje)
+# names(svinje) <- cyr_lat(names(svinje)) 
+# svinje <- svinje %>%
+#   mutate_all(~replace_na(., 0))
+# svinje$Opština[svinje$Opština == "Indjija"] <- "Inđija"
+# svinje$Opština[svinje$Opština == "LJubovija"] <- "Ljubovija"
+# svinje$Opština[svinje$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+# svinje$Opština[svinje$Opština == "Savski venac"] <- "Savski Venac"
+# svinje$Opština[svinje$Opština == "Stari grad"] <- "Stari Grad"
+# svinje$Opština[svinje$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+# svinje$Opština[svinje$Opština == "Arandjelovac"] <- "Aranđelovac"
+# svinje$Opština[svinje$Opština == "LJig"] <- "Ljig"
+# svinje$Opština[svinje$Opština == "Žitoradja"] <- "Žitorađa"
+# svinje$Opština[svinje$Opština == "Medvedja"] <- "Medveđa"
+# 
+# sf_opstine$Br_svinje <- svinje$Svinje[match(sf_opstine$NAME_2, svinje$Opština)]
+# 
+# sf_opstine %<>% 
+#   st_transform(crs = "+init=epsg:32634")
+# 
+# # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
+# sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+# 
+# sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+# 
+# sf_rural %<>% dplyr::select(.,Br_svinje, NAME_2.y) %>% 
+#   filter(!is.na(Br_svinje))
+# sf_rural[,vars] <- NA
+# 
+# sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+#   filter(!is.na(Br_svinje))
+# 
+# sum.3B3 <- sf.3B3 %>% 
+#   st_drop_geometry() %>%
+#   dplyr::select(., vars) %>% 
+#   apply(., 2, sum) %>% 
+#   t(.) %>% 
+#   as.data.frame() %>%
+#   dplyr::mutate_if(is.numeric, round, 2)
+# total.3B3 <- source.3B3[[2]][[2]][, vars] %>% 
+#   mutate_all(~replace(., is.na(.), 0)) %>%
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   as.data.frame()
+# 
+# sum_s <- sum(sf_rur.int$Br_svinje)
+# diff.3B3 <- data.frame(total.3B3 - sum.3B3)
+# sf_rur.int <- sf_rur.int %>%
+#   mutate(NOx = ((diff.3B3$NOx/sum_s)*Br_svinje),
+#          SO2 = ((diff.3B3$SO2/sum_s)*Br_svinje),
+#          PM10 = ((diff.3B3$PM10/sum_s)*Br_svinje),
+#          PM2.5 = ((diff.3B3$PM2.5/sum_s)*Br_svinje),
+#          NMVOC = ((diff.3B3$NMVOC/sum_s)*Br_svinje),
+#          NH3 = ((diff.3B3$NH3/sum_s)*Br_svinje))
+# sf_rur.int %<>% dplyr::select(vars)
+# 
+# sf_rur.int$ID <- dplyr::row_number(sf_rur.int$NOx)
+# 
+# sf_rur.int <- sf_rur.int %>%
+#   st_join(sf.3B3) %>%
+#   dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+#   group_by(ID.x) %>%
+#   dplyr::mutate(NOx = (NOx.x + NOx.y),
+#             SO2 = (SO2.x + SO2.y),
+#             PM10 = (PM10.x + PM10.y),
+#             PM2.5 = (PM2.5.x + PM2.5.y),
+#             NMVOC = (NMVOC.x + NMVOC.y),
+#             NH3 = (NH3.x + NH3.y)) %>% 
+#   dplyr::mutate(ID = as.numeric(ID.x)) %>% 
+#   dplyr::select(vars, ID) %>%
+#   ungroup()
+# 
+# 
+# 
+# source.3B3$sources$points <- NA
+# source.3B3$sources$polygon <- sf_rur.int
+# 
+# sf.3B3 <- corsum2sf_polygon(source.3B3, distribute = TRUE) %>%
+#   st_transform(crs = "+init=epsg:32634")
+# 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -357,12 +360,12 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.3B3, total.3B3, dat
 #     NH3 = (total.3B3$NH3/sum.NH3)*vars_1$NH3) %>%
 #   mutate_all(~replace(., is.na(.), 0)) 
 
-sf.3B3 %<>%
-  dplyr::select(-ID)
+#sf.3B3 %<>%
+#  dplyr::select(-ID)
 
 #+ include = FALSE, echo = FALSE, result = FALSE
 p.3B3 <- sf.grid.5km %>%
-  st_join(sf.3B3, join = st_contains) %>%
+  st_join(sf.3B3) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -388,7 +391,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B3, total.3B3, 
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
-
+  
 #+ include = FALSE
 # st_write(p.3B3, dsn="Products/3 - Agriculture/3B3.gpkg", layer='3B3')
 
@@ -399,11 +402,11 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B3, total.3B3, 
 #+ include = FALSE
 source.3B4gi_gii <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.3B4gi_gii$sources$points <- readxl::read_xlsx(path = source.file, range = "D8:S55", sheet = source.sheet, col_names = header)
-source.3B4gi_gii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D62:I62", sheet = source.sheet, col_names = vars)
-source.3B4gi_gii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D63:I63", sheet = source.sheet, col_names = vars)
+source.3B4gi_gii$sources$points <- readxl::read_xlsx(path = source.file, range = "D64:S109", sheet = source.sheet, col_names = header)
+source.3B4gi_gii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D116:I116", sheet = source.sheet, col_names = vars)
+source.3B4gi_gii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D117:I117", sheet = source.sheet, col_names = vars)
 
-sf.3B4gi_gii <- corsum2sf(source.3B4gi_gii, distribute = FALSE) %>%
+sf.3B4gi_gii <- corsum2sf(source.3B4gi_gii, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 
@@ -412,93 +415,93 @@ sf.3B4gi_gii <- corsum2sf(source.3B4gi_gii, distribute = FALSE) %>%
 
 
 #+ include = FALSE
-Sys.setlocale(locale = 'Serbian (Latin)')
-opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
-                   use_iconv=TRUE,  
-                   encoding = "UTF-8")
-sf_opstine <- st_as_sf(opstine)
-
-#+ include = FALSE
-zivina <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
-lcl(loc = "C")
-zivina <- cyr_lat(zivina)
-names(zivina) <- cyr_lat(names(zivina)) 
-zivina <- zivina %>%
-  mutate_all(~replace_na(., 0))
-zivina$Opština[zivina$Opština == "Indjija"] <- "Inđija"
-zivina$Opština[zivina$Opština == "LJubovija"] <- "Ljubovija"
-zivina$Opština[zivina$Opština == "Mali Idjoš"] <- "Mali Iđoš"
-zivina$Opština[zivina$Opština == "Savski venac"] <- "Savski Venac"
-zivina$Opština[zivina$Opština == "Stari grad"] <- "Stari Grad"
-zivina$Opština[zivina$Opština == "Petrovac na Mlavi"] <- "Petrovac"
-zivina$Opština[zivina$Opština == "Arandjelovac"] <- "Aranđelovac"
-zivina$Opština[zivina$Opština == "LJig"] <- "Ljig"
-zivina$Opština[zivina$Opština == "Žitoradja"] <- "Žitorađa"
-zivina$Opština[zivina$Opština == "Medvedja"] <- "Medveđa"
-
-sf_opstine$Br_zivina <- zivina$Živina[match(sf_opstine$NAME_2, zivina$Opština)]
-
-sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634")
-
-# sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
-
-sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
-
-sf_rural %<>% dplyr::select(.,Br_zivina, NAME_2.y) %>% 
-  filter(!is.na(Br_zivina))
-sf_rural[,vars] <- NA
-
-sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
-  filter(!is.na(Br_zivina))
-
-sum.3B4gi_gii <- sf.3B4gi_gii %>% 
-  st_drop_geometry() %>%
-  dplyr::select(., vars) %>% 
-  apply(., 2, sum) %>% 
-  t(.) %>% 
-  as.data.frame() %>%
-  dplyr::mutate_if(is.numeric, round, 2)
-total.3B4gi_gii <- source.3B4gi_gii[[2]][[2]][, vars] %>% 
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  as.data.frame()
-
-sum_s <- sum(sf_rur.int$Br_zivina)
-diff.3B4gi_gii <- data.frame(total.3B4gi_gii - sum.3B4gi_gii)
-sf_rur.int <- sf_rur.int %>%
-  mutate(NOx = ((diff.3B4gi_gii$NOx/sum_s)*Br_zivina),
-         SO2 = ((diff.3B4gi_gii$SO2/sum_s)*Br_zivina),
-         PM10 = ((diff.3B4gi_gii$PM10/sum_s)*Br_zivina),
-         PM2.5 = ((diff.3B4gi_gii$PM2.5/sum_s)*Br_zivina),
-         NMVOC = ((diff.3B4gi_gii$NMVOC/sum_s)*Br_zivina),
-         NH3 = ((diff.3B4gi_gii$NH3/sum_s)*Br_zivina))
-sf_rur.int %<>% select(vars)
-
-sf_rur.int$ID <- dplyr::row_number(sf_rur.int$NOx)
-
-sf_rur.int <- sf_rur.int %>%
-  st_join(sf.3B4gi_gii) %>%
-  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
-  group_by(ID) %>%
-  dplyr::mutate(NOx = (NOx.x + NOx.y),
-                SO2 = (SO2.x + SO2.y),
-                PM10 = (PM10.x + PM10.y),
-                PM2.5 = (PM2.5.x + PM2.5.y),
-                NMVOC = (NMVOC.x + NMVOC.y),
-                NH3 = (NH3.x + NH3.y)) %>% 
-  #dplyr::mutate(ID = as.numeric(ID)) %>% 
-  dplyr::select(vars, ID) %>%
-  ungroup()
-
-
-
-source.3B4gi_gii$sources$points <- NA
-source.3B4gi_gii$sources$polygon <- sf_rur.int
-
-sf.3B4gi_gii <- corsum2sf_polygon(source.3B4gi_gii, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+# Sys.setlocale(locale = 'Serbian (Latin)')
+# opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+#                    use_iconv=TRUE,  
+#                    encoding = "UTF-8")
+# sf_opstine <- st_as_sf(opstine)
+# 
+# #+ include = FALSE
+# zivina <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
+# lcl(loc = "C")
+# zivina <- cyr_lat(zivina)
+# names(zivina) <- cyr_lat(names(zivina)) 
+# zivina <- zivina %>%
+#   mutate_all(~replace_na(., 0))
+# zivina$Opština[zivina$Opština == "Indjija"] <- "Inđija"
+# zivina$Opština[zivina$Opština == "LJubovija"] <- "Ljubovija"
+# zivina$Opština[zivina$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+# zivina$Opština[zivina$Opština == "Savski venac"] <- "Savski Venac"
+# zivina$Opština[zivina$Opština == "Stari grad"] <- "Stari Grad"
+# zivina$Opština[zivina$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+# zivina$Opština[zivina$Opština == "Arandjelovac"] <- "Aranđelovac"
+# zivina$Opština[zivina$Opština == "LJig"] <- "Ljig"
+# zivina$Opština[zivina$Opština == "Žitoradja"] <- "Žitorađa"
+# zivina$Opština[zivina$Opština == "Medvedja"] <- "Medveđa"
+# 
+# sf_opstine$Br_zivina <- zivina$Živina[match(sf_opstine$NAME_2, zivina$Opština)]
+# 
+# sf_opstine %<>% 
+#   st_transform(crs = "+init=epsg:32634")
+# 
+# # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
+# sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+# 
+# sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+# 
+# sf_rural %<>% dplyr::select(.,Br_zivina, NAME_2.y) %>% 
+#   filter(!is.na(Br_zivina))
+# sf_rural[,vars] <- NA
+# 
+# sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+#   filter(!is.na(Br_zivina))
+# 
+# sum.3B4gi_gii <- sf.3B4gi_gii %>% 
+#   st_drop_geometry() %>%
+#   dplyr::select(., vars) %>% 
+#   apply(., 2, sum) %>% 
+#   t(.) %>% 
+#   as.data.frame() %>%
+#   dplyr::mutate_if(is.numeric, round, 2)
+# total.3B4gi_gii <- source.3B4gi_gii[[2]][[2]][, vars] %>% 
+#   mutate_all(~replace(., is.na(.), 0)) %>%
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   as.data.frame()
+# 
+# sum_s <- sum(sf_rur.int$Br_zivina)
+# diff.3B4gi_gii <- data.frame(total.3B4gi_gii - sum.3B4gi_gii)
+# sf_rur.int <- sf_rur.int %>%
+#   mutate(NOx = ((diff.3B4gi_gii$NOx/sum_s)*Br_zivina),
+#          SO2 = ((diff.3B4gi_gii$SO2/sum_s)*Br_zivina),
+#          PM10 = ((diff.3B4gi_gii$PM10/sum_s)*Br_zivina),
+#          PM2.5 = ((diff.3B4gi_gii$PM2.5/sum_s)*Br_zivina),
+#          NMVOC = ((diff.3B4gi_gii$NMVOC/sum_s)*Br_zivina),
+#          NH3 = ((diff.3B4gi_gii$NH3/sum_s)*Br_zivina))
+# sf_rur.int %<>% select(vars)
+# 
+# sf_rur.int$ID <- dplyr::row_number(sf_rur.int$NOx)
+# 
+# sf_rur.int <- sf_rur.int %>%
+#   st_join(sf.3B4gi_gii) %>%
+#   dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+#   group_by(ID) %>%
+#   dplyr::mutate(NOx = (NOx.x + NOx.y),
+#                 SO2 = (SO2.x + SO2.y),
+#                 PM10 = (PM10.x + PM10.y),
+#                 PM2.5 = (PM2.5.x + PM2.5.y),
+#                 NMVOC = (NMVOC.x + NMVOC.y),
+#                 NH3 = (NH3.x + NH3.y)) %>% 
+#   #dplyr::mutate(ID = as.numeric(ID)) %>% 
+#   dplyr::select(vars, ID) %>%
+#   ungroup()
+# 
+# 
+# 
+# source.3B4gi_gii$sources$points <- NA
+# source.3B4gi_gii$sources$polygon <- sf_rur.int
+# 
+# sf.3B4gi_gii <- corsum2sf_polygon(source.3B4gi_gii, distribute = TRUE) %>%
+#   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -561,8 +564,8 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.3B4gi_gii, total.3B
 #     NH3 = (total.3B4gi_gii$NH3/sum.NH3)*vars_1$NH3) %>%
 #   mutate_all(~replace(., is.na(.), 0)) 
 
-sf.3B4gi_gii %<>%
-  dplyr::select(-ID)
+#sf.3B4gi_gii %<>%
+#  dplyr::select(-ID)
 
 #+ include = FALSE, echo = FALSE, result = FALSE
 p.3B4gi_gii <- sf.grid.5km %>%

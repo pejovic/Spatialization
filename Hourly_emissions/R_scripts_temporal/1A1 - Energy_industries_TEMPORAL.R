@@ -414,7 +414,7 @@ ggplot(he.1A1b, aes(x = times, y = he_1A1b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6) + 
+  #ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6) + 
   # labs( caption = "he_1A1b = (WT0024+0.5) * RP2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
@@ -530,7 +530,7 @@ ggplot(he.1B2aiv, aes(x = times, y = he_1B2aiv)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "RP2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
@@ -644,7 +644,7 @@ ggplot(he.1B2c, aes(x = times, y = he_1B2c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1B2c = RP2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")

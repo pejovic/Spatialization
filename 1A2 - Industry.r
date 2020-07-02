@@ -130,6 +130,41 @@ corsum2sf_polygon <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
+
+
+corsum2sf_point.sf <- function(source.list, distribute = FALSE){
+  source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
+  source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
+  
+  points.sum <- source.list$sources$points %>% 
+    st_drop_geometry() %>%
+    dplyr::select(., vars) %>% 
+    apply(., 2, sum) %>% 
+    t(.) %>% 
+    as.data.frame() %>%
+    dplyr::mutate_if(is.numeric, round, 2)
+  
+  points.total <- source.list[[2]][[2]][, vars] %>% 
+    dplyr::mutate_if(is.numeric, round, 2) %>%
+    as.data.frame()
+  
+  if(!identical(points.sum, points.total) & distribute == TRUE){
+    d <- (points.total - points.sum)[1, ]
+    zero.ind <- source.list$sources$points[, vars] %>% st_drop_geometry() == 0
+    w <- replace(source.list$sources$points[, vars] %>% st_drop_geometry(), zero.ind, 1) %>% 
+      apply(., 2, function(x) x/sum(x)) %>%
+      as.data.frame() %>%
+      dplyr::mutate_all(~replace(., is.na(.), 0))
+    
+    cor.data <- as.matrix(w) %*% diag(d) + source.list$sources$points[, vars]%>% st_drop_geometry()
+    source.list$sources$points[, vars] <- cor.data
+    source.sf <- source.list$sources$points
+  }else{
+    source.sf <- source.list$sources$points
+  }
+  return(source.sf)
+}
+
 # Function for spatial data visualisation at web maps
 # Parameters:
 #    1. sf.sources -  sf object with sources to be spatialised
@@ -497,8 +532,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2d, total.1A2d
 source.1A2e <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D110:S131", sheet = source.sheet, col_names = header)
-source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D137:I137", sheet = source.sheet, col_names = vars)
-source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "D151:I151", sheet = source.sheet, col_names = vars)
+source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "U151:Z151", sheet = source.sheet, col_names = vars)
+source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "U151:Z151", sheet = source.sheet, col_names = vars)
 
 sf.1A2e <- corsum2sf(source.1A2e, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -573,6 +608,235 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e, total.1A2e
 
 #+ include = FALSE
 # st_write(p.1A2e, dsn="Products/1A2 - Industry/1A2e.gpkg", layer='1A2e')
+
+
+
+
+
+#'
+#'
+#'
+#' ## 1A2e - Food, beverages and tobacco - bread
+#'
+#+ include = FALSE
+
+source.1A2e.bread <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A2e.bread$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D142:I142", sheet = source.sheet, col_names = vars)
+source.1A2e.bread$total$inventory <- readxl::read_xlsx(path = source.file, range = "D142:I142", sheet = source.sheet, col_names = vars)
+
+#+ include = FALSE
+osm.bread <- sf::st_read(dsn = "Data/pekare/OSM_bakery_4326.gpkg") %>%
+  sf::st_transform(32634) %>%
+  dplyr::select()
+
+osm.bread$ID <- 1:nrow(osm.bread)
+mapview(osm.bread)+mapview(grid.5km)
+
+# TACKE VAN POLIGONA, id: 50, 116
+osm.bread %<>% dplyr::filter(ID != c(50)) %>% 
+  dplyr::filter(ID != c(116))%>% 
+  dplyr::filter(ID != c(105))
+
+osm.bread[,vars] <- NA
+source.1A2e.bread$sources$points <- osm.bread %>% dplyr::select(vars)
+
+sf.1A2e.bread <- corsum2sf_point.sf(source.1A2e.bread, distribute = TRUE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A2e.bread %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 27: sf.1A2e.bread',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A2e.bread <- sf.1A2e.bread %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A2e.bread <- source.1A2e.bread[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2e.bread, total.1A2e.bread, data.frame(total.1A2e.bread-sum.1A2e.bread))) %>%
+  datatable(., caption = 'Table 28: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2e.bread <- sf.grid.5km %>%
+  st_join(sf.1A2e.bread) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(sf.1A2e.bread, layer.name = "Sources 1A2e.bread", col.regions = "red") + mapview(p.1A2e.bread, layer.name = "Spatialised 1A2e.bread")
+spatialised.mapview(sf.sources = sf.1A2e.bread, layer.name.1 = "Sources 1A2e.bread", sf.spatialised = p.1A2e.bread, layer.name.2 = "Spatialised 1A2e.bread", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2e.bread <- p.1A2e.bread %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.bread, total.1A2e.bread, data.frame(sum.p.1A2e.bread == total.1A2e.bread)-1)) %>%
+  datatable(., caption = 'Table 15: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2e.bread, dsn="Products/1A2 - Industry/1A2e.bread.gpkg", layer='1A2e.bread')
+
+
+
+
+
+#'
+#'
+#'
+#' ## 1A2e - Food, beverages and tobacco - wine
+#'
+#+ include = FALSE
+
+source.1A2e.wine <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A2e.wine$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D148:I148", sheet = source.sheet, col_names = vars)
+source.1A2e.wine$total$inventory <- readxl::read_xlsx(path = source.file, range = "D148:I148", sheet = source.sheet, col_names = vars)
+
+#+ include = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+
+clc221 <- subset(sf_clc18, CODE_18 == "221") %>% # VINEYARDS
+  st_set_crs(32634)
+
+clc221 %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+
+clc221[,vars] <- NA
+clc221.int <- st_intersection(clc221, sf.grid.5km) %>%
+  select(.,vars)
+
+source.1A2e.wine$sources$polygon <- clc221.int
+
+sf.1A2e.wine <- corsum2sf_polygon(source.1A2e.wine, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A2e.wine %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 27: sf.1A2e.wine',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A2e.wine <- sf.1A2e.wine %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A2e.wine <- source.1A2e.wine[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2e.wine, total.1A2e.wine, data.frame(total.1A2e.wine-sum.1A2e.wine))) %>%
+  datatable(., caption = 'Table 28: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+sf.1A2e.wine <- sf.1A2e.wine %>%
+  mutate(Area = st_area(.))
+
+sum_Area <- sum(sf.1A2e.wine$Area)
+diff.1A2e.wine <- data.frame(total.1A2e.wine - sum.1A2e.wine)
+sf.1A2e.wine <- sf.1A2e.wine %>%
+  mutate(NOx = ((diff.1A2e.wine$NOx/sum_Area)*Area),
+         SO2 = ((diff.1A2e.wine$SO2/sum_Area)*Area),
+         PM10 = ((diff.1A2e.wine$PM10/sum_Area)*Area),
+         PM2.5 = ((diff.1A2e.wine$PM2.5/sum_Area)*Area),
+         NMVOC = ((diff.1A2e.wine$NMVOC/sum_Area)*Area),
+         NH3 = ((diff.1A2e.wine$NH3/sum_Area)*Area))
+sf.1A2e.wine %<>% select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2e.wine <- sf.grid.5km %>%
+  st_join(sf.1A2e.wine, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(p.1A2e.wine, layer.name = "Spatialised 1A2e.wine") + mapview(sf.1A2e.wine, layer.name = "Sources 1A2e.wine", col.regions = "red") 
+spatialised.mapview(sf.sources = sf.1A2e.wine, layer.name.1 = "Sources 1A2e.wine", sf.spatialised = p.1A2e.wine, layer.name.2 = "Spatialised 1A2e.wine", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2e.wine <- p.1A2e.wine %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.wine, total.1A2e.wine, data.frame(sum.p.1A2e.wine == total.1A2e.wine)-1)) %>%
+  datatable(., caption = 'Table 29: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2e.wine, dsn="Products/1A2 - Industry/1A2e.wine.gpkg", layer='1A2e.wine')
+
 
 #'
 #'
@@ -661,6 +925,98 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2f, total.1A2f
 #+ include = FALSE
 # st_write(p.1A2f, dsn="Products/1A2 - Industry/1A2f.gpkg", layer='1A2f')
 
+
+#'
+#'
+#'
+#' ## 1A2g - Auto-production
+#'
+#+ include = FALSE
+# NIJE AUTOMOBILSKA INDUSTRIJA, DATE SU LOKACIJE, ZAMENI U INVENTORY FAJLU ---> ZAMENJENO
+
+source.1A2gvi <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S240", sheet = source.sheet, col_names = header)
+source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D253:I253", sheet = source.sheet, col_names = vars)
+source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D258:I258", sheet = source.sheet, col_names = vars)
+
+sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = TRUE) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A2gvi %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 24: sf.1A2g - Auto-production',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A2gvi <- sf.1A2gvi %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A2gvi <- source.1A2gvi[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2gvi, total.1A2gvi, data.frame(total.1A2gvi-sum.1A2gvi))) %>%
+  datatable(., caption = 'Table 25: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.1A2gvi <- sf.grid.5km %>%
+  st_join(sf.1A2gvi) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(sf.1A2gvi, layer.name = "Sources 1A2g - Auto-production", col.regions = "red") + mapview(p.1A2gvi, layer.name = "Spatialised 1A2gvi")
+spatialised.mapview(sf.sources = sf.1A2gvi, layer.name.1 = "Sources 1A2g - Auto-production", sf.spatialised = p.1A2gvi, layer.name.2 = "Spatialised 1A2gvi", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A2gvi <- p.1A2gvi %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2gvi, total.1A2gvi, data.frame(sum.p.1A2gvi == total.1A2gvi)-1)) %>%
+  datatable(., caption = 'Table 26: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.1A2gvi, dsn="Products/1A2 - Industry/1A2g-Auto-production.gpkg", layer='1A2g-Auto-production')
+
+
+
+
 #'
 #'
 #'
@@ -718,20 +1074,38 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2g, total.1A2g, d
 
 
 #+ include = FALSE
-clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
-sf_clc18 <- st_as_sf(clc_18)
 clc121 <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") %>%
   st_set_crs(32634)
 #+ include = FALSE
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# DODATO U ALL_POINTS i sf.1A2gvi a zatim napravljen indikator preklapanja sa over 
+# i iskljuceni poligoni iz clc121 koji se preklapaju!!!
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
 # Combine all known points into one sf object
-points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f, sf.1A2g) %>%
+points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f, sf.1A2gvi) %>% # , sf.1A2g
   st_transform(crs = "+init=epsg:32634")
-clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
-  subset(is.na(NOx) | is.na(SO2) | is.na(PM10) | is.na(PM2.5) | is.na(NMVOC) | is.na(NH3))
+#clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
+#  subset(is.na(NOx) | is.na(SO2) | is.na(PM10) | is.na(PM2.5) | is.na(NMVOC) | is.na(NH3))
+
+clc121.sp <- as(clc121, "Spatial")
+points_all.sp <- as(points_all, "Spatial")
+ind <- over(clc121.sp, points_all.sp)
+clc121$ind <- ind
+
+clc121 %<>% dplyr::mutate(ind1 = ifelse(is.na(ind$NOx), TRUE, FALSE))
+clc121 %<>% dplyr::filter(ind1 == TRUE) 
+
 
 #+ include = FALSE
 # Polygon Centroid
-clc121.otherIndustries %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+clc121.otherIndustries <- clc121 %>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+clc121.otherIndustries[,vars] <- NA
 
 clc121.oI.cen <- st_centroid(clc121.otherIndustries) %>%
   select(ID, Area_Ha, SHAPE_Area, NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
@@ -824,93 +1198,6 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g
 #+ include = FALSE
 #st_write(p.1A2g, dsn="Products/1A2 - Industry/1A2g.gpkg", layer='1A2g')
 
-#'
-#'
-#'
-#' ## 1A2g - Auto-production
-#'
-#+ include = FALSE
-# NIJE AUTOMOBILSKA INDUSTRIJA, DATE SU LOKACIJE, ZAMENI U INVENTORY FAJLU ---> ZAMENJENO
-
-source.1A2gvi <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
-
-source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S240", sheet = source.sheet, col_names = header)
-source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D253:I253", sheet = source.sheet, col_names = vars)
-source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D258:I258", sheet = source.sheet, col_names = vars)
-
-sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
-mapview(sf.1A2gvi)
-#'
-#'
-#+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A2gvi %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 24: sf.1A2g - Auto-production',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
-#'
-#'
-#+ echo = FALSE, result = TRUE, eval = TRUE
-sum.1A2gvi <- sf.1A2gvi %>% 
-  st_drop_geometry() %>%
-  dplyr::select(., vars) %>% 
-  apply(., 2, sum) %>% 
-  t(.) %>% 
-  as.data.frame() %>%
-  dplyr::mutate_if(is.numeric, round, 2)
-total.1A2gvi <- source.1A2gvi[[2]][[2]][, vars] %>% 
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  as.data.frame()
-
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2gvi, total.1A2gvi, data.frame(total.1A2gvi-sum.1A2gvi))) %>%
-  datatable(., caption = 'Table 25: Summary differences',
-            options = list(pageLength = 5)
-  )
-
-#'
-#'
-#+ include = FALSE, echo = FALSE, result = FALSE
-p.1A2gvi <- sf.grid.5km %>%
-  st_join(sf.1A2gvi) %>%
-  group_by(ID) %>%
-  summarize(NOx = sum(NOx, na.rm = TRUE),
-            SO2 = sum(SO2, na.rm = TRUE),
-            PM10 = sum(PM10, na.rm = TRUE),
-            PM2.5 = sum(PM2.5, na.rm = TRUE),
-            NMVOC = sum(NMVOC, na.rm = TRUE),
-            NH3 = sum(NH3, na.rm = TRUE)) %>% 
-  mutate(ID = as.numeric(ID))
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-# mapview(sf.1A2gvi, layer.name = "Sources 1A2g - Auto-production", col.regions = "red") + mapview(p.1A2gvi, layer.name = "Spatialised 1A2gvi")
-spatialised.mapview(sf.sources = sf.1A2gvi, layer.name.1 = "Sources 1A2g - Auto-production", sf.spatialised = p.1A2gvi, layer.name.2 = "Spatialised 1A2gvi", vars = vars)
-
-#+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.1A2gvi <- p.1A2gvi %>% 
-  st_drop_geometry() %>%
-  dplyr::select(., vars) %>% 
-  apply(., 2, sum) %>% 
-  t(.) %>% 
-  as.data.frame() %>%
-  dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2gvi, total.1A2gvi, data.frame(sum.p.1A2gvi == total.1A2gvi)-1)) %>%
-  datatable(., caption = 'Table 26: Summary differences after spatialisation',
-            options = list(pageLength = 5)
-  )
-
-#+ include = FALSE
-# st_write(p.1A2gvi, dsn="Products/1A2 - Industry/1A2g-Auto-production.gpkg", layer='1A2g-Auto-production')
 
 #'
 #'

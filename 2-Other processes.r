@@ -613,7 +613,7 @@ source.2D3b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D7
 
 sf_roads[,vars] <- NA
 roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
-  select(.,vars)
+  dplyr::select(.,vars)
 
 source.2D3b$sources$lines <- roads.int
 sf.2D3b <- corsum2sf_lines(source.2D3b, distribute = FALSE) %>%
@@ -2033,7 +2033,8 @@ source.2D3a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D9
 
 
 
-
+library(raster)
+library(stars)
 #+ include = FALSE
 
 pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/popdens_32634.tif")
@@ -2253,7 +2254,7 @@ source.2D3f <- list(sources = list(points = NA, lines = NA, polygon = NA), total
 
 source.2D3f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
 source.2D3f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D94:I94", sheet = source.sheet, col_names = vars)
-
+#sf_clc18_urb[,vars] <- NA # za kartu
 source.2D3f$sources$polygon <- sf_clc18_urb.int
 
 sf.2D3f <- corsum2sf_polygon(source.2D3f, distribute = FALSE) %>%
