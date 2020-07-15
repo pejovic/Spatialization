@@ -975,13 +975,36 @@ names(activity_df)
 
 
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# NEW GRAPH FOR ELECTRICITY PRODUCTION 15072020
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
+names(activity.df)
+
+weekly.ep <- readxl::read_xlsx(path = "D:/R_projects/Spatialization/Hourly_emissions/Data/Electricity_productiion_weekly_hourly.xlsx", sheet = "Weekly")
+hourly.ep <- readxl::read_xlsx(path = "D:/R_projects/Spatialization/Hourly_emissions/Data/Electricity_productiion_weekly_hourly.xlsx", sheet = "Hourly")
+
+activity.df$working_days
+
+# Function: Working days
+days.label <- lubridate::wday(times, label = TRUE) 
+activity.df$day.label <- days.label
+
+activity.df %<>% dplyr::mutate(weekly.ep = dplyr::case_when(working_days == TRUE ~ 1.06, 
+                                                            working_days == FALSE ~ 0.85))
+
+day_hours <- rep(c(1:24), 365)
+
+activity.df %<>% dplyr::mutate(hourly.ep = rep(hourly.ep$Ratio,365))
+
+activity_df <- activity.df
+saveRDS(activity_df, file = "Version_4_update/Temporalization/activity_df_new.rds")
+
+# Sys.setlocale("LC_ALL","English")
 
 
-
-
-
-
-
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 

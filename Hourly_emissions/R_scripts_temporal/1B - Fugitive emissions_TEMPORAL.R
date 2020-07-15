@@ -70,7 +70,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_4_update/Temporalization/activity_df_new.rds")
 load(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/counters_df.rds")
 counters.df <- counters_df %>% 
   mutate(ALL_mean = (IA_mean + IIA_mean + IB_mean)/3)
@@ -153,7 +153,7 @@ he.1B1a <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1B1a = EP) %>%
+  dplyr::mutate(he_1B1a = EP*weekly.ep*hourly.ep) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B1a = he_sig) %>%
   dplyr::mutate(he_1B1a_n = he_sig/sum(he_sig))%>%

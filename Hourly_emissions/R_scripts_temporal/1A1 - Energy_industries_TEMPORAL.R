@@ -68,7 +68,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_4_update/Temporalization/activity_df_new.rds")
 
 summary_tab <- data.frame(Label = c("WD", "WDWW", "WT0816", "WT1624", "WT0622", "DL", 
                                     "WE", "WW", "RH0709", "RH1517", "PH", "SA", "HS", "SAAG", "TEMP", "SLP", "VA", "NFH", "RP", "EC"),
@@ -141,6 +141,7 @@ data.frame(t.1A1a_ep%>%
 #
 # ---  HE = WDWW + WT0024 + WT0622 + !PH + k*SA + k*HS + TEMP + !RP
 #
+# Sys.setlocale("LC_ALL","English")
 
 he.1A1a_ep <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
@@ -153,14 +154,14 @@ he.1A1a_ep <- activity.df %>%
                                        HS == FALSE ~ 0)) %>%
   dplyr::mutate(HS2 = (sin(((2*pi)/12)*(HS1))+0.5)) %>%
   # dplyr::mutate(he_1A1a_ep = ((WT0622+0.5))  * (HS2) * RP2 * (PH2) * EP) %>%
-  dplyr::mutate(he_1A1a_ep = EP) %>%
+  dplyr::mutate(he_1A1a_ep = EP*weekly.ep*hourly.ep) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1a_ep))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1a_ep_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   dplyr::mutate(he_1A1a_ep = he_sig) %>%
   dplyr::select(times, he_1A1a_ep, he_1A1a_ep_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
-                       to   = ymd_h("2015-04-05 24"),
+                       to   = ymd_h("2015-02-01 12"),
                        by   = dhours(1)) 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
@@ -747,10 +748,10 @@ he.1A1c <- activity.df %>%
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   # dplyr::mutate(he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2* (TEMP+30)) %>%
-  dplyr::mutate(he_1A1c = WDWW) %>%
-  #dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  #dplyr::mutate(he_1A1c = he_sig) %>%
-  #dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::mutate(he_1A1c = EP*weekly.ep*hourly.ep) %>% # WDWW
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A1c = he_sig) %>%
+  dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   select(times, he_1A1c)#, he_1A1c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -763,7 +764,7 @@ ggplot(he.1A1c, aes(x = times, y = he_1A1c)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2* (TEMP+30)")+
+  #labs( caption = "he_1A1c = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2* (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
@@ -867,10 +868,10 @@ he.1B1b <- activity.df %>%
                                        PH == FALSE ~ 0)) %>%
   dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
   # dplyr::mutate(he_1B1b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)) %>%
-  dplyr::mutate(he_1B1b = WDWW) %>%
-  # dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  # dplyr::mutate(he_1B1b = he_sig) %>%
-  # dplyr::mutate(he_1B1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
+  dplyr::mutate(he_1B1b = EP*weekly.ep*hourly.ep) %>% # WDWW
+  dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1B1b = he_sig) %>%
+  dplyr::mutate(he_1B1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
   select(times, he_1B1b)#, he_1B1b_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
@@ -883,7 +884,7 @@ ggplot(he.1B1b, aes(x = times, y = he_1B1b)) +
   geom_line(colour = "deepskyblue") + 
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
-  labs( caption = "he_1B1b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)")+
+  #labs( caption = "he_1B1b = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * (TEMP+30)")+
   theme(
     plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
   )
