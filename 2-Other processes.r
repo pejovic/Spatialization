@@ -237,7 +237,7 @@ source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:
 source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
 source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
 
-
+  
 sf.2A5a <- corsum2sf(source.2A5a, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
 
