@@ -643,7 +643,9 @@ vars <- header[1:6]
 # sf.2A5a <- corsum2sf(source.2A5a, distribute = TRUE) %>%
 #   st_transform(crs = "+init=epsg:32634")
 
-sf.2A5a
+
+# Polygons
+sf.2A5a <- clc131.quarries
 sf.2A5a %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "2A5a-Quarrying and mining of minerals other than coal") %>% 
   sf::st_transform(4326)
 
@@ -665,7 +667,37 @@ map.2A5a <- ggplot()+
                          pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)
 map.2A5a
-ggsave(plot = map.2A5a, filename = "Maps/Subcategories/Other processes/Map_2A5a.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+# Points
+# pozvati iz skripte prvi deo bloka
+sf.2A5a 
+sf.2A5a %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "2A5a-Quarrying and mining of minerals other than coal") %>% 
+  sf::st_transform(4326)
+
+map.2A5a.1 <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 2 - Other processes",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.2A5a, aes(colour = `Sub-category: `))+
+  geom_sf(data = sf_granica, colour = "black", fill = NA)+
+  scale_colour_manual(values=c("violet"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"),
+        legend.position = "bottom")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.2A5a.1
+
+
+maps_2A5a <- grid.arrange(map.2A5a.1, map.2A5a, ncol = 2)
+
+ggsave(plot = maps_2A5a, filename = "Maps/Subcategories/Other processes/maps_2A5a.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
 
 # 2A5b - Construction and demolition
 # POKRENUTO IZ SKRIPTE
