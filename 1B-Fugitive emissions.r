@@ -262,6 +262,9 @@ source.1B1a$sources$points <- NA
 sf.1B1a <- corsum2sf_polygon(source.1B1a, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
+# st_write(sf.1B1a, dsn="D:/coal_polygons.gpkg", layer='sf.1B1a')
+
+
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE

@@ -633,17 +633,17 @@ vars <- header[1:6]
 
 # 2A5a - Quarrying and mining of minerals other than coal
 
-source.2A5a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+# source.2A5a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+# 
+# source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S19", sheet = source.sheet, col_names = header)
+# source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
+# source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
+# 
+# 
+# sf.2A5a <- corsum2sf(source.2A5a, distribute = TRUE) %>%
+#   st_transform(crs = "+init=epsg:32634")
 
-source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S19", sheet = source.sheet, col_names = header)
-source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
-source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
-
-
-sf.2A5a <- corsum2sf(source.2A5a, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
-
-
+sf.2A5a
 sf.2A5a %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "2A5a-Quarrying and mining of minerals other than coal") %>% 
   sf::st_transform(4326)
 
@@ -652,9 +652,9 @@ map.2A5a <- ggplot()+
        caption = "Coordinate Reference System - WGS84",
        subtitle = "Category: 2 - Other processes",
        title = "Spatial locations - GIS layers")+#,
-  geom_sf(data = sf.2A5a, aes(color = `Sub-category: `), size= 2)+
+  geom_sf(data = sf.2A5a, aes(fill = `Sub-category: `))+
   geom_sf(data = sf_granica, colour = "black", fill = NA)+
-  scale_color_manual(values=c("violet"))+
+  scale_fill_manual(values=c("violet"))+
   theme(panel.grid = element_line(color = "black"), 
         panel.background = element_rect(fill = "white"), 
         axis.text.x = element_text(colour = "black"), 
@@ -704,9 +704,9 @@ map.2A5c <- ggplot()+
        caption = "Coordinate Reference System - WGS84",
        subtitle = "Category: 2 - Other processes",
        title = "Spatial locations - GIS layers")+#,
-  geom_sf(data = sf.2A5c, aes(colour = `Sub-category: `))+
+  geom_sf(data = sf.2A5c, aes(fill = `Sub-category: `))+
   geom_sf(data = sf_granica, colour = "black", fill = NA)+
-  scale_color_manual(values=c("violet"))+
+  scale_fill_manual(values=c("violet"))+
   theme(panel.grid = element_line(color = "black"), 
         panel.background = element_rect(fill = "white"), 
         axis.text.x = element_text(colour = "black"), 
@@ -1290,6 +1290,7 @@ ggsave(plot = map.1A4cii, filename = "Maps/Subcategories/Residential-Tertiary/Ma
 
 # #####################################################
 
+
 # #####################################################
 # 1A3 – Transports
 # #####################################################
@@ -1482,6 +1483,7 @@ ggsave(plot = map.5D2, filename = "Maps/Subcategories/Waste/Map_5D2.jpg", width 
 
 # #####################################################
 
+
 # #####################################################
 # 3 - Agriculture
 # #####################################################
@@ -1490,11 +1492,11 @@ source.sheet =  "3-Agriculture"
 header <- readxl::read_xlsx(path = source.file, range = "D7:S7", sheet = source.sheet) %>% names()
 vars <- header[1:6]
 
-# Dairy cattle, non-dairy cattle, sheep, goats, turkeys, other poultry
+# Dairy cattle, non-dairy cattle, turkeys, other poultry
 
-sf.3B1a <- sf_rural 
+sf.3B1a <- sf_rur 
 
-sf.3B1a %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "3B1a-Dairy cattle, non-dairy cattle, sheep, goats, turkeys, other poultry") %>% 
+sf.3B1a %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "3B1a-Dairy cattle, non-dairy cattle, turkeys, other poultry") %>% 
   sf::st_transform(4326)
 
 map.3B1a <- ggplot()+
@@ -1516,6 +1518,35 @@ map.3B1a <- ggplot()+
                          style = north_arrow_fancy_orienteering)
 map.3B1a
 ggsave(plot = map.3B1a, filename = "Maps/Subcategories/Agriculture/Map_3B1a.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+# sheep, goats and horses
+
+sf.3B2 <- sf_clc18_pasnjaci
+
+sf.3B2 %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "3B1a-sheep, goats and horses") %>% 
+  sf::st_transform(4326)
+
+map.3B1a.sgh <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 3 - Agriculture",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.3B2, aes(fill = `Sub-category: `), colour = NA)+
+  geom_sf(data = sf_granica, colour = "black", fill = NA)+
+  scale_fill_manual(values=c("red"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"),
+        legend.position = "bottom")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.3B1a.sgh
+ggsave(plot = map.3B1a.sgh, filename = "Maps/Subcategories/Agriculture/Map_3B1a.sgh.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
 
 
 # Swine (3B3) 
@@ -1541,7 +1572,35 @@ map.3B3 <- ggplot()+
                          pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)
 map.3B3
-ggsave(plot = map.3B3, filename = "Maps/Subcategories/Agriculture/Map_3B3.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+sf.3B3.1 <- sf_rur 
+
+sf.3B3.1 %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "3B3 - Swine") %>% 
+  sf::st_transform(4326)
+
+map.3B3.1 <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 3 - Agriculture",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.3B3.1, aes(fill = `Sub-category: `), colour = NA)+
+  geom_sf(data = sf_granica, colour = "black", fill = NA)+
+  scale_fill_manual(values=c("red"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"),
+        legend.position = "bottom")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.3B3.1
+
+
+maps_3B3 <- grid.arrange(map.3B3, map.3B3.1, ncol = 2)
+
+ggsave(plot = maps_3B3, filename = "Maps/Subcategories/Agriculture/maps_3B3.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 # 3B4gi & 3B4gii-Laying hens & Broilers
 
@@ -1567,7 +1626,37 @@ map.3B4gi_gii <- ggplot()+
                          pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)
 map.3B4gi_gii
-ggsave(plot = map.3B4gi_gii, filename = "Maps/Subcategories/Agriculture/Map_3B4gi_gii.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
+sf.3B4gi_gii.1 <- sf_rur 
+
+sf.3B4gi_gii.1 %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "3B4gi & 3B4gii - Laying hens & Broilers") %>% 
+  sf::st_transform(4326)
+
+map.3B4gi_gii.1 <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 3 - Agriculture",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.3B4gi_gii.1, aes(fill = `Sub-category: `), colour = NA)+
+  geom_sf(data = sf_granica, colour = "black", fill = NA)+
+  scale_fill_manual(values=c("red"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"),
+        legend.position = "bottom")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.3B4gi_gii.1
+
+
+maps_3B4gi_gii <- grid.arrange(map.3B4gi_gii, map.3B4gi_gii.1, ncol = 2)
+
+ggsave(plot = maps_3B4gi_gii, filename = "Maps/Subcategories/Agriculture/maps_3B4gi_gii.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
 
 

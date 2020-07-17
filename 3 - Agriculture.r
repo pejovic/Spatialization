@@ -204,7 +204,7 @@ source.3B3$sources$points <- readxl::read_xlsx(path = source.file, range = "D8:S
 source.3B3$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D62:I62", sheet = source.sheet, col_names = vars)
 source.3B3$total$inventory <- readxl::read_xlsx(path = source.file, range = "D63:I63", sheet = source.sheet, col_names = vars)
 
-sf.3B3 <- corsum2sf(source.3B3, distribute = TRUE) %>%
+sf.3B3 <- corsum2sf(source.3B3, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 # mapview(sf.3B3) + mapview(sf.grid.5km)
 
@@ -391,7 +391,190 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B3, total.3B3, 
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
-  
+
+
+### OSTATAK
+
+Sys.setlocale(locale = 'Serbian (Latin)')
+opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+                  use_iconv=TRUE,  
+                  encoding = "UTF-8")
+sf_opstine <- st_as_sf(opstine)
+
+#+ include = FALSE
+svinje <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
+lcl(loc = "C")
+svinje <- cyr_lat(svinje)
+names(svinje) <- cyr_lat(names(svinje)) 
+svinje <- svinje %>%
+ mutate_all(~replace_na(., 0))
+svinje$Opština[svinje$Opština == "Indjija"] <- "Inđija"
+svinje$Opština[svinje$Opština == "LJubovija"] <- "Ljubovija"
+svinje$Opština[svinje$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+svinje$Opština[svinje$Opština == "Savski venac"] <- "Savski Venac"
+svinje$Opština[svinje$Opština == "Stari grad"] <- "Stari Grad"
+svinje$Opština[svinje$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+svinje$Opština[svinje$Opština == "Arandjelovac"] <- "Aranđelovac"
+svinje$Opština[svinje$Opština == "LJig"] <- "Ljig"
+svinje$Opština[svinje$Opština == "Žitoradja"] <- "Žitorađa"
+svinje$Opština[svinje$Opština == "Medvedja"] <- "Medveđa"
+
+sf_opstine$Br_svinje <- svinje$Svinje[match(sf_opstine$NAME_2, svinje$Opština)]
+
+sf_opstine %<>% 
+ st_transform(crs = "+init=epsg:32634")
+
+# sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+
+sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+
+sf_rural %<>% dplyr::select(.,Br_svinje, NAME_2) %>% 
+ filter(!is.na(Br_svinje))
+sf_rural[,vars] <- NA
+
+sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+ filter(!is.na(Br_svinje))
+
+# POZVATI PONOVO SF SA TACKAMA
+sum.3B3 <- sf.3B3 %>% 
+ st_drop_geometry() %>%
+ dplyr::select(., vars) %>% 
+ apply(., 2, sum) %>% 
+ t(.) %>% 
+ as.data.frame() %>%
+ dplyr::mutate_if(is.numeric, round, 2)
+total.3B3 <- source.3B3[[2]][[2]][, vars] %>% 
+ mutate_all(~replace(., is.na(.), 0)) %>%
+ dplyr::mutate_if(is.numeric, round, 2) %>%
+ as.data.frame()
+
+sum_s <- sum(sf_rur.int$Br_svinje)
+diff.3B3 <- data.frame(total.3B3 - sum.3B3)
+sf_rur.int <- sf_rur.int %>%
+ mutate(NOx = ((diff.3B3$NOx/sum_s)*Br_svinje),
+        SO2 = ((diff.3B3$SO2/sum_s)*Br_svinje),
+        PM10 = ((diff.3B3$PM10/sum_s)*Br_svinje),
+        PM2.5 = ((diff.3B3$PM2.5/sum_s)*Br_svinje),
+        NMVOC = ((diff.3B3$NMVOC/sum_s)*Br_svinje),
+        NH3 = ((diff.3B3$NH3/sum_s)*Br_svinje))
+sf_rur.int %<>% dplyr::select(vars)
+
+sf_rur.int$ID <- dplyr::row_number(sf_rur.int$NOx)
+
+# sf_rur.int <- sf_rur.int %>%
+#  st_join(sf.3B3) %>%
+#  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+#  group_by(ID) %>%
+#  dplyr::mutate(NOx = (NOx.x + NOx.y),
+#            SO2 = (SO2.x + SO2.y),
+#            PM10 = (PM10.x + PM10.y),
+#            PM2.5 = (PM2.5.x + PM2.5.y),
+#            NMVOC = (NMVOC.x + NMVOC.y),
+#            NH3 = (NH3.x + NH3.y)) %>% 
+#  #dplyr::mutate(ID = as.numeric(ID)) %>% 
+#  dplyr::select(vars, ID) %>%
+#  ungroup()
+
+
+
+source.3B3$sources$points <- NA
+source.3B3$sources$polygon <- sf_rur.int
+
+sf.3B3 <- corsum2sf_polygon(source.3B3, distribute = FALSE) %>%
+ st_transform(crs = "+init=epsg:32634")
+
+
+sf.3B3 %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 1: sf.3B3',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.3B3 <- sf.3B3 %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.3B3 <- source.3B3[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.3B3, total.3B3, data.frame(total.3B3 - sum.3B3))) %>%
+  datatable(., caption = 'Table 2: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.3B3.1 <- sf.grid.5km %>%
+  st_join(sf.3B3, join = st_contains) %>%
+  group_by(ID.x) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID.x)) %>%
+  dplyr::ungroup()
+
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.3B3, layer.name.1 = "Sources 3B3", sf.spatialised = p.3B3.1, layer.name.2 = "Spatialised 3B3", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.3B3 <- p.3B3.1 %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B3, total.3B3, data.frame(sum.p.3B3 == total.3B3)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+p.3B3$ID
+p.3B3.1$ID
+
+p.3B3 %<>% dplyr::mutate(NOx = NOx + p.3B3.1$NOx,
+                        SO2 = SO2 + p.3B3.1$SO2,
+                        PM10 =PM10 + p.3B3.1$PM10, 
+                        PM2.5 = PM2.5 + p.3B3.1$PM2.5,
+                        NMVOC = NMVOC + p.3B3.1$NMVOC,
+                        NH3 = NH3 + p.3B3.1$NH3)
+
+sum.p.3B3 <- p.3B3 %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B3, total.3B3, data.frame(sum.p.3B3 == total.3B3)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+
+
+
 #+ include = FALSE
 # st_write(p.3B3, dsn="Products/3 - Agriculture/3B3.gpkg", layer='3B3')
 
@@ -406,7 +589,7 @@ source.3B4gi_gii$sources$points <- readxl::read_xlsx(path = source.file, range =
 source.3B4gi_gii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D116:I116", sheet = source.sheet, col_names = vars)
 source.3B4gi_gii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D117:I117", sheet = source.sheet, col_names = vars)
 
-sf.3B4gi_gii <- corsum2sf(source.3B4gi_gii, distribute = TRUE) %>%
+sf.3B4gi_gii <- corsum2sf(source.3B4gi_gii, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 
@@ -595,6 +778,151 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B4gi_gii, total
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
+
+
+### OSTATAK
+
+Sys.setlocale(locale = 'Serbian (Latin)')
+opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+                  use_iconv=TRUE,  
+                  encoding = "UTF-8")
+sf_opstine <- st_as_sf(opstine)
+
+#+ include = FALSE
+zivina <- readxl::read_xls(path = "Data/Poljoprivreda_2015.xls", sheet = "Poljoprivreda") 
+lcl(loc = "C")
+zivina <- cyr_lat(zivina)
+names(zivina) <- cyr_lat(names(zivina)) 
+zivina <- zivina %>%
+ mutate_all(~replace_na(., 0))
+zivina$Opština[zivina$Opština == "Indjija"] <- "Inđija"
+zivina$Opština[zivina$Opština == "LJubovija"] <- "Ljubovija"
+zivina$Opština[zivina$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+zivina$Opština[zivina$Opština == "Savski venac"] <- "Savski Venac"
+zivina$Opština[zivina$Opština == "Stari grad"] <- "Stari Grad"
+zivina$Opština[zivina$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+zivina$Opština[zivina$Opština == "Arandjelovac"] <- "Aranđelovac"
+zivina$Opština[zivina$Opština == "LJig"] <- "Ljig"
+zivina$Opština[zivina$Opština == "Žitoradja"] <- "Žitorađa"
+zivina$Opština[zivina$Opština == "Medvedja"] <- "Medveđa"
+
+sf_opstine$Br_zivina <- zivina$Živina[match(sf_opstine$NAME_2, zivina$Opština)]
+
+sf_opstine %<>% 
+ st_transform(crs = "+init=epsg:32634")
+
+# sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+
+sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+
+sf_rural %<>% dplyr::select(.,Br_zivina, NAME_2) %>% 
+ filter(!is.na(Br_zivina))
+sf_rural[,vars] <- NA
+
+sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+ filter(!is.na(Br_zivina))
+
+sum.3B4gi_gii <- sf.3B4gi_gii %>% 
+ st_drop_geometry() %>%
+ dplyr::select(., vars) %>% 
+ apply(., 2, sum) %>% 
+ t(.) %>% 
+ as.data.frame() %>%
+ dplyr::mutate_if(is.numeric, round, 2)
+total.3B4gi_gii <- source.3B4gi_gii[[2]][[2]][, vars] %>% 
+ mutate_all(~replace(., is.na(.), 0)) %>%
+ dplyr::mutate_if(is.numeric, round, 2) %>%
+ as.data.frame()
+
+sum_s <- sum(sf_rur.int$Br_zivina)
+diff.3B4gi_gii <- data.frame(total.3B4gi_gii - sum.3B4gi_gii)
+sf_rur.int <- sf_rur.int %>%
+ mutate(NOx = ((diff.3B4gi_gii$NOx/sum_s)*Br_zivina),
+        SO2 = ((diff.3B4gi_gii$SO2/sum_s)*Br_zivina),
+        PM10 = ((diff.3B4gi_gii$PM10/sum_s)*Br_zivina),
+        PM2.5 = ((diff.3B4gi_gii$PM2.5/sum_s)*Br_zivina),
+        NMVOC = ((diff.3B4gi_gii$NMVOC/sum_s)*Br_zivina),
+        NH3 = ((diff.3B4gi_gii$NH3/sum_s)*Br_zivina))
+sf_rur.int %<>% select(vars)
+
+sf_rur.int$ID <- dplyr::row_number(sf_rur.int$NOx)
+
+# sf_rur.int <- sf_rur.int %>%
+#  st_join(sf.3B4gi_gii) %>%
+#  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+#  group_by(ID) %>%
+#  dplyr::mutate(NOx = (NOx.x + NOx.y),
+#                SO2 = (SO2.x + SO2.y),
+#                PM10 = (PM10.x + PM10.y),
+#                PM2.5 = (PM2.5.x + PM2.5.y),
+#                NMVOC = (NMVOC.x + NMVOC.y),
+#                NH3 = (NH3.x + NH3.y)) %>% 
+#  #dplyr::mutate(ID = as.numeric(ID)) %>% 
+#  dplyr::select(vars, ID) %>%
+#  ungroup()
+
+
+
+source.3B4gi_gii$sources$points <- NA
+source.3B4gi_gii$sources$polygon <- sf_rur.int
+
+sf.3B4gi_gii <- corsum2sf_polygon(source.3B4gi_gii, distribute = FALSE) %>%
+ st_transform(crs = "+init=epsg:32634")
+
+
+
+p.3B4gi_gii.1 <- sf.grid.5km %>%
+  st_join(sf.3B4gi_gii, join = st_contains) %>%
+  group_by(ID.x) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID.x)) %>%
+  dplyr::ungroup()
+
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.3B4gi_gii <- p.3B4gi_gii.1 %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B4gi_gii, total.3B4gi_gii, data.frame(sum.p.3B4gi_gii == total.3B4gi_gii)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+
+
+p.3B4gi_gii.1$ID
+p.3B4gi_gii$ID
+
+p.3B4gi_gii %<>% dplyr::mutate(NOx = NOx + p.3B4gi_gii.1$NOx,
+                         SO2 = SO2 + p.3B4gi_gii.1$SO2,
+                         PM10 =PM10 + p.3B4gi_gii.1$PM10, 
+                         PM2.5 = PM2.5 + p.3B4gi_gii.1$PM2.5,
+                         NMVOC = NMVOC + p.3B4gi_gii.1$NMVOC,
+                         NH3 = NH3 + p.3B4gi_gii.1$NH3)
+
+
+sum.p.3B4gi_gii <- p.3B4gi_gii %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B4gi_gii, total.3B4gi_gii, data.frame(sum.p.3B4gi_gii == total.3B4gi_gii)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
 
 #+ include = FALSE
 # st_write(p.3B4gi_gii, dsn="Products/3 - Agriculture/3B4gi_gii.gpkg", layer='3B4gi_gii')
@@ -887,18 +1215,25 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
-sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+#+ include = FALSE
+sf_clc18_pasnjaci <- subset(sf_clc18, CODE_18 == "231") %>% # CLC pastures
+  st_transform(crs = "+init=epsg:32634")
+# sf_clc18_pasnjaci[,vars] <- NA
+# sf_clc18_pasnjaci.int <- st_intersection(sf_clc18_pasnjaci, sf.grid.5km)
 
-sf_rural %<>% dplyr::select(.,Br_ovce, NAME_2.y) %>% 
+#sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+
+sf_clc18_pasnjaci <- st_join(sf_clc18_pasnjaci, sf_opstine, largest = TRUE) 
+
+sf_clc18_pasnjaci %<>% dplyr::select(.,Br_ovce, NAME_2) %>% 
   filter(!is.na(Br_ovce))
-sf_rural[,vars] <- NA
+sf_clc18_pasnjaci[,vars] <- NA
 
-sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+sf_clc18_pasnjaci.int <- st_intersection(sf_clc18_pasnjaci, sf.grid.5km) %>% 
   filter(!is.na(Br_ovce))
 
-source.3B2$sources$polygon <- sf_rur.int
+source.3B2$sources$polygon <- sf_clc18_pasnjaci.int
 
 sf.3B2 <- corsum2sf_polygon(source.3B2, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -1023,18 +1358,33 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+#  sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+#  
+#  sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+#  
+#  sf_rural %<>% dplyr::select(.,Br_koze, NAME_2.y) %>% 
+#    filter(!is.na(Br_koze))
+#  sf_rural[,vars] <- NA
+#  
+#  sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+#    filter(!is.na(Br_koze))
+#  
+#  source.3B4d$sources$polygon <- sf_rur.int
 
-sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+sf_clc18_pasnjaci <- subset(sf_clc18, CODE_18 == "231") %>% # CLC pastures
+  st_transform(crs = "+init=epsg:32634")
+sf_clc18_pasnjaci <- st_join(sf_clc18_pasnjaci, sf_opstine, largest = TRUE) 
 
-sf_rural %<>% dplyr::select(.,Br_koze, NAME_2.y) %>% 
+sf_clc18_pasnjaci %<>% dplyr::select(.,Br_koze, NAME_2) %>% 
   filter(!is.na(Br_koze))
-sf_rural[,vars] <- NA
+sf_clc18_pasnjaci[,vars] <- NA
 
-sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+sf_clc18_pasnjaci.int <- st_intersection(sf_clc18_pasnjaci, sf.grid.5km) %>% 
   filter(!is.na(Br_koze))
 
-source.3B4d$sources$polygon <- sf_rur.int
+source.3B4d$sources$polygon <- sf_clc18_pasnjaci.int
+
+
 
 sf.3B4d <- corsum2sf_polygon(source.3B4d, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -1159,18 +1509,32 @@ sf_opstine %<>%
   st_transform(crs = "+init=epsg:32634")
 
 # sf_clc18_rur <- st_sym_difference(sf_opstine, sf_clc18_urb)
-sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+# sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
+# 
+# sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
+# 
+# sf_rural %<>% dplyr::select(.,Br_konji, NAME_2.y) %>% 
+#   filter(!is.na(Br_konji))
+# sf_rural[,vars] <- NA
+# 
+# sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+#   filter(!is.na(Br_konji))
+# 
+# source.3B4e$sources$polygon <- sf_rur.int
 
-sf_rural <- st_join(sf_rur, sf_opstine, largest = TRUE) 
 
-sf_rural %<>% dplyr::select(.,Br_konji, NAME_2.y) %>% 
+sf_clc18_pasnjaci <- subset(sf_clc18, CODE_18 == "231") %>% # CLC pastures
+  st_transform(crs = "+init=epsg:32634")
+sf_clc18_pasnjaci <- st_join(sf_clc18_pasnjaci, sf_opstine, largest = TRUE) 
+
+sf_clc18_pasnjaci %<>% dplyr::select(.,Br_konji, NAME_2) %>% 
   filter(!is.na(Br_konji))
-sf_rural[,vars] <- NA
+sf_clc18_pasnjaci[,vars] <- NA
 
-sf_rur.int <- st_intersection(sf_rural, sf.grid.5km) %>% 
+sf_clc18_pasnjaci.int <- st_intersection(sf_clc18_pasnjaci, sf.grid.5km) %>% 
   filter(!is.na(Br_konji))
 
-source.3B4e$sources$polygon <- sf_rur.int
+source.3B4e$sources$polygon <- sf_clc18_pasnjaci.int
 
 sf.3B4e <- corsum2sf_polygon(source.3B4e, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
