@@ -234,35 +234,41 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #+ include = FALSE
 source.1B1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1B1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S21", sheet = source.sheet, col_names = header)
+# source.1B1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S21", sheet = source.sheet, col_names = header)
 source.1B1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
 source.1B1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D29:I29", sheet = source.sheet, col_names = vars)
 
 sf.1B1a <- corsum2sf(source.1B1a) %>%
   st_transform(crs = "+init=epsg:32634")
+#
+##+ include = FALSE
+#clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+#sf_clc18 <- st_as_sf(clc_18)
+#clc131 <- subset(sf_clc18, CODE_18 == "131") %>% # Mine sites
+#  st_set_crs(32634)
+#clc131[,vars] <- NA
+#
+#buf_131 <- st_buffer(sf.1B1a$geometry, dist = 1100)
+#
+#clc131_buff <- st_join(clc131, st_sf(buf_131) %>% mutate(id = seq(1:dim(.))), join = st_intersects) %>%
+#  filter(!is.na(id))
+#
+#clc131.int <- st_intersection(clc131_buff, sf.grid.5km) %>%
+#  dplyr::select(.,vars)
 
-#+ include = FALSE
-clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
-sf_clc18 <- st_as_sf(clc_18)
-clc131 <- subset(sf_clc18, CODE_18 == "131") %>% # Mine sites
-  st_set_crs(32634)
-clc131[,vars] <- NA
-
-buf_131 <- st_buffer(sf.1B1a$geometry, dist = 1100)
-
-clc131_buff <- st_join(clc131, st_sf(buf_131) %>% mutate(id = seq(1:dim(.))), join = st_intersects) %>%
-  filter(!is.na(id))
-
-clc131.int <- st_intersection(clc131_buff, sf.grid.5km) %>%
+coal_mining_polygons <- st_read(dsn = "Data/coal_mining/coal_mining_polygons.gpkg")
+coal_mining_polygons[, vars] <- NA
+coal_mining_polygons.int <- st_intersection(coal_mining_polygons, sf.grid.5km) %>%
   dplyr::select(.,vars)
-
-source.1B1a$sources$polygon <- clc131.int
-source.1B1a$sources$points <- NA
+source.1B1a$sources$polygon <- coal_mining_polygons.int
 
 sf.1B1a <- corsum2sf_polygon(source.1B1a, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
 # st_write(sf.1B1a, dsn="D:/coal_polygons.gpkg", layer='sf.1B1a')
+# st_write(sf.1B1a, dsn="D:/coal_mining_points.gpkg", layer='sf.1B1a')
+# clc131_buff %<>% dplyr::select()
+# st_write(clc131_buff, dsn="D:/coal_mining_polygons.gpkg", layer='clc131_buff')
 
 
 #'

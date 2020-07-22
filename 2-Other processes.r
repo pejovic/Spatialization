@@ -233,7 +233,7 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #+ include = FALSE
 source.2A5a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S19", sheet = source.sheet, col_names = header)
+source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S15", sheet = source.sheet, col_names = header)
 source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
 source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
 
