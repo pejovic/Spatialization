@@ -150,7 +150,7 @@ he.5A <- activity.df %>%
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   # dplyr::mutate(he_5A = ((WT0816+0.5)) * PH2 * (TEMP+30))  %>%
-  dplyr::mutate(he_5A = 1)  %>%
+  dplyr::mutate(he_5A = 1 * (TEMP+30))  %>%
   # dplyr::mutate(he_sig = sigmoid(scale(he_5A))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   # dplyr::mutate(he_5A = he_sig) %>%
   # dplyr::mutate(he_5A_n = he_sig/sum(he_sig))%>%
@@ -286,7 +286,7 @@ ggplot(he.5C1bv, aes(x = times, y = he_5C1bv)) +
   geom_line(colour = "lightblue") + 
   #geom_smooth() +
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_5C1bv = ((WT0816+0.5)*(TEMP+30)) * PH2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
@@ -407,7 +407,7 @@ ggplot(he.5D1, aes(x = times, y = he_5D1)) +
   geom_line(colour = "lightblue") + 
   #geom_smooth() +
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_5D1 = (WDWW * (TEMP+30) * SLP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
@@ -527,7 +527,7 @@ ggplot(he.5D2, aes(x = times, y = he_5D2)) +
   geom_line(colour = "lightblue") + 
   #geom_smooth() +
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_5D2 = WDWW * (TEMP+30) * SLP")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 

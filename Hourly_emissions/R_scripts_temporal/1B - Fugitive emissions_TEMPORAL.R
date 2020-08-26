@@ -70,7 +70,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_4_update/Temporalization/activity_df_new.rds")
 load(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/counters_df.rds")
 counters.df <- counters_df %>% 
   mutate(ALL_mean = (IA_mean + IIA_mean + IB_mean)/3)
@@ -153,7 +153,7 @@ he.1B1a <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1B1a = EP) %>%
+  dplyr::mutate(he_1B1a = EP*weekly.ep*hourly.ep) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B1a))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B1a = he_sig) %>%
   dplyr::mutate(he_1B1a_n = he_sig/sum(he_sig))%>%
@@ -167,7 +167,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1B1a, aes(x = times, y = he_1B1a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "purple") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B1a = (WDWW * PH2 * (TEMP+30) * RP2")+
@@ -288,7 +288,7 @@ ggplot(he.1B2ai, aes(x = times, y = he_1B2ai)) +
   geom_line(colour = "purple") + 
   # geom_smooth()+
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B2ai = ((WT0816+0.5) * (WT1624+0.5)) * PH2 * VA")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 
@@ -405,7 +405,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1B2av, aes(x = times, y = he_1B2av)) +
   geom_point(size = 0.1) +
   geom_line(colour = "purple") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B2av = ((WT0024+0.5)) * PH2 * TEMP")+
@@ -525,7 +525,7 @@ ggplot(he.1B2b, aes(x = times, y = he_1B2b)) +
   geom_line(colour = "purple") + 
   # geom_smooth()+
   theme_bw() + 
-  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  # ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1B2b = (WDWW * (WT0024+0.5)) * PH2")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
 

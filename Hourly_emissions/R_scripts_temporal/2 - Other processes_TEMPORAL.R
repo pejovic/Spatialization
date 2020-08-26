@@ -166,7 +166,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2A5a, aes(x = times, y = he_2A5a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2A5a = ((WT0024+0.5)) * PH2 * RP2 * (TEMP+30)")+
@@ -286,7 +286,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2A5b, aes(x = times, y = he_2A5b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2A5b = ((WT0816+0.5) * (WT1624+0.5)) * PH2 * (TEMP+30))")+
@@ -405,7 +405,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2A5c, aes(x = times, y = he_2A5c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2A5c = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * VA")+
@@ -524,7 +524,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3b, aes(x = times, y = he_2D3b)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3b = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * VA + (TEMP+30)")+
@@ -643,7 +643,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3c, aes(x = times, y = he_2D3c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3c = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 + (TEMP+30)")+
@@ -766,7 +766,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3d.pfc, aes(x = times, y = he_2D3d.pfc)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3d.pfc = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 + (TEMP+30)")+
@@ -890,7 +890,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3d.cbtlf, aes(x = times, y = he_2D3d.cbtlf)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3d.cbtlf = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 + (TEMP+30)")+
@@ -1014,7 +1014,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3g.rp, aes(x = times, y = he_2D3g.rp)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3g.rp = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1134,7 +1134,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3g.pigm, aes(x = times, y = he_2D3g.pigm)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   #labs( caption = "he_2D3g.pigm = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1256,7 +1256,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3g.ms, aes(x = times, y = he_2D3g.ms)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3g.ms = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1380,7 +1380,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3g.lt, aes(x = times, y = he_2D3g.lt)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3g.lt = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1501,7 +1501,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3i.feneox, aes(x = times, y = he_2D3i.feneox)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3i.feneox = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1621,7 +1621,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3i.pow, aes(x = times, y = he_2D3i.pow)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3i.pow = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1745,7 +1745,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3i.utcv, aes(x = times, y = he_2D3i.utcv)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3i.utcv = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1854,7 +1854,7 @@ he.2D3i.t <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+1)) %>%
-  dplyr::mutate(he_2D3i.t = ((WT0816+0.5) * (WT1624+0.5)) * PH2)  %>%
+  dplyr::mutate(he_2D3i.t = ((DL+0.5)) * (TEMP+30))  %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_2D3i.t))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_2D3i.t = he_sig) %>%
   dplyr::mutate(he_2D3i.t_n = he_sig/sum(he_sig))%>%
@@ -1868,7 +1868,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3i.t, aes(x = times, y = he_2D3i.t)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3i.t = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -1979,7 +1979,7 @@ he.2D3i.uos <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+1)) %>%
-  dplyr::mutate(he_2D3i.uos = ((WT0816+0.5) * (WT1624+0.5)) * PH2)  %>%
+  dplyr::mutate(he_2D3i.uos = ((DL+0.5)) * (TEMP+30))  %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_2D3i.uos))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_2D3i.uos = he_sig) %>%
   dplyr::mutate(he_2D3i.uos_n = he_sig/sum(he_sig))%>%
@@ -1993,7 +1993,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3i.uos, aes(x = times, y = he_2D3i.uos)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3i.uos = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -2131,7 +2131,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3a, aes(x = times, y = he_2D3a)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3a = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -2248,7 +2248,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3e, aes(x = times, y = he_2D3e)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3e = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -2366,7 +2366,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3f, aes(x = times, y = he_2D3f)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3f = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -2484,7 +2484,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2D3h, aes(x = times, y = he_2D3h)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2D3h = ((DL+0.5)) * (TEMP+30) * SLP * PH2")+
@@ -2593,7 +2593,8 @@ he.2I <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+1)) %>%
-  dplyr::mutate(he_2I = ((DL)) * (temp_smooth) * WE2 * PH2)  %>%
+  # dplyr::mutate(he_2I = ((DL)) * (temp_smooth) * WE2 * PH2)  %>%
+  dplyr::mutate(he_2I = ((WT0816+0.5) + (WT1624+0.5)) * PH2)  %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_2I))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_2I = he_sig) %>%
   dplyr::mutate(he_2I_n = he_sig/sum(he_sig))%>%
@@ -2607,7 +2608,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.2I, aes(x = times, y = he_2I)) +
   geom_point(size = 0.1) +
   geom_line(colour = "violet") + 
-  geom_smooth() +
+  # geom_smooth() +
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_2I = ((WT0816+0.5) * (DL+0.5)) * PH2 * (TEMP + 30) * WE2")+

@@ -70,7 +70,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 #'
 #'
 #+ include = FALSE
-activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_2_update/Temporalization/activity_df_new.rds")
+activity.df <- readRDS(file = "D:/R_projects/Spatialization/Version_4_update/Temporalization/activity_df_new.rds")
 load(file = "D:/R_projects/Spatialization/Hourly_emissions/Data/counters_df.rds")
 counters.df <- counters_df %>% 
   mutate(ALL_mean = (IA_mean + IIA_mean + IB_mean)/3,
@@ -147,6 +147,65 @@ data.frame(t.1A3ai%>%
 # ---  HE = NFH
 #
 
+monthly.air <- readxl::read_xlsx(path = "D:/R_projects/Spatialization/Hourly_emissions/Data/Nikola_Tesla_airport.xlsx")
+
+monthly.air$Ratio
+t1 <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                 to   = ymd_h("2015-01-31 23"),
+                 by   = dhours(1)) 
+t2 <- seq.POSIXt(from = ymd_h("2015-02-01 00"),
+                 to   = ymd_h("2015-02-28 23"),
+                 by   = dhours(1)) 
+t3 <- seq.POSIXt(from = ymd_h("2015-03-01 00"),
+                 to   = ymd_h("2015-03-31 23"),
+                 by   = dhours(1)) 
+t4 <- seq.POSIXt(from = ymd_h("2015-04-01 00"),
+                 to   = ymd_h("2015-04-30 23"),
+                 by   = dhours(1)) 
+t5 <- seq.POSIXt(from = ymd_h("2015-05-01 00"),
+                 to   = ymd_h("2015-05-31 23"),
+                 by   = dhours(1)) 
+t6 <- seq.POSIXt(from = ymd_h("2015-06-01 00"),
+                 to   = ymd_h("2015-06-30 23"),
+                 by   = dhours(1)) 
+t7 <- seq.POSIXt(from = ymd_h("2015-07-01 00"),
+                 to   = ymd_h("2015-07-31 23"),
+                 by   = dhours(1)) 
+t8 <- seq.POSIXt(from = ymd_h("2015-08-01 00"),
+                 to   = ymd_h("2015-08-31 23"),
+                 by   = dhours(1)) 
+t9 <- seq.POSIXt(from = ymd_h("2015-09-01 00"),
+                 to   = ymd_h("2015-09-30 23"),
+                 by   = dhours(1)) 
+t10 <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
+                  to   = ymd_h("2015-10-31 23"),
+                  by   = dhours(1)) 
+t11 <- seq.POSIXt(from = ymd_h("2015-11-01 00"),
+                  to   = ymd_h("2015-11-30 23"),
+                  by   = dhours(1)) 
+t12 <- seq.POSIXt(from = ymd_h("2015-12-01 00"),
+                  to   = ymd_h("2015-12-31 23"),
+                  by   = dhours(1)) 
+
+
+activity.df$indAir[activity.df$times %in% t1] <- monthly.air$Ratio[1] 
+activity.df$indAir[(activity.df$times %in% t2)] <-  monthly.air$Ratio[2]
+activity.df$indAir[activity.df$times %in% t3] <- monthly.air$Ratio[3] 
+activity.df$indAir[(activity.df$times %in% t4)] <-  monthly.air$Ratio[4]
+activity.df$indAir[activity.df$times %in% t5] <- monthly.air$Ratio[5] 
+activity.df$indAir[(activity.df$times %in% t6)] <-  monthly.air$Ratio[6]
+activity.df$indAir[activity.df$times %in% t7] <- monthly.air$Ratio[7] 
+activity.df$indAir[(activity.df$times %in% t8)] <-  monthly.air$Ratio[8]
+activity.df$indAir[activity.df$times %in% t9] <- monthly.air$Ratio[9] 
+activity.df$indAir[(activity.df$times %in% t10)] <-  monthly.air$Ratio[10]
+activity.df$indAir[activity.df$times %in% t11] <- monthly.air$Ratio[11] 
+activity.df$indAir[(activity.df$times %in% t12)] <-  monthly.air$Ratio[12]
+
+
+activity.df %<>% dplyr::mutate(monthly_air = indAir)
+
+
+
 he.1A3ai <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
@@ -157,7 +216,7 @@ he.1A3ai <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_1A3ai = DL) %>%
+  dplyr::mutate(he_1A3ai = DL*monthly_air) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A3ai))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A3ai = he_sig) %>%
   dplyr::mutate(he_1A3ai_n = he_sig/sum(he_sig))%>%
@@ -171,7 +230,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3ai, aes(x = times, y = he_1A3ai)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1A3ai = NFH")+
@@ -290,7 +349,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3aii, aes(x = times, y = he_1A3aii)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3aii = (DL+0.5) * (TEMP+30)")+
@@ -411,7 +470,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bi_U, aes(x = times, y = he_1A3bi_U)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   #labs( caption = "he_1A3bi_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -526,7 +585,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bi_R, aes(x = times, y = he_1A3bi_R)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IIA + VA_IB")+
@@ -640,7 +699,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bi_H, aes(x = times, y = he_1A3bi_H)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IA")+
@@ -762,7 +821,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bii_U, aes(x = times, y = he_1A3bii_U)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3bii_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -877,7 +936,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bii_R, aes(x = times, y = he_1A3bii_R)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IIA + VA_IB")+
@@ -991,7 +1050,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bii_H, aes(x = times, y = he_1A3bii_H)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IA")+
@@ -1114,7 +1173,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biii_U, aes(x = times, y = he_1A3biii_U)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3biii_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -1230,7 +1289,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biii_R, aes(x = times, y = he_1A3biii_R)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IIA + VA_IB")+
@@ -1344,7 +1403,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biii_H, aes(x = times, y = he_1A3biii_H)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IA")+
@@ -1466,7 +1525,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biii_bc_U, aes(x = times, y = he_1A3biii_bc_U)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3biii_bc_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -1581,7 +1640,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biii_bc_R, aes(x = times, y = he_1A3biii_bc_R)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IIA + VA_IB")+
@@ -1695,7 +1754,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biii_bc_H, aes(x = times, y = he_1A3biii_bc_H)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IA")+
@@ -1820,7 +1879,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biv_U, aes(x = times, y = he_1A3biv_U)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3biv_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -1936,7 +1995,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biv_R, aes(x = times, y = he_1A3biv_R)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IIA + VA_IB")+
@@ -2051,7 +2110,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3biv_H, aes(x = times, y = he_1A3biv_H)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IA")+
@@ -2175,7 +2234,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bv_U, aes(x = times, y = he_1A3bv_U)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3bv_U = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -2290,7 +2349,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bv_R, aes(x = times, y = he_1A3bv_R)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IIA + VA_IB")+
@@ -2404,7 +2463,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bv_H, aes(x = times, y = he_1A3bv_H)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "HE = VA_IA")+
@@ -2526,7 +2585,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bvi, aes(x = times, y = he_1A3bvi)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3bvi = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -2652,7 +2711,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3bvii, aes(x = times, y = he_1A3bvii)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   labs( caption = "he_1A3bvii = ((WT0816+0.5) * (WT1624+0.5)) * WE2 * PH2 * (VA+0.5) * 
@@ -2776,7 +2835,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3c, aes(x = times, y = he_1A3c)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1A3c = (WT0816+0.5) * (WT1624+0.5) * WE2 * PH2 * (TEMP+30)")+
@@ -2894,7 +2953,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
 ggplot(he.1A3dii, aes(x = times, y = he_1A3dii)) +
   geom_point(size = 0.1) +
   geom_line(colour = "coral") + 
-  geom_smooth()+
+  # geom_smooth()+
   theme_bw() + 
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   # labs( caption = "he_1A3dii = (DL+0.5) * WE2 * PH2 * (TEMP+30)")+

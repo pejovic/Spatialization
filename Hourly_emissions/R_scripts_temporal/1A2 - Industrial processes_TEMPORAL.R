@@ -712,6 +712,276 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 # }
 #'
 #'
+
+#'
+#'
+#'
+#'
+#'
+#'
+#' ## 1A2e.bread - Food, beverages and tobacco - bread
+#+ include = FALSE
+
+sf.1A2e.bread <- st_read("D:/R_projects/Spatialization/Products/1A2 - Industry/1A2e.bread.gpkg")
+
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+t.1A2e.bread <- sf.1A2e.bread %>%
+  summarize(NOx = sum(NOx),
+            SO2 = sum(SO2),
+            PM10 = sum(PM10),
+            PM2.5 = sum(PM2.5),
+            NMVOC = sum(NMVOC),
+            NH3 = sum(NH3)) %>%
+  select(NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  st_drop_geometry()
+
+data.frame(t.1A2e.bread%>%
+             dplyr::mutate_if(is.numeric, round, 2)) %>%
+  datatable(., caption = 'Table 1: Total spatialized inventory',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# Building function for Hourly emissions - HE:
+# ---  HE = WD + WT0816 + WT1624 + WW + !PH + !RP
+#
+
+he.1A2e.bread <- activity.df %>%
+  dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
+                                       RP == FALSE ~ 0)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
+  dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
+                                       PH == FALSE ~ 0)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
+  dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
+                                       WE == FALSE ~ 0)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  # dplyr::mutate(he_1A2e.bread = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1A2e.bread = ((WT0816+0.5) + (WT1624+0.5)) * PH2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2e.bread))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2e.bread = he_sig) %>%
+  dplyr::mutate(he_1A2e.bread_n = he_sig/sum(he_sig))%>%
+  select(times, he_1A2e.bread, he_1A2e.bread_n)
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
+                       by   = dhours(1)) 
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+ggplot(he.1A2e.bread, aes(x = times, y = he_1A2e.bread)) +
+  geom_point(size = 0.1) +
+  geom_line(colour = "tomato") + 
+  theme_bw() + 
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2e.bread = (WDWW *(WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2e.bread$he_1A2e.bread), max(he.1A2e.bread$he_1A2e.bread), sum(he.1A2e.bread$he_1A2e.bread))) %>%
+  datatable(., caption = 'Table 2: Function summary',
+            options = list(pageLength = 5)
+  ) # min mora biti veci od 0 !!!!!
+
+#'
+#+ include = FALSE
+t.1A2e.bread$sumF <- sum(he.1A2e.bread$he_1A2e.bread)
+he.1A2e.bread %<>% 
+  dplyr::mutate(NOx_1A2e.bread = (t.1A2e.bread$NOx/t.1A2e.bread$sumF)*he_1A2e.bread, 
+                NOx_1A2e.bread_p = (NOx_1A2e.bread/sum(NOx_1A2e.bread))*100,
+                SO2_1A2e.bread = (t.1A2e.bread$SO2/t.1A2e.bread$sumF)*he_1A2e.bread, 
+                SO2_1A2e.bread_p = (SO2_1A2e.bread/sum(SO2_1A2e.bread))*100,
+                PM10_1A2e.bread = (t.1A2e.bread$PM10/t.1A2e.bread$sumF)*he_1A2e.bread, 
+                PM10_1A2e.bread_p = (PM10_1A2e.bread/sum(PM10_1A2e.bread))*100,
+                PM2.5_1A2e.bread = (t.1A2e.bread$PM2.5/t.1A2e.bread$sumF)*he_1A2e.bread, 
+                PM2.5_1A2e.bread_p = (PM2.5_1A2e.bread/sum(PM2.5_1A2e.bread))*100,
+                NMVOC_1A2e.bread = (t.1A2e.bread$NMVOC/t.1A2e.bread$sumF)*he_1A2e.bread, 
+                NMVOC_1A2e.bread_p = (NMVOC_1A2e.bread/sum(NMVOC_1A2e.bread))*100,
+                NH3_1A2e.bread = (t.1A2e.bread$NH3/t.1A2e.bread$sumF)*he_1A2e.bread, 
+                NH3_1A2e.bread_p = (NH3_1A2e.bread/sum(NH3_1A2e.bread))*100) %>%
+  #replace_all(., is.na(.), 0) %>%
+  select(NOx_1A2e.bread_p, SO2_1A2e.bread_p, PM10_1A2e.bread_p, PM2.5_1A2e.bread_p, NMVOC_1A2e.bread_p, NH3_1A2e.bread_p) %>%
+  rename(`1A2e.bread_NOx` = NOx_1A2e.bread_p,
+         `1A2e.bread_SO2` = SO2_1A2e.bread_p,
+         `1A2e.bread_PM10` = PM10_1A2e.bread_p,
+         `1A2e.bread_PM2.5` = PM2.5_1A2e.bread_p,
+         `1A2e.bread_NMVOC` = NMVOC_1A2e.bread_p,
+         `1A2e.bread_NH3` = NH3_1A2e.bread_p) %>% 
+  mutate_all(~replace_na(., 0))
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]", "NH3 [%]"), 
+           Sum = rbind(sum(he.1A2e.bread$`1A2e.bread_NOx`), sum(he.1A2e.bread$`1A2e.bread_SO2`), sum(he.1A2e.bread$`1A2e.bread_PM10`), sum(he.1A2e.bread$`1A2e.bread_PM2.5`), sum(he.1A2e.bread$`1A2e.bread_NMVOC`), sum(he.1A2e.bread$`1A2e.bread_NH3`))) %>%
+  datatable(., caption = 'Table 3: Summary',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#'
+# sf.1A2e.bread_df <- sf.1A2e.bread %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A2e.bread.tl <- lapply(sf.1A2e.bread_df[,-1], function(x) t((x %o% he.1A2e.bread$he_1A2e.bread_n)[,,1]))
+# 
+# sf.1A2e.bread.tl <- lapply(sf.1A2e.bread.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A2e.bread.tle, "sf.1A2e.bread.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A2e.bread_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A2e.bread.tl[[i]], file = paste("sf.1A2e.bread", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
+#'
+#'
+
+
+
+
+#'
+#'
+#'
+#'
+#'
+#'
+#' ## 1A2e.wine - Food, beverages and tobacco - wine
+#+ include = FALSE
+
+sf.1A2e.wine <- st_read("D:/R_projects/Spatialization/Products/1A2 - Industry/1A2e.wine.gpkg")
+
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+t.1A2e.wine <- sf.1A2e.wine %>%
+  summarize(NOx = sum(NOx),
+            SO2 = sum(SO2),
+            PM10 = sum(PM10),
+            PM2.5 = sum(PM2.5),
+            NMVOC = sum(NMVOC),
+            NH3 = sum(NH3)) %>%
+  select(NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  st_drop_geometry()
+
+data.frame(t.1A2e.wine%>%
+             dplyr::mutate_if(is.numeric, round, 2)) %>%
+  datatable(., caption = 'Table 1: Total spatialized inventory',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# Building function for Hourly emissions - HE:
+# ---  HE = WD + WT0816 + WT1624 + WW + !PH + !RP
+#
+
+he.1A2e.wine <- activity.df %>%
+  dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
+                                       RP == FALSE ~ 0)) %>%
+  dplyr::mutate(RP2 = (sin(((pi)/24)*(!RP1))+0.5)) %>%
+  dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
+                                       PH == FALSE ~ 0)) %>%
+  dplyr::mutate(PH2 = (sin(((pi)/24)*(!PH1))+0.5)) %>%
+  dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
+                                       WE == FALSE ~ 0)) %>%
+  dplyr::mutate(WE2 = (sin(((pi)/24)*(!WE1))+0.5)) %>%
+  # dplyr::mutate(he_1A2e.wine = ((WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)) %>%
+  dplyr::mutate(he_1A2e.wine = ((WT0816+0.5) + (WT1624+0.5)) * PH2) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_1A2e.wine))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_1A2e.wine = he_sig) %>%
+  dplyr::mutate(he_1A2e.wine_n = he_sig/sum(he_sig))%>%
+  select(times, he_1A2e.wine, he_1A2e.wine_n)
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-03-31 24"),
+                       by   = dhours(1)) 
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+ggplot(he.1A2e.wine, aes(x = times, y = he_1A2e.wine)) +
+  geom_point(size = 0.1) +
+  geom_line(colour = "tomato") + 
+  theme_bw() + 
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+
+  labs( caption = "he_1A2e.wine = (WDWW *(WT0816+0.5) + (WT1624+0.5)) * RP2 * PH2 * WE2 * (TEMP+30)")+
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", colour = "black")
+  )
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.1A2e.wine$he_1A2e.wine), max(he.1A2e.wine$he_1A2e.wine), sum(he.1A2e.wine$he_1A2e.wine))) %>%
+  datatable(., caption = 'Table 2: Function summary',
+            options = list(pageLength = 5)
+  ) # min mora biti veci od 0 !!!!!
+
+#'
+#+ include = FALSE
+t.1A2e.wine$sumF <- sum(he.1A2e.wine$he_1A2e.wine)
+he.1A2e.wine %<>% 
+  dplyr::mutate(NOx_1A2e.wine = (t.1A2e.wine$NOx/t.1A2e.wine$sumF)*he_1A2e.wine, 
+                NOx_1A2e.wine_p = (NOx_1A2e.wine/sum(NOx_1A2e.wine))*100,
+                SO2_1A2e.wine = (t.1A2e.wine$SO2/t.1A2e.wine$sumF)*he_1A2e.wine, 
+                SO2_1A2e.wine_p = (SO2_1A2e.wine/sum(SO2_1A2e.wine))*100,
+                PM10_1A2e.wine = (t.1A2e.wine$PM10/t.1A2e.wine$sumF)*he_1A2e.wine, 
+                PM10_1A2e.wine_p = (PM10_1A2e.wine/sum(PM10_1A2e.wine))*100,
+                PM2.5_1A2e.wine = (t.1A2e.wine$PM2.5/t.1A2e.wine$sumF)*he_1A2e.wine, 
+                PM2.5_1A2e.wine_p = (PM2.5_1A2e.wine/sum(PM2.5_1A2e.wine))*100,
+                NMVOC_1A2e.wine = (t.1A2e.wine$NMVOC/t.1A2e.wine$sumF)*he_1A2e.wine, 
+                NMVOC_1A2e.wine_p = (NMVOC_1A2e.wine/sum(NMVOC_1A2e.wine))*100,
+                NH3_1A2e.wine = (t.1A2e.wine$NH3/t.1A2e.wine$sumF)*he_1A2e.wine, 
+                NH3_1A2e.wine_p = (NH3_1A2e.wine/sum(NH3_1A2e.wine))*100) %>%
+  #replace_all(., is.na(.), 0) %>%
+  select(NOx_1A2e.wine_p, SO2_1A2e.wine_p, PM10_1A2e.wine_p, PM2.5_1A2e.wine_p, NMVOC_1A2e.wine_p, NH3_1A2e.wine_p) %>%
+  rename(`1A2e.wine_NOx` = NOx_1A2e.wine_p,
+         `1A2e.wine_SO2` = SO2_1A2e.wine_p,
+         `1A2e.wine_PM10` = PM10_1A2e.wine_p,
+         `1A2e.wine_PM2.5` = PM2.5_1A2e.wine_p,
+         `1A2e.wine_NMVOC` = NMVOC_1A2e.wine_p,
+         `1A2e.wine_NH3` = NH3_1A2e.wine_p) %>% 
+  mutate_all(~replace_na(., 0))
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]", "NH3 [%]"), 
+           Sum = rbind(sum(he.1A2e.wine$`1A2e.wine_NOx`), sum(he.1A2e.wine$`1A2e.wine_SO2`), sum(he.1A2e.wine$`1A2e.wine_PM10`), sum(he.1A2e.wine$`1A2e.wine_PM2.5`), sum(he.1A2e.wine$`1A2e.wine_NMVOC`), sum(he.1A2e.wine$`1A2e.wine_NH3`))) %>%
+  datatable(., caption = 'Table 3: Summary',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#'
+# sf.1A2e.wine_df <- sf.1A2e.wine %>% st_drop_geometry() #%>% dplyr::select(NOx)
+# 
+# sf.1A2e.wine.tl <- lapply(sf.1A2e.wine_df[,-1], function(x) t((x %o% he.1A2e.wine$he_1A2e.wine_n)[,,1]))
+# 
+# sf.1A2e.wine.tl <- lapply(sf.1A2e.wine.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+# 
+# # writexl::write_xlsx(sf.1A2e.wine.tle, "sf.1A2e.wine.tle.xlsx") # Mnogo traje...
+# 
+# vars <- names(sf.1A2e.wine_df)[-1]
+# 
+# for(i in 1:length(vars)){
+#   fwrite(sf.1A2e.wine.tl[[i]], file = paste("sf.1A2e.wine", paste(vars[i],"csv", sep = "."), sep = "_"))
+# }
+#'
+#'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #'
 #'
 #'
@@ -1197,7 +1467,9 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #        he.1A2b[,1:6], 
 #        he.1A2c[,1:6], 
 #        he.1A2d[,1:6], 
-#        he.1A2e[,1:6], 
+#        he.1A2e[,1:6],
+#        he.1A2e.bread[,1:6],
+#        he.1A2e.wine[,1:6],
 #        he.1A2f[,1:6], 
 #        he.1A2g[,1:6], 
 #        he.1A2gvi[,1:6], 

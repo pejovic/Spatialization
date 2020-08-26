@@ -227,10 +227,37 @@ opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp",
 sf_opstine <- st_as_sf(opstine)
 
 #+ include = FALSE
-toplane <- readxl::read_xls(path = "Data/toplane/Toplane_2015.xls") %>%
-  mutate(GRAD = str_to_title(GRAD))
+#  toplane <- readxl::read_xls(path = "Data/toplane/Toplane_2015.xls") %>%
+#    mutate(GRAD = str_to_title(GRAD))
+#  
+#  sf_opstine$Toplane <- toplane$`Ukupna grejna povrsina ostalih ustanova, institucija i poslovnih jedininica (m2)`[match(sf_opstine$NAME_2, toplane$GRAD)] 
 
-sf_opstine$Toplane <- toplane$`Ukupna grejna povrsina ostalih ustanova, institucija i poslovnih jedininica (m2)`[match(sf_opstine$NAME_2, toplane$GRAD)] 
+grejanje <- readxl::read_xls(path = "Data/toplane/tabela-13.xls") %>% as.data.frame()
+
+
+#+ include = FALSE
+lcl(loc = "C")
+grejanje <- cyr_lat(grejanje)
+names(grejanje) <- cyr_lat(names(grejanje)) 
+grejanje <- grejanje %>%
+  mutate_all(~replace_na(., 0))
+grejanje$Opština[grejanje$Opština == "Indjija"] <- "Inđija"
+grejanje$Opština[grejanje$Opština == "LJubovija"] <- "Ljubovija"
+grejanje$Opština[grejanje$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+grejanje$Opština[grejanje$Opština == "Savski venac"] <- "Savski Venac"
+grejanje$Opština[grejanje$Opština == "Stari grad"] <- "Stari Grad"
+grejanje$Opština[grejanje$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+grejanje$Opština[grejanje$Opština == "Arandjelovac"] <- "Aranđelovac"
+grejanje$Opština[grejanje$Opština == "LJig"] <- "Ljig"
+grejanje$Opština[grejanje$Opština == "Žitoradja"] <- "Žitorađa"
+grejanje$Opština[grejanje$Opština == "Medvedja"] <- "Medveđa"
+
+g_kolone <- grejanje %>% names()
+vars_g <- g_kolone[2:11]
+
+grejanje %<>% dplyr::mutate(ukupno = ugalj_etažno+drvo_etažno+mazut_etažno+plin_etažno+drugo_etažno+ugalj_bez_etažnog+drvo_bez_etažnog+mazut_bez_etažnog+plin_bez_etažnog+drugo_bez_etažnog)
+
+sf_opstine$grejanje_ukupno <- grejanje$ukupno[match(sf_opstine$NAME_2, grejanje$Opština)]
 
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634") %>% 
@@ -239,11 +266,11 @@ sf_opstine %<>%
 sf_final <- sf.final
 sf_final <- st_join(sf_final, sf_opstine, largest = TRUE) 
 
-sf_final %<>% dplyr::select(.,Toplane, NAME_2)
+sf_final %<>% dplyr::select(.,grejanje_ukupno, NAME_2)
 sf_final[,vars] <- NA
 
 sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>% 
-  filter(!is.na(Toplane))
+  filter(!is.na(grejanje_ukupno))
 
 source.1A4ai$sources$polygon <- sf_final.int
 
@@ -294,15 +321,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4ai, total.1A4ai,
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.1A4ai$Toplane)
+sum_s <- sum(sf.1A4ai$grejanje_ukupno)
 diff.1A4ai <- data.frame(total.1A4ai - sum.1A4ai)
 sf.1A4ai <- sf.1A4ai %>%
-  mutate(NOx = ((diff.1A4ai$NOx/sum_s)*Toplane),
-         SO2 = ((diff.1A4ai$SO2/sum_s)*Toplane),
-         PM10 = ((diff.1A4ai$PM10/sum_s)*Toplane),
-         PM2.5 = ((diff.1A4ai$PM2.5/sum_s)*Toplane),
-         NMVOC = ((diff.1A4ai$NMVOC/sum_s)*Toplane),
-         NH3 = ((diff.1A4ai$NH3/sum_s)*Toplane))
+  mutate(NOx = ((diff.1A4ai$NOx/sum_s)*grejanje_ukupno),
+         SO2 = ((diff.1A4ai$SO2/sum_s)*grejanje_ukupno),
+         PM10 = ((diff.1A4ai$PM10/sum_s)*grejanje_ukupno),
+         PM2.5 = ((diff.1A4ai$PM2.5/sum_s)*grejanje_ukupno),
+         NMVOC = ((diff.1A4ai$NMVOC/sum_s)*grejanje_ukupno),
+         NH3 = ((diff.1A4ai$NH3/sum_s)*grejanje_ukupno))
 sf.1A4ai %<>% dplyr::select(vars)
 #'
 #'

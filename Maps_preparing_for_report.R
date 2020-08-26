@@ -170,8 +170,11 @@ vcds_map <- ggplot(data = vcds)+
                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)+
   geom_sf(data = sf_roads.4326)
-
+vcds_map
 ggsave(plot = vcds_map, filename = "Maps/Map_vcds.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -163,6 +163,38 @@ corsum2sf_lines <- function(source.list, distribute = FALSE){
   }
   return(source.sf)
 }
+corsum2sf_point.sf <- function(source.list, distribute = FALSE){
+  source.list$sources$points[, vars] <- source.list$sources$points[, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0)) %>% st_drop_geometry()
+  source.list[[2]][[2]][, vars] <- source.list[[2]][[2]][, vars] %>% dplyr::mutate_all(~replace(., is.na(.), 0))
+  
+  points.sum <- source.list$sources$points %>% 
+    st_drop_geometry() %>%
+    dplyr::select(., vars) %>% 
+    apply(., 2, sum) %>% 
+    t(.) %>% 
+    as.data.frame() %>%
+    dplyr::mutate_if(is.numeric, round, 2)
+  
+  points.total <- source.list[[2]][[2]][, vars] %>% 
+    dplyr::mutate_if(is.numeric, round, 2) %>%
+    as.data.frame()
+  
+  if(!identical(points.sum, points.total) & distribute == TRUE){
+    d <- (points.total - points.sum)[1, ]
+    zero.ind <- source.list$sources$points[, vars] %>% st_drop_geometry() == 0
+    w <- replace(source.list$sources$points[, vars] %>% st_drop_geometry(), zero.ind, 1) %>% 
+      apply(., 2, function(x) x/sum(x)) %>%
+      as.data.frame() %>%
+      dplyr::mutate_all(~replace(., is.na(.), 0))
+    
+    cor.data <- as.matrix(w) %*% diag(d) + source.list$sources$points[, vars]%>% st_drop_geometry()
+    source.list$sources$points[, vars] <- cor.data
+    source.sf <- source.list$sources$points
+  }else{
+    source.sf <- source.list$sources$points
+  }
+  return(source.sf)
+}
 
 #+ include = FALSE, echo = FALSE
 # Function for spatial data visualisation at web maps
@@ -214,7 +246,7 @@ clc132 <- subset(sf_clc18, CODE_18 == "132") %>% # Dump sites
 clc132[,vars] <- NA
 
 clc132.int <- st_intersection(clc132, sf.grid.5km) %>% # Intersection with grid cells
-  select(.,vars)
+  dplyr::select(.,vars)
 
 source.5A$sources$polygon <- clc132.int
 sf.5A <- corsum2sf_polygon(source.5A, distribute = FALSE) %>% # Preparing data for final spatialization
@@ -435,7 +467,10 @@ sf_opstine %<>%
 sf_opstine %<>% dplyr::select(.,Otpadne_vode, NAME_2)
 sf_opstine[,vars] <- NA
 
-sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km) %>%
+urbana <- sf::st_read("GIS_layers/Urban_areas.gpkg")
+urbana_opstine <- st_join(urbana, sf_opstine, join = st_intersects)
+
+sf_opstine.int <- st_intersection(urbana_opstine, sf.grid.5km) %>%
   filter(!is.na(Otpadne_vode))
 
 source.5D1$sources$polygon <- sf_opstine.int
@@ -541,22 +576,73 @@ source.5D2$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D5
 source.5D2$total$inventory <- readxl::read_xlsx(path = source.file, range = "D59:I59", sheet = source.sheet, col_names = vars)
 
 #+ include = TRUE, message = FALSE, warning = FALSE
-sf.ind <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") %>%
-  dplyr::rename(geometry = geom) %>%
-  dplyr::select(geometry)
+#sf.ind <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg") %>%
+#  dplyr::rename(geometry = geom) %>%
+#  dplyr::select(geometry)
 sf.waste <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Wastewater_plants_OSM_32634.gpkg") %>%
   dplyr::rename(geometry = geom) %>%
   dplyr::select(geometry)
 
+#sf.final <- rbind(sf.ind, sf.waste)
 
-sf.final <- rbind(sf.ind, sf.waste)
-sf.final[, vars] <- NA
-sf.final.int <- st_intersection(sf.final, sf.grid.5km) %>% # Intersection with grid cells
-  dplyr::select(.,vars)
+# Polygon Centroid
+sf.waste <- sf.waste %>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+sf.waste[,vars] <- NA
+sf.waste$ID <- 1:nrow(sf.waste)
 
-source.5D2$sources$polygon <- sf.final.int
-sf.5D2 <- corsum2sf_polygon(source.5D2, distribute = FALSE) %>% # Preparing data for final spatialization
+sf.waste.oI.cen <- st_centroid(sf.waste) %>%
+  select(ID, Area_Ha, SHAPE_Area, NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  rename(ID_CLC = ID)
+
+sf.waste.oI.cen <- st_join(sf.waste.oI.cen, sf.grid.5km) %>%
+  subset(!is.na(ID))
+
+sf.waste.oI.cen %<>% dplyr::select(vars)
+
+source.5D2$sources$points <- sf.waste.oI.cen
+sf.5D2 <- corsum2sf_point.sf(source.5D2, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
+
+
+
+#+ include = FALSE
+# Distribute values based on area of each polygon and add it to centroids
+# total.5D2 <- source.5D2[[2]][[2]][, vars] %>% 
+#   mutate_all(~replace(., is.na(.), 0)) %>%
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   as.data.frame()
+# 
+# sum.5D2 <- sf.waste.oI.cen %>% 
+#   st_drop_geometry() %>%
+#   dplyr::select(., vars) %>% 
+#   apply(., 2, sum) %>% 
+#   t(.) %>% 
+#   as.data.frame() %>%
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   mutate_all(~replace(., is.na(.), 0))
+# 
+# sum_Area <- sum(sf.waste.oI.cen$SHAPE_Area)
+# diff.5D2 <- data.frame(total.5D2 - sum.5D2)
+# sf.waste.oI.cen <- sf.waste.oI.cen %>%
+#   mutate(NOx = ((diff.5D2$NOx/sum_Area)*SHAPE_Area),
+#          SO2 = ((diff.5D2$SO2/sum_Area)*SHAPE_Area),
+#          PM10 = ((diff.5D2$PM10/sum_Area)*SHAPE_Area),
+#          PM2.5 = ((diff.5D2$PM2.5/sum_Area)*SHAPE_Area),
+#          NMVOC = ((diff.5D2$NMVOC/sum_Area)*SHAPE_Area),
+#          NH3 = ((diff.5D2$NH3/sum_Area)*SHAPE_Area))
+# 
+# sf.waste.oI.cen %<>% select(vars) 
+# sf.5D2 <- sf.waste.oI.cen
+
+
+
+#sf.final[, vars] <- NA
+#sf.final.int <- st_intersection(sf.final, sf.grid.5km) %>% # Intersection with grid cells
+#  dplyr::select(.,vars)
+
+#source.5D2$sources$polygon <- sf.final.int
+#sf.5D2 <- corsum2sf_polygon(source.5D2, distribute = FALSE) %>% # Preparing data for final spatialization
+#  st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -599,24 +685,24 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.5D2, total.5D2, dat
 #'
 #+ include = TRUE, message = FALSE, warning = FALSE
 
-sf.5D2 <- sf.5D2 %>% # Calculate polygons area
-  mutate(Area = st_area(.))
-
-sum_Area <- sum(sf.5D2$Area) 
-diff.5D2 <- data.frame(total.5D2 - sum.5D2)
-sf.5D2 <- sf.5D2 %>% # Calculate weights and distibute data
-  mutate(NOx = ((diff.5D2$NOx/sum_Area)*Area),
-         SO2 = ((diff.5D2$SO2/sum_Area)*Area),
-         PM10 = ((diff.5D2$PM10/sum_Area)*Area),
-         PM2.5 = ((diff.5D2$PM2.5/sum_Area)*Area),
-         NMVOC = ((diff.5D2$NMVOC/sum_Area)*Area),
-         NH3 = ((diff.5D2$NH3/sum_Area)*Area))
-sf.5D2 %<>% dplyr::select(vars)
+# sf.5D2 <- sf.5D2 %>% # Calculate polygons area
+#   mutate(Area = st_area(.))
+# 
+# sum_Area <- sum(sf.5D2$Area) 
+# diff.5D2 <- data.frame(total.5D2 - sum.5D2)
+# sf.5D2 <- sf.5D2 %>% # Calculate weights and distibute data
+#   mutate(NOx = ((diff.5D2$NOx/sum_Area)*Area),
+#          SO2 = ((diff.5D2$SO2/sum_Area)*Area),
+#          PM10 = ((diff.5D2$PM10/sum_Area)*Area),
+#          PM2.5 = ((diff.5D2$PM2.5/sum_Area)*Area),
+#          NMVOC = ((diff.5D2$NMVOC/sum_Area)*Area),
+#          NH3 = ((diff.5D2$NH3/sum_Area)*Area))
+# sf.5D2 %<>% dplyr::select(vars)
 #'
 #'
 #+ include = TRUE, message = FALSE, warning = FALSE
 p.5D2 <- sf.grid.5km %>% # Spatialization
-  st_join(sf.5D2, join = st_contains) %>% 
+  st_join(sf.5D2) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),

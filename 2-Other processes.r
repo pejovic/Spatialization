@@ -233,13 +233,18 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #+ include = FALSE
 source.2A5a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S19", sheet = source.sheet, col_names = header)
+source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S15", sheet = source.sheet, col_names = header)
 source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
 source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
 
+  
+sf.2A5a <- corsum2sf(source.2A5a, distribute = FALSE) %>%
+   st_transform(crs = "+init=epsg:32634")
 
-sf.2A5a <- corsum2sf(source.2A5a, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+#st_write(sf.2A5a, dsn="D:/other_than_coal.gpkg", layer='sf.2A5a')
+
+
+
 
 #'
 #'
@@ -307,6 +312,161 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2A5a, total.2A5a
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
+
+
+
+
+#### OSTATAK
+
+clc131.quarries <- sf::st_read(dsn = "Data/mineral_sites_quarries/clc131_without_coal_polygons_and_25ha_bez_11_lokacija.gpkg") 
+
+clc131.quarries %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+
+clc131.quarries[,vars] <- NA
+clc131.quarries.int <- st_intersection(clc131.quarries, sf.grid.5km) %>%
+  dplyr::select(.,vars)
+
+
+clc131.quarries.int %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
+
+
+sum.2A5a <- sf.2A5a %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2A5a <- source.2A5a[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+
+sum_s <- sum(clc131.quarries.int$SHAPE_Area)
+
+diff.2A5a <- data.frame(total.2A5a - sum.2A5a)
+clc131.quarries.int <- clc131.quarries.int %>%
+  mutate(NOx = ((diff.2A5a$NOx/sum_s)*SHAPE_Area),
+         SO2 = ((diff.2A5a$SO2/sum_s)*SHAPE_Area),
+         PM10 = ((diff.2A5a$PM10/sum_s)*SHAPE_Area),
+         PM2.5 = ((diff.2A5a$PM2.5/sum_s)*SHAPE_Area),
+         NMVOC = ((diff.2A5a$NMVOC/sum_s)*SHAPE_Area),
+         NH3 = ((diff.2A5a$NH3/sum_s)*SHAPE_Area))
+clc131.quarries.int %<>% dplyr::select(vars)
+
+clc131.quarries.int$ID <- dplyr::row_number(clc131.quarries.int$NOx)
+
+source.2A5a$sources$points <- NA
+source.2A5a$sources$polygon <- clc131.quarries.int
+
+sf.2A5a <- corsum2sf_polygon(source.2A5a, distribute = FALSE) %>%
+  st_transform(crs = "+init=epsg:32634")
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.2A5a %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 27: sf.2A5a',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.2A5a <- sf.2A5a %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.2A5a <- source.2A5a[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2A5a, total.2A5a, data.frame(total.2A5a-sum.2A5a))) %>%
+  datatable(., caption = 'Table 28: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+
+# sf.2A5a <- sf.2A5a %>%
+#   mutate(Area = st_area(.))
+# 
+# sum_Area <- sum(sf.2A5a$Area)
+# diff.2A5a <- data.frame(total.2A5a - sum.2A5a)
+# sf.2A5a <- sf.2A5a %>%
+#   mutate(NOx = ((diff.2A5a$NOx/sum_Area)*Area),
+#          SO2 = ((diff.2A5a$SO2/sum_Area)*Area),
+#          PM10 = ((diff.2A5a$PM10/sum_Area)*Area),
+#          PM2.5 = ((diff.2A5a$PM2.5/sum_Area)*Area),
+#          NMVOC = ((diff.2A5a$NMVOC/sum_Area)*Area),
+#          NH3 = ((diff.2A5a$NH3/sum_Area)*Area))
+# sf.2A5a %<>% dplyr::select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.2A5a.1 <- sf.grid.5km %>%
+  st_join(sf.2A5a, join = st_contains) %>% 
+  group_by(ID.x) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID.x))
+
+sum.p.2A5a <- p.2A5a.1 %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2A5a, total.2A5a, data.frame(sum.p.2A5a == total.2A5a)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+
+p.2A5a.1$ID
+p.2A5a$ID
+
+
+p.2A5a %<>% dplyr::mutate(NOx = NOx + p.2A5a.1$NOx,
+                         SO2 = SO2 + p.2A5a.1$SO2,
+                         PM10 =PM10 + p.2A5a.1$PM10, 
+                         PM2.5 = PM2.5 + p.2A5a.1$PM2.5,
+                         NMVOC = NMVOC + p.2A5a.1$NMVOC,
+                         NH3 = NH3 + p.2A5a.1$NH3)
+
+sum.p.2A5a <- p.2A5a %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2A5a, total.2A5a, data.frame(sum.p.2A5a == total.2A5a)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
 
 #+ include = FALSE
 # st_write(p.2A5a, dsn="Products/2 - Other processes/2A5a.gpkg", layer='2A5a')
@@ -487,31 +647,38 @@ source.2A5c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D
 source.2A5c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D54:I54", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-o.t.coals <- sf.2A5a 
-o.t.coals[,vars] <- NA
+# o.t.coals <- sf.2A5a 
+# o.t.coals[,vars] <- NA
+# 
+# buf_otcoals <- st_buffer(o.t.coals$geometry, dist = 15000)
+# 
+# 
+# roads <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
+#                  use_iconv=TRUE,  
+#                  encoding = "UTF-8",
+#                  stringsAsFactors = FALSE)
+# sf_roads <- st_as_sf(roads) %>%
+#   st_transform(crs = "+init=epsg:32634") 
+# 
+# 
+# 
+# 
+# roads_buff <- st_join(sf_roads, st_sf(buf_otcoals) %>% mutate(id = seq(1:dim(.))), join = st_intersects) %>%
+#   filter(!is.na(id))
+# roads_buff[,vars] <- NA
+# roads.int <- st_intersection(roads_buff, sf.grid.5km) %>%
+#   select(.,vars)
+# 
+# source.2A5c$sources$lines <- roads.int
+# sf.2A5c <- corsum2sf_lines(source.2A5c, distribute = FALSE) %>%
+#   st_transform(crs = "+init=epsg:32634")
 
-buf_otcoals <- st_buffer(o.t.coals$geometry, dist = 15000)
 
+source.2A5c$sources$polygon <- clc131.quarries.int
 
-roads <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
-                 use_iconv=TRUE,  
-                 encoding = "UTF-8",
-                 stringsAsFactors = FALSE)
-sf_roads <- st_as_sf(roads) %>%
-  st_transform(crs = "+init=epsg:32634") 
-
-
-
-
-roads_buff <- st_join(sf_roads, st_sf(buf_otcoals) %>% mutate(id = seq(1:dim(.))), join = st_intersects) %>%
-  filter(!is.na(id))
-roads_buff[,vars] <- NA
-roads.int <- st_intersection(roads_buff, sf.grid.5km) %>%
-  select(.,vars)
-
-source.2A5c$sources$lines <- roads.int
-sf.2A5c <- corsum2sf_lines(source.2A5c, distribute = FALSE) %>%
+sf.2A5c <- corsum2sf_polygon(source.2A5c, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
+
 
 #'
 #'
@@ -553,17 +720,44 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2A5c, total.2A5c, d
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-sf.2A5c %<>% dplyr::mutate(Length = st_length(.))
-sum_Length <- sum(sf.2A5c$Length)
+#   sf.2A5c %<>% dplyr::mutate(Length = st_length(.))
+#   sum_Length <- sum(sf.2A5c$Length)
+#   diff.2A5c <- data.frame(total.2A5c - sum.2A5c)
+#   sf.2A5c <- sf.2A5c %>%
+#     mutate(NOx = ((diff.2A5c$NOx/sum_Length)*Length),
+#            SO2 = ((diff.2A5c$SO2/sum_Length)*Length),
+#            PM10 = ((diff.2A5c$PM10/sum_Length)*Length),
+#            PM2.5 = ((diff.2A5c$PM2.5/sum_Length)*Length),
+#            NMVOC = ((diff.2A5c$NMVOC/sum_Length)*Length),
+#            NH3 = ((diff.2A5c$NH3/sum_Length)*Length))
+#   sf.2A5c %<>% select(vars)
+#   #'
+#   #'
+#   #+ include = FALSE, echo = FALSE, result = FALSE
+#   p.2A5c <- sf.grid.5km %>%
+#     st_join(sf.2A5c, join = st_contains) %>% 
+#     group_by(ID) %>%
+#     summarize(NOx = sum(NOx, na.rm = TRUE),
+#               SO2 = sum(SO2, na.rm = TRUE),
+#               PM10 = sum(PM10, na.rm = TRUE),
+#               PM2.5 = sum(PM2.5, na.rm = TRUE),
+#               NMVOC = sum(NMVOC, na.rm = TRUE),
+#               NH3 = sum(NH3, na.rm = TRUE)) %>% 
+#     mutate(ID = as.numeric(ID))
+
+sf.2A5c <- sf.2A5c %>%
+  mutate(Area = st_area(.))
+
+sum_Area <- sum(sf.2A5c$Area)
 diff.2A5c <- data.frame(total.2A5c - sum.2A5c)
 sf.2A5c <- sf.2A5c %>%
-  mutate(NOx = ((diff.2A5c$NOx/sum_Length)*Length),
-         SO2 = ((diff.2A5c$SO2/sum_Length)*Length),
-         PM10 = ((diff.2A5c$PM10/sum_Length)*Length),
-         PM2.5 = ((diff.2A5c$PM2.5/sum_Length)*Length),
-         NMVOC = ((diff.2A5c$NMVOC/sum_Length)*Length),
-         NH3 = ((diff.2A5c$NH3/sum_Length)*Length))
-sf.2A5c %<>% select(vars)
+  mutate(NOx = ((diff.2A5c$NOx/sum_Area)*Area),
+         SO2 = ((diff.2A5c$SO2/sum_Area)*Area),
+         PM10 = ((diff.2A5c$PM10/sum_Area)*Area),
+         PM2.5 = ((diff.2A5c$PM2.5/sum_Area)*Area),
+         NMVOC = ((diff.2A5c$NMVOC/sum_Area)*Area),
+         NH3 = ((diff.2A5c$NH3/sum_Area)*Area))
+sf.2A5c %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -577,9 +771,12 @@ p.2A5c <- sf.grid.5km %>%
             NMVOC = sum(NMVOC, na.rm = TRUE),
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
+
+
+
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-spatialised.mapview(sf.sources = sf.2A5c, layer.name.1 = "Sources 2A5c", sf.spatialised = p.2A5c, layer.name.2 = "Spatialised 2A5c", vars = vars, source.lines = TRUE) + 
-  mapview(o.t.coals, layer.name = "Other than coals locations")
+spatialised.mapview(sf.sources = sf.2A5c, layer.name.1 = "Sources 2A5c", sf.spatialised = p.2A5c, layer.name.2 = "Spatialised 2A5c", vars = vars, source.lines = TRUE)  
+  # mapview(o.t.coals, layer.name = "Other than coals locations")
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sum.p.2A5c <- p.2A5c %>% 
@@ -613,7 +810,7 @@ source.2D3b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D7
 
 sf_roads[,vars] <- NA
 roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
-  select(.,vars)
+  dplyr::select(.,vars)
 
 source.2D3b$sources$lines <- roads.int
 sf.2D3b <- corsum2sf_lines(source.2D3b, distribute = FALSE) %>%
@@ -2033,7 +2230,8 @@ source.2D3a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D9
 
 
 
-
+library(raster)
+library(stars)
 #+ include = FALSE
 
 pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/popdens_32634.tif")
@@ -2253,7 +2451,7 @@ source.2D3f <- list(sources = list(points = NA, lines = NA, polygon = NA), total
 
 source.2D3f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
 source.2D3f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D94:I94", sheet = source.sheet, col_names = vars)
-
+#sf_clc18_urb[,vars] <- NA # za kartu
 source.2D3f$sources$polygon <- sf_clc18_urb.int
 
 sf.2D3f <- corsum2sf_polygon(source.2D3f, distribute = FALSE) %>%
