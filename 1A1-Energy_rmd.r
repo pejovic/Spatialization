@@ -112,36 +112,36 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A1-Energy"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
+grid.5km <- readOGR("Grid/Grid_5km_Serbia_new.gpkg")
 sf.grid.5km <- st_as_sf(grid.5km)
 #'
 #'
-#' ## 1A1a - Public heat and electricity production
+#' ## 1A1a - Public electricity production
 #'
 #'
 #'
 #+ include = FALSE
-source.1A1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+source.1A1a_ep <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S37", sheet = source.sheet, col_names = header)
-source.1A1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
-source.1A1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
+source.1A1a_ep$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S29", sheet = source.sheet, col_names = header)
+source.1A1a_ep$total$spatialize <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
+source.1A1a_ep$total$inventory <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
 
 
-sf.1A1a <- corsum2sf(source.1A1a) %>%
+sf.1A1a_ep <- corsum2sf(source.1A1a_ep) %>%
   st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1A1a %>% 
+sf.1A1a_ep %>% 
   st_drop_geometry() %>% 
   dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 1: sf.1A1a',
+  datatable(., caption = 'Table 1: sf.1A1a_ep',
             rownames = FALSE, escape = FALSE, selection = "single",
             extensions = c('Buttons'),
             class = 'white-space: nowrap',
@@ -156,29 +156,29 @@ sf.1A1a %>%
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.1A1a <- sf.1A1a %>% 
+sum.1A1a_ep <- sf.1A1a_ep %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-total.1A1a <- source.1A1a[[2]][[2]][, vars] %>% 
+total.1A1a_ep <- source.1A1a_ep[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::mutate_if(is.numeric, round, 2) %>%
   as.data.frame()
 
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A1a, total.1A1a, data.frame(sum.1A1a == total.1A1a)-1)) %>%
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A1a_ep, total.1A1a_ep, data.frame(sum.1A1a_ep == total.1A1a_ep)-1)) %>%
   datatable(., caption = 'Table 2: Summary differences',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE, echo = FALSE, result = FALSE
-# p.1A1a <- sf.grid.5km %>%
-#   st_join(., sf.1A1a, join = st_intersects) %>%
+# p.1A1a_ep <- sf.grid.5km %>%
+#   st_join(., sf.1A1a_ep, join = st_intersects) %>%
 #   dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
-p.1A1a <- sf.grid.5km %>%
-  st_join(sf.1A1a) %>%
+p.1A1a_ep <- sf.grid.5km %>%
+  st_join(sf.1A1a_ep) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -189,24 +189,119 @@ p.1A1a <- sf.grid.5km %>%
   mutate(ID = as.numeric(ID))
 
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-# mapview(sf.1A1a, layer.name = "Sources 1A1a", col.regions = "red") + mapview(p.1A1a)
-spatialised.mapview(sf.sources = sf.1A1a, layer.name.1 = "Sources 1A1a", sf.spatialised = p.1A1a, layer.name.2 = "Spatialised 1A1a", vars = vars)
+# mapview(sf.1A1a_ep, layer.name = "Sources 1A1a_ep", col.regions = "red") + mapview(p.1A1a_ep)
+spatialised.mapview(sf.sources = sf.1A1a_ep, layer.name.1 = "Sources 1A1a_ep", sf.spatialised = p.1A1a_ep, layer.name.2 = "Spatialised 1A1a_ep", vars = vars)
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.1A1a <- p.1A1a %>% 
+sum.p.1A1a_ep <- p.1A1a_ep %>% 
   st_drop_geometry() %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
   as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1a, total.1A1a, data.frame(sum.p.1A1a == total.1A1a)-1)) %>%
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1a_ep, total.1A1a_ep, data.frame(sum.p.1A1a_ep == total.1A1a_ep)-1)) %>%
+  datatable(., caption = 'Table 3: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+# p.1A1a_ep %>% dplyr::arrange(., ID)
+#+ include = FALSE
+p.1A1a_ep %<>% sf::st_transform(4326)
+# st_write(p.1A1a_ep, dsn = "Products/1A1 - Energy/1A1a_ep.gpkg", layer = '1A1a_ep')
+
+
+
+#'
+#'
+#' ## 1A1a - Public heat production
+#'
+#'
+#'
+#+ include = FALSE
+source.1A1a_hp <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+
+source.1A1a_hp$sources$points <- readxl::read_xlsx(path = source.file, range = "D30:S37", sheet = source.sheet, col_names = header)
+source.1A1a_hp$total$spatialize <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
+source.1A1a_hp$total$inventory <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
+
+
+sf.1A1a_hp <- corsum2sf(source.1A1a_hp) %>%
+  st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sf.1A1a_hp %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 1: sf.1A1a_hp',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.1A1a_hp <- sf.1A1a_hp %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.1A1a_hp <- source.1A1a_hp[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A1a_hp, total.1A1a_hp, data.frame(sum.1A1a_hp == total.1A1a_hp)-1)) %>%
+  datatable(., caption = 'Table 2: Summary differences',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE, echo = FALSE, result = FALSE
+# p.1A1a_hp <- sf.grid.5km %>%
+#   st_join(., sf.1A1a_hp, join = st_intersects) %>%
+#   dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+p.1A1a_hp <- sf.grid.5km %>%
+  st_join(sf.1A1a_hp) %>%
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# mapview(sf.1A1a_hp, layer.name = "Sources 1A1a_hp", col.regions = "red") + mapview(p.1A1a_hp)
+spatialised.mapview(sf.sources = sf.1A1a_hp, layer.name.1 = "Sources 1A1a_hp", sf.spatialised = p.1A1a_hp, layer.name.2 = "Spatialised 1A1a_hp", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.1A1a_hp <- p.1A1a_hp %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1a_hp, total.1A1a_hp, data.frame(sum.p.1A1a_hp == total.1A1a_hp)-1)) %>%
   datatable(., caption = 'Table 3: Summary differences after spatialisation',
             options = list(pageLength = 5)
   )
 
 #+ include = FALSE
-# st_write(p.1A1a, dsn="Products/1A1 - Energy/1A1a.gpkg", layer='1A1a')
+p.1A1a_hp %<>% sf::st_transform(4326)
+st_write(p.1A1a_hp, dsn = "Products/1A1 - Energy/1A1a_hp.gpkg", layer = '1A1a_hp')
 
 #'
 #'
@@ -292,87 +387,93 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1b, total.1A1b
   )
 
 #+ include = FALSE
-#st_write(p.1A1b, dsn="Products/1A1 - Energy/1A1b.gpkg", layer='1A1b')
+p.1A1b %<>% sf::st_transform(4326)
+st_write(p.1A1b, dsn="Products/1A1 - Energy/1A1b_1B2aiv.gpkg", layer='1A1b_1B2aiv')
 
-#'
+
+# !!!!!!!!!!!!!!!!!!!!!!
+# MERGED WITH RAFINERIES
+# !!!!!!!!!!!!!!!!!!!!!!
+
+
 #'
 #' ## 1B2aiv - Fugitive emissions from liquid fuels: Refining, storage
 #'
 #+ include = FALSE
 
-source.1B2aiv <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
-
-source.1B2aiv$sources$points <- readxl::read_xlsx(path = source.file, range = "D53:S56", sheet = source.sheet, col_names = header)
-source.1B2aiv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D57:I57", sheet = source.sheet, col_names = vars)
-source.1B2aiv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D58:I58", sheet = source.sheet, col_names = vars)
-
-sf.1B2aiv <- corsum2sf(source.1B2aiv) %>%
-  st_transform(crs = "+init=epsg:32634")
-
-#+ echo = FALSE, result = TRUE, eval = TRUE
-sf.1B2aiv %>% 
-  st_drop_geometry() %>% 
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  datatable(., caption = 'Table 7: sf.1A2aiv',
-            rownames = FALSE, escape = FALSE, selection = "single",
-            extensions = c('Buttons'),
-            class = 'white-space: nowrap',
-            options = list(
-              pageLength = 5,
-              dom = 'Bfrtip',
-              buttons = list('pageLength'),
-              searchHighlight = TRUE,
-              scrollX = TRUE,
-              scrollY = TRUE
-            ))
-#'
-#'
-#+ echo = FALSE, result = TRUE, eval = TRUE
-sum.1B2aiv <- sf.1B2aiv %>% 
-  st_drop_geometry() %>%
-  dplyr::select(., vars) %>% 
-  apply(., 2, sum) %>% 
-  t(.) %>% 
-  as.data.frame() %>%
-  dplyr::mutate_if(is.numeric, round, 2)
-total.1B2aiv <- source.1B2aiv[[2]][[2]][, vars] %>% 
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  dplyr::mutate_if(is.numeric, round, 2) %>%
-  as.data.frame()
-
-data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2aiv, total.1B2aiv, data.frame(sum.1B2aiv == total.1B2aiv)-1)) %>%
-  datatable(., caption = 'Table 8: Summary differences',
-            options = list(pageLength = 5)
-  )
-#+ include = FALSE, echo = FALSE, result = FALSE
-p.1B2aiv <- sf.grid.5km %>%
-  st_join(sf.1B2aiv) %>%
-  group_by(ID) %>%
-  summarize(NOx = sum(NOx, na.rm = TRUE),
-            SO2 = sum(SO2, na.rm = TRUE),
-            PM10 = sum(PM10, na.rm = TRUE),
-            PM2.5 = sum(PM2.5, na.rm = TRUE),
-            NMVOC = sum(NMVOC, na.rm = TRUE),
-            NH3 = sum(NH3, na.rm = TRUE)) %>% 
-  mutate(ID = as.numeric(ID))
-
-#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-# mapview(sf.1B2aiv, layer.name = "Sources 1B2aiv", col.regions = "red") + mapview(p.1B2aiv)
-spatialised.mapview(sf.sources = sf.1B2aiv, layer.name.1 = "Sources 1B2aiv", sf.spatialised = p.1B2aiv, layer.name.2 = "Spatialised 1B2aiv", vars = vars)
-
-#+ echo = FALSE, result = TRUE, eval = TRUE
-sum.p.1B2aiv <- p.1B2aiv %>% 
-  st_drop_geometry() %>%
-  dplyr::select(., vars) %>% 
-  apply(., 2, sum) %>% 
-  t(.) %>% 
-  as.data.frame() %>%
-  dplyr::mutate_if(is.numeric, round, 2)
-data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2aiv, total.1B2aiv, data.frame(sum.p.1B2aiv == total.1B2aiv)-1)) %>%
-  datatable(., caption = 'Table 9: Summary differences after spatialisation',
-            options = list(pageLength = 5)
-  )
-
+# source.1B2aiv <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+# 
+# source.1B2aiv$sources$points <- readxl::read_xlsx(path = source.file, range = "D53:S56", sheet = source.sheet, col_names = header)
+# source.1B2aiv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D57:I57", sheet = source.sheet, col_names = vars)
+# source.1B2aiv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D58:I58", sheet = source.sheet, col_names = vars)
+# 
+# sf.1B2aiv <- corsum2sf(source.1B2aiv) %>%
+#   st_transform(crs = "+init=epsg:32634")
+# 
+# #+ echo = FALSE, result = TRUE, eval = TRUE
+# sf.1B2aiv %>% 
+#   st_drop_geometry() %>% 
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   datatable(., caption = 'Table 7: sf.1A2aiv',
+#             rownames = FALSE, escape = FALSE, selection = "single",
+#             extensions = c('Buttons'),
+#             class = 'white-space: nowrap',
+#             options = list(
+#               pageLength = 5,
+#               dom = 'Bfrtip',
+#               buttons = list('pageLength'),
+#               searchHighlight = TRUE,
+#               scrollX = TRUE,
+#               scrollY = TRUE
+#             ))
+# #'
+# #'
+# #+ echo = FALSE, result = TRUE, eval = TRUE
+# sum.1B2aiv <- sf.1B2aiv %>% 
+#   st_drop_geometry() %>%
+#   dplyr::select(., vars) %>% 
+#   apply(., 2, sum) %>% 
+#   t(.) %>% 
+#   as.data.frame() %>%
+#   dplyr::mutate_if(is.numeric, round, 2)
+# total.1B2aiv <- source.1B2aiv[[2]][[2]][, vars] %>% 
+#   mutate_all(~replace(., is.na(.), 0)) %>%
+#   dplyr::mutate_if(is.numeric, round, 2) %>%
+#   as.data.frame()
+# 
+# data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2aiv, total.1B2aiv, data.frame(sum.1B2aiv == total.1B2aiv)-1)) %>%
+#   datatable(., caption = 'Table 8: Summary differences',
+#             options = list(pageLength = 5)
+#   )
+# #+ include = FALSE, echo = FALSE, result = FALSE
+# p.1B2aiv <- sf.grid.5km %>%
+#   st_join(sf.1B2aiv) %>%
+#   group_by(ID) %>%
+#   summarize(NOx = sum(NOx, na.rm = TRUE),
+#             SO2 = sum(SO2, na.rm = TRUE),
+#             PM10 = sum(PM10, na.rm = TRUE),
+#             PM2.5 = sum(PM2.5, na.rm = TRUE),
+#             NMVOC = sum(NMVOC, na.rm = TRUE),
+#             NH3 = sum(NH3, na.rm = TRUE)) %>% 
+#   mutate(ID = as.numeric(ID))
+# 
+# #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+# # mapview(sf.1B2aiv, layer.name = "Sources 1B2aiv", col.regions = "red") + mapview(p.1B2aiv)
+# spatialised.mapview(sf.sources = sf.1B2aiv, layer.name.1 = "Sources 1B2aiv", sf.spatialised = p.1B2aiv, layer.name.2 = "Spatialised 1B2aiv", vars = vars)
+# 
+# #+ echo = FALSE, result = TRUE, eval = TRUE
+# sum.p.1B2aiv <- p.1B2aiv %>% 
+#   st_drop_geometry() %>%
+#   dplyr::select(., vars) %>% 
+#   apply(., 2, sum) %>% 
+#   t(.) %>% 
+#   as.data.frame() %>%
+#   dplyr::mutate_if(is.numeric, round, 2)
+# data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2aiv, total.1B2aiv, data.frame(sum.p.1B2aiv == total.1B2aiv)-1)) %>%
+#   datatable(., caption = 'Table 9: Summary differences after spatialisation',
+#             options = list(pageLength = 5)
+#   )
+# 
 #+ include = FALSE
 # st_write(p.1B2aiv, dsn="Products/1A1 - Energy/1B2aiv.gpkg", layer='1B2aiv')
 
@@ -387,9 +488,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2aiv, total.1B
 #+ include = FALSE
 source.1B2c <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1B2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D59:S62", sheet = source.sheet, col_names = header)
-source.1B2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D63:I63", sheet = source.sheet, col_names = vars)
-source.1B2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D64:I64", sheet = source.sheet, col_names = vars)
+source.1B2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D53:S56", sheet = source.sheet, col_names = header)
+source.1B2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D57:I57", sheet = source.sheet, col_names = vars)
+source.1B2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D58:I58", sheet = source.sheet, col_names = vars)
 
 sf.1B2c <- corsum2sf(source.1B2c) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -463,6 +564,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2c, total.1B2c
   )
 
 #+ include = FALSE
+p.1B2c %<>% sf::st_transform(4326)
 # st_write(p.1B2c, dsn="Products/1A1 - Energy/1B2c.gpkg", layer='1B2c')
 
 #'
@@ -473,9 +575,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2c, total.1B2c
 #+ include = FALSE
 source.1A1c <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A1c$sources$points <- readxl::read_xlsx(path = source.file, range = "D65:S73", sheet = source.sheet, col_names = header)
-source.1A1c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D81:I81", sheet = source.sheet, col_names = vars)
-source.1A1c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D82:I82", sheet = source.sheet, col_names = vars)
+source.1A1c$sources$points <- readxl::read_xlsx(path = source.file, range = "D59:S67", sheet = source.sheet, col_names = header)
+source.1A1c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D75:I75", sheet = source.sheet, col_names = vars)
+source.1A1c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D76:I76", sheet = source.sheet, col_names = vars)
 
 sf.1A1c <- corsum2sf(source.1A1c) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -552,6 +654,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1c, total.1A1c
   )
 
 #+ include = FALSE
+p.1A1c %<>% sf::st_transform(4326)
 # st_write(p.1A1c, dsn="Products/1A1 - Energy/1A1c.gpkg", layer='1A1c')
 
 #'
@@ -565,9 +668,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1c, total.1A1c
 #+ include = FALSE
 source.1B1b <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1B1b$sources$points <- readxl::read_xlsx(path = source.file, range = "D83:S83", sheet = source.sheet, col_names = header)
-source.1B1b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D91:I91", sheet = source.sheet, col_names = vars)
-source.1B1b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D92:I92", sheet = source.sheet, col_names = vars)
+source.1B1b$sources$points <- readxl::read_xlsx(path = source.file, range = "D77:S77", sheet = source.sheet, col_names = header)
+source.1B1b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D79:I79", sheet = source.sheet, col_names = vars)
+source.1B1b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D80:I80", sheet = source.sheet, col_names = vars)
 
 sf.1B1b <- corsum2sf(source.1B1b) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -641,6 +744,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B1b, total.1B1b
   )
 
 #+ include = FALSE
+p.1B1b %<>% sf::st_transform(4326)
 # st_write(p.1B1b, dsn="Products/1A1 - Energy/1B1b.gpkg", layer='1B1b')
 
 #'
