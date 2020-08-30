@@ -181,12 +181,14 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A2-2-Industry"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km)   
+grid.5km <- readOGR("Grid/Grid_5km_Serbia_new.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+
+
 #'
 #'
 #' ## 1A2a / 2C1 - Iron and Steel
@@ -270,6 +272,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2a, total.1A2a
   )
 
 #+ include = FALSE
+p.1A2a %<>% sf::st_transform(4326)
 # st_write(p.1A2a, dsn="Products/1A2 - Industry/1A2a.gpkg", layer='1A2a')
 
 #'
@@ -352,6 +355,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2b, total.1A2b
   )
 
 #+ include = FALSE
+p.1A2b %<>% sf::st_transform(4326)
 # st_write(p.1A2b, dsn="Products/1A2 - Industry/1A2b.gpkg", layer='1A2b')
 
 #'
@@ -362,9 +366,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2b, total.1A2b
 
 source.1A2c <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D55:S69", sheet = source.sheet, col_names = header)
-source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D71:I71", sheet = source.sheet, col_names = vars)
-source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D86:I86", sheet = source.sheet, col_names = vars)
+source.1A2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D55:S70", sheet = source.sheet, col_names = header)
+source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
+source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
 
 sf.1A2c <- corsum2sf(source.1A2c) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -433,6 +437,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2c, total.1A2c
   )
 
 #+ include = FALSE
+p.1A2c %<>% sf::st_transform(4326)
 # st_write(p.1A2c, dsn="Products/1A2 - Industry/1A2c.gpkg", layer='1A2c')
 
 #'
@@ -446,9 +451,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2c, total.1A2c
 #+ include = FALSE
 source.1A2d <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2d$sources$points <- readxl::read_xlsx(path = source.file, range = "D87:S94", sheet = source.sheet, col_names = header)
-source.1A2d$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D103:I103", sheet = source.sheet, col_names = vars)
-source.1A2d$total$inventory <- readxl::read_xlsx(path = source.file, range = "D109:I109", sheet = source.sheet, col_names = vars)
+source.1A2d$sources$points <- readxl::read_xlsx(path = source.file, range = "D88:S95", sheet = source.sheet, col_names = header)
+source.1A2d$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D104:I104", sheet = source.sheet, col_names = vars)
+source.1A2d$total$inventory <- readxl::read_xlsx(path = source.file, range = "D110:I110", sheet = source.sheet, col_names = vars)
 
 sf.1A2d <- corsum2sf(source.1A2d, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -521,6 +526,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2d, total.1A2d
   )
 
 #+ include = FALSE
+p.1A2d %<>% sf::st_transform(4326)
 # st_write(p.1A2d, dsn="Products/1A2 - Industry/1A2d.gpkg", layer='1A2d')
 
 #'
@@ -531,9 +537,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2d, total.1A2d
 #+ include = FALSE
 source.1A2e <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D110:S131", sheet = source.sheet, col_names = header)
-source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "U151:Z151", sheet = source.sheet, col_names = vars)
-source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "U151:Z151", sheet = source.sheet, col_names = vars)
+source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D111:S132", sheet = source.sheet, col_names = header)
+source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "U152:Z152", sheet = source.sheet, col_names = vars)
+source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "U152:Z152", sheet = source.sheet, col_names = vars)
 
 sf.1A2e <- corsum2sf(source.1A2e, distribute = TRUE) %>%
   st_transform(crs = "+init=epsg:32634")
@@ -607,6 +613,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e, total.1A2e
   )
 
 #+ include = FALSE
+p.1A2e %<>% sf::st_transform(4326)
 # st_write(p.1A2e, dsn="Products/1A2 - Industry/1A2e.gpkg", layer='1A2e')
 
 
@@ -622,8 +629,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e, total.1A2e
 
 source.1A2e.bread <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2e.bread$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D142:I142", sheet = source.sheet, col_names = vars)
-source.1A2e.bread$total$inventory <- readxl::read_xlsx(path = source.file, range = "D142:I142", sheet = source.sheet, col_names = vars)
+source.1A2e.bread$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D143:I143", sheet = source.sheet, col_names = vars)
+source.1A2e.bread$total$inventory <- readxl::read_xlsx(path = source.file, range = "D143:I143", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 osm.bread <- sf::st_read(dsn = "Data/pekare/OSM_bakery_4326.gpkg") %>%
@@ -714,6 +721,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.bread, tota
   )
 
 #+ include = FALSE
+p.1A2e.bread %<>% sf::st_transform(4326)
 # st_write(p.1A2e.bread, dsn="Products/1A2 - Industry/1A2e.bread.gpkg", layer='1A2e.bread')
 
 
@@ -726,11 +734,10 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.bread, tota
 #' ## 1A2e - Food, beverages and tobacco - wine
 #'
 #+ include = FALSE
-
 source.1A2e.wine <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2e.wine$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D148:I148", sheet = source.sheet, col_names = vars)
-source.1A2e.wine$total$inventory <- readxl::read_xlsx(path = source.file, range = "D148:I148", sheet = source.sheet, col_names = vars)
+source.1A2e.wine$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D149:I149", sheet = source.sheet, col_names = vars)
+source.1A2e.wine$total$inventory <- readxl::read_xlsx(path = source.file, range = "D149:I149", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
@@ -749,6 +756,7 @@ source.1A2e.wine$sources$polygon <- clc221.int
 
 sf.1A2e.wine <- corsum2sf_polygon(source.1A2e.wine, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
+
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -790,7 +798,6 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2e.wine, total.1A
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-
 sf.1A2e.wine <- sf.1A2e.wine %>%
   mutate(Area = st_area(.))
 
@@ -807,6 +814,7 @@ sf.1A2e.wine %<>% select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
+st_write(sf.1A2e.wine, dsn = "Grid/sfwine.gpkg")
 p.1A2e.wine <- sf.grid.5km %>%
   st_join(sf.1A2e.wine, join = st_contains) %>% 
   group_by(ID) %>%
@@ -817,6 +825,15 @@ p.1A2e.wine <- sf.grid.5km %>%
             NMVOC = sum(NMVOC, na.rm = TRUE),
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
+
+aaa <- aggregate(x = sf.1A2e.wine, 
+                 by = sf.grid.5km, 
+                 FUN = sum, 
+                 #join = st_contains, 
+                 do_union = FALSE)
+aaa %<>% 
+  mutate_all(~replace(., is.na(.), 0))
+p.1A2e.wine <- aaa
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 # mapview(p.1A2e.wine, layer.name = "Spatialised 1A2e.wine") + mapview(sf.1A2e.wine, layer.name = "Sources 1A2e.wine", col.regions = "red") 
 spatialised.mapview(sf.sources = sf.1A2e.wine, layer.name.1 = "Sources 1A2e.wine", sf.spatialised = p.1A2e.wine, layer.name.2 = "Spatialised 1A2e.wine", vars = vars)
