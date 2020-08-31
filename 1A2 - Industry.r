@@ -185,7 +185,8 @@ source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A2-2-Industry"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Grid_5km_Serbia_new1.gpkg")
+#grid.5km <- readOGR("Grid/Grid_5km_Serbia_new1.gpkg")
+grid.5km <- readOGR("Grid/rast3warp_polygons.gpkg")
 sf.grid.5km <- st_as_sf(grid.5km)
 sf.grid.5km %<>% dplyr::mutate(ID = VALUE)
 
@@ -855,7 +856,7 @@ sf.1A2e.wine %<>% st_transform(32634)
 #+ include = FALSE, echo = FALSE, result = FALSE
 #st_write(sf.1A2e.wine, dsn = "Grid/sfwine.gpkg")
 p.1A2e.wine <- sf.grid.5km %>%
-  st_join(sf.1A2e.wine, join = st_within) %>% 
+  st_join(sf.1A2e.wine, join = st_contains) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
