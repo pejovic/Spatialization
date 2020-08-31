@@ -185,9 +185,9 @@ source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A2-2-Industry"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Grid_5km_Serbia_new.gpkg")
+grid.5km <- readOGR("Grid/Grid_5km_Serbia_new1.gpkg")
 sf.grid.5km <- st_as_sf(grid.5km)
-
+sf.grid.5km %<>% dplyr::mutate(ID = VALUE)
 
 #'
 #'
@@ -754,6 +754,37 @@ clc221.int <- st_intersection(clc221, sf.grid.5km) %>%
 
 source.1A2e.wine$sources$polygon <- clc221.int
 
+
+
+
+
+
+# When polygons sharing a boundary are combined, this leads to geometries that are invalid; see https://github.com/r-spatial/sf/issues/681.
+
+st_is_valid(clc221.int) # geometry check
+
+# Compute DE9-IM relation between pairs of geometries, or match it to a given pattern
+?st_relate
+st_relate(clc221.int)[,1]
+st_relate(sf.grid.5km)[,1] # postoje razlike vec na pocetku
+# https://github.com/r-spatial/sf/issues/681
+# any combination of polygons sharing a border is invalid. 
+# So you could check for pairs of geometries for which the boundaries intersection is maximally 1-dimensional.
+
+# 05-126_OpenGIS_Implementation_Specification_for_Geographic_information_-_Simple_feature_access_-_Part_1Common_architecture.pdf
+
+
+?st_set_precision
+# different value of precision - "artefacts" in a different places 
+# https://github.com/r-spatial/sf/issues/382
+
+# also try precision values smaller than 0;
+st_precision(sf.grid.5km)
+sf.grid.5km %<>% st_set_precision(-0.001)
+
+
+
+
 sf.1A2e.wine <- corsum2sf_polygon(source.1A2e.wine, distribute = FALSE) %>%
   st_transform(crs = "+init=epsg:32634")
 
@@ -811,12 +842,20 @@ sf.1A2e.wine <- sf.1A2e.wine %>%
          NMVOC = ((diff.1A2e.wine$NMVOC/sum_Area)*Area),
          NH3 = ((diff.1A2e.wine$NH3/sum_Area)*Area))
 sf.1A2e.wine %<>% select(vars)
+
+#
+st_is_valid(sf.1A2e.wine)
+all(st_is_valid(sf.grid.5km))
+
+
+sf.grid.5km %<>% st_transform(32634)
+sf.1A2e.wine %<>% st_transform(32634)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
-st_write(sf.1A2e.wine, dsn = "Grid/sfwine.gpkg")
+#st_write(sf.1A2e.wine, dsn = "Grid/sfwine.gpkg")
 p.1A2e.wine <- sf.grid.5km %>%
-  st_join(sf.1A2e.wine, join = st_contains) %>% 
+  st_join(sf.1A2e.wine, join = st_within) %>% 
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
