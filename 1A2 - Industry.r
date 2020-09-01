@@ -35,6 +35,7 @@ library(kableExtra)
 library(DT)
 library(mapview)
 library(rgdal)
+library(s2)
 #' 
 #' 
 #+ include = FALSE
@@ -186,9 +187,9 @@ source.sheet =  "1A2-2-Industry"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
 #grid.5km <- readOGR("Grid/Grid_5km_Serbia_new1.gpkg")
-grid.5km <- readOGR("Grid/rast3warp_polygons.gpkg")
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
 sf.grid.5km <- st_as_sf(grid.5km)
-sf.grid.5km %<>% dplyr::mutate(ID = VALUE)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
 
 #'
 #'
@@ -750,44 +751,37 @@ clc221 <- subset(sf_clc18, CODE_18 == "221") %>% # VINEYARDS
 clc221 %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
 
 clc221[,vars] <- NA
+clc221 %<>% sf::st_transform(4326)
 clc221.int <- st_intersection(clc221, sf.grid.5km) %>%
-  select(.,vars)
+  dplyr::select(.,vars)
 
 source.1A2e.wine$sources$polygon <- clc221.int
 
+# # When polygons sharing a boundary are combined, this leads to geometries that are invalid; see https://github.com/r-spatial/sf/issues/681.
+# 
+# st_is_valid(clc221.int) # geometry check
+# 
+# # Compute DE9-IM relation between pairs of geometries, or match it to a given pattern
+# ?st_relate
+# st_relate(clc221.int)[,1]
+# st_relate(sf.grid.5km)[,1] # postoje razlike vec na pocetku
+# # https://github.com/r-spatial/sf/issues/681
+# # any combination of polygons sharing a border is invalid. 
+# # So you could check for pairs of geometries for which the boundaries intersection is maximally 1-dimensional.
+# 
+# # 05-126_OpenGIS_Implementation_Specification_for_Geographic_information_-_Simple_feature_access_-_Part_1Common_architecture.pdf
+# 
+# 
+# ?st_set_precision
+# # different value of precision - "artefacts" in a different places 
+# # https://github.com/r-spatial/sf/issues/382
+# 
+# # also try precision values smaller than 0;
+# st_precision(sf.grid.5km)
+# sf.grid.5km %<>% st_set_precision(-0.001)
 
-
-
-
-
-# When polygons sharing a boundary are combined, this leads to geometries that are invalid; see https://github.com/r-spatial/sf/issues/681.
-
-st_is_valid(clc221.int) # geometry check
-
-# Compute DE9-IM relation between pairs of geometries, or match it to a given pattern
-?st_relate
-st_relate(clc221.int)[,1]
-st_relate(sf.grid.5km)[,1] # postoje razlike vec na pocetku
-# https://github.com/r-spatial/sf/issues/681
-# any combination of polygons sharing a border is invalid. 
-# So you could check for pairs of geometries for which the boundaries intersection is maximally 1-dimensional.
-
-# 05-126_OpenGIS_Implementation_Specification_for_Geographic_information_-_Simple_feature_access_-_Part_1Common_architecture.pdf
-
-
-?st_set_precision
-# different value of precision - "artefacts" in a different places 
-# https://github.com/r-spatial/sf/issues/382
-
-# also try precision values smaller than 0;
-st_precision(sf.grid.5km)
-sf.grid.5km %<>% st_set_precision(-0.001)
-
-
-
-
-sf.1A2e.wine <- corsum2sf_polygon(source.1A2e.wine, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2e.wine <- corsum2sf_polygon(source.1A2e.wine, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -842,15 +836,8 @@ sf.1A2e.wine <- sf.1A2e.wine %>%
          PM2.5 = ((diff.1A2e.wine$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.1A2e.wine$NMVOC/sum_Area)*Area),
          NH3 = ((diff.1A2e.wine$NH3/sum_Area)*Area))
-sf.1A2e.wine %<>% select(vars)
+sf.1A2e.wine %<>% dplyr::select(vars)
 
-#
-st_is_valid(sf.1A2e.wine)
-all(st_is_valid(sf.grid.5km))
-
-
-sf.grid.5km %<>% st_transform(32634)
-sf.1A2e.wine %<>% st_transform(32634)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -866,14 +853,14 @@ p.1A2e.wine <- sf.grid.5km %>%
             NH3 = sum(NH3, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID))
 
-aaa <- aggregate(x = sf.1A2e.wine, 
-                 by = sf.grid.5km, 
-                 FUN = sum, 
-                 #join = st_contains, 
-                 do_union = FALSE)
-aaa %<>% 
-  mutate_all(~replace(., is.na(.), 0))
-p.1A2e.wine <- aaa
+# aaa <- aggregate(x = sf.1A2e.wine, 
+#                  by = sf.grid.5km, 
+#                  FUN = sum, 
+#                  #join = st_contains, 
+#                  do_union = FALSE)
+# aaa %<>% 
+#   mutate_all(~replace(., is.na(.), 0))
+# p.1A2e.wine <- aaa
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 # mapview(p.1A2e.wine, layer.name = "Spatialised 1A2e.wine") + mapview(sf.1A2e.wine, layer.name = "Sources 1A2e.wine", col.regions = "red") 
 spatialised.mapview(sf.sources = sf.1A2e.wine, layer.name.1 = "Sources 1A2e.wine", sf.spatialised = p.1A2e.wine, layer.name.2 = "Spatialised 1A2e.wine", vars = vars)
@@ -894,6 +881,85 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.wine, total
 #+ include = FALSE
 # st_write(p.1A2e.wine, dsn="Products/1A2 - Industry/1A2e.wine.gpkg", layer='1A2e.wine')
 
+# # 1
+# library(raster)
+# library(stars)
+# rast_32634 <- raster::raster("Grid/rast3warp.tif")
+# rast_NOx <- rasterize(p.1A2e.wine, rast_32634, p.1A2e.wine$NMVOC, fun = mean) 
+# 
+# star_pred <- st_as_stars(rast_NOx)
+# 
+# pred_plot <- ggplot()+
+#   geom_stars(data = star_pred)+
+#   #scale_fill_distiller(palette = "PuBu") +
+#   #scale_fill_viridis(option = "B", na.value = NA) + # , limits = c(-20, 40)
+#   ggtitle("Prediction plot")+
+#   xlab("Easting_UTM [m]")+
+#   ylab("Northing_UTM [m]")+
+#   labs(fill = "TMEAN [°C]")+
+#   theme_bw()+
+#   theme(legend.position="bottom")
+# 
+# write_stars(star_pred, "Grid/pred1.tif")
+# 
+# # 2
+# c.p.1A2e.wine <- st_centroid(p.1A2e.wine) 
+# polygons_4326 <- st_read("Grid/Grid_Serbia_0.05deg.gpkg")
+# polygons_32634 <- st_read("Grid/Grid_5km_Serbia_new.gpkg")
+# 
+# spatialised.mapview(sf.sources = c.p.1A2e.wine, layer.name.1 = "Sources 1A2e.wine", sf.spatialised = p.1A2e.wine1, layer.name.2 = "Spatialised 1A2e.wine", vars = vars)
+# 
+# 
+# polygons_32634 %<>% mutate(ID1 = ID)
+# p.1A2e.wine1 <- polygons_32634 %>%
+#   sf::st_join(c.p.1A2e.wine) %>%
+#   dplyr::group_by(ID1) %>%
+#   dplyr::summarize(NOx = sum(NOx, na.rm = TRUE),
+#             SO2 = sum(SO2, na.rm = TRUE),
+#             PM10 = sum(PM10, na.rm = TRUE),
+#             PM2.5 = sum(PM2.5, na.rm = TRUE),
+#             NMVOC = sum(NMVOC, na.rm = TRUE),
+#             NH3 = sum(NH3, na.rm = TRUE)) %>% 
+#   dplyr::mutate(ID = as.numeric(ID1))
+# 
+# sum.p.1A2e.wine1 <- p.1A2e.wine1 %>% 
+#   st_drop_geometry() %>%
+#   dplyr::select(., vars) %>% 
+#   apply(., 2, sum) %>% 
+#   t(.) %>% 
+#   as.data.frame() %>%
+#   dplyr::mutate_if(is.numeric, round, 2)
+# data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.wine1, total.1A2e.wine, data.frame(sum.p.1A2e.wine == total.1A2e.wine)-1)) %>%
+#   datatable(., caption = 'Table 29: Summary differences after spatialisation',
+#             options = list(pageLength = 5)
+#   )
+# 
+# p.1A2e.wine1 %<>% st_transform(4326)
+# 
+# st_write(p.1A2e.wine1, "Grid/proba2.gpkg")
+
+#########################################################
+# library(s2)
+# polygons_4326 <- st_read("Grid/Grid_Serbia_0.05deg.gpkg")
+# polygons_4326 %<>% mutate(ID = id)
+# 
+# clc221[,vars] <- NA
+# clc221 %<>% st_transform(4326)
+# rm(clc221.int)
+# clc221.int <- st_intersection(clc221, polygons_4326) %>%
+#   dplyr::select(.,vars)
+# 
+# p.1A2e.wine <- polygons_4326 %>%
+#   st_join(sf.1A2e.wine, join = st_contains) %>% 
+#   group_by(ID) %>%
+#   summarize(NOx = sum(NOx, na.rm = TRUE),
+#             SO2 = sum(SO2, na.rm = TRUE),
+#             PM10 = sum(PM10, na.rm = TRUE),
+#             PM2.5 = sum(PM2.5, na.rm = TRUE),
+#             NMVOC = sum(NMVOC, na.rm = TRUE),
+#             NH3 = sum(NH3, na.rm = TRUE)) %>% 
+#   mutate(ID = as.numeric(ID))
+# st_write(p.1A2e.wine, "Grid/proba3.gpkg")
 
 #'
 #'
@@ -906,12 +972,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.wine, total
 #+ include = FALSE
 source.1A2f <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2f$sources$points <- readxl::read_xlsx(path = source.file, range = "D152:S180", sheet = source.sheet, col_names = header)
-source.1A2f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D182:I182", sheet = source.sheet, col_names = vars)
-source.1A2f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D189:I189", sheet = source.sheet, col_names = vars)
+source.1A2f$sources$points <- readxl::read_xlsx(path = source.file, range = "D153:S181", sheet = source.sheet, col_names = header)
+source.1A2f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D183:I183", sheet = source.sheet, col_names = vars)
+source.1A2f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D190:I190", sheet = source.sheet, col_names = vars)
 
-sf.1A2f <- corsum2sf(source.1A2f, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2f <- corsum2sf(source.1A2f, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -993,12 +1059,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2f, total.1A2f
 
 source.1A2gvi <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D210:S240", sheet = source.sheet, col_names = header)
-source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D253:I253", sheet = source.sheet, col_names = vars)
-source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D258:I258", sheet = source.sheet, col_names = vars)
+source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D208:S232", sheet = source.sheet, col_names = header)
+source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D235:I235", sheet = source.sheet, col_names = vars)
+source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D240:I240", sheet = source.sheet, col_names = vars)
 
-sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1084,12 +1150,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2gvi, total.1A
 #+ include = FALSE
 source.1A2g <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2g$sources$points <- readxl::read_xlsx(path = source.file, range = "D190:S194", sheet = source.sheet, col_names = header)
-source.1A2g$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D202:I202", sheet = source.sheet, col_names = vars)
-source.1A2g$total$inventory <- readxl::read_xlsx(path = source.file, range = "D209:I209", sheet = source.sheet, col_names = vars)
+source.1A2g$sources$points <- readxl::read_xlsx(path = source.file, range = "D191:S195", sheet = source.sheet, col_names = header)
+source.1A2g$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D200:I200", sheet = source.sheet, col_names = vars)
+source.1A2g$total$inventory <- readxl::read_xlsx(path = source.file, range = "D207:I207", sheet = source.sheet, col_names = vars)
 
-sf.1A2g <- corsum2sf(source.1A2g, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2g <- corsum2sf(source.1A2g, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1264,8 +1330,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g
 #+ include = FALSE
 source.1A2gvii <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A2gvii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D268:I268", sheet = source.sheet, col_names = vars)
-source.1A2gvii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D269:I269", sheet = source.sheet, col_names = vars)
+source.1A2gvii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D250:I250", sheet = source.sheet, col_names = vars)
+source.1A2gvii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D251:I251", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
@@ -1283,13 +1349,14 @@ clc133 <- rbind(clc133, clc121)
 clc133 %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
 
 clc133[,vars] <- NA
+clc133 %<>% sf::st_transform(4326)
 clc133.int <- st_intersection(clc133, sf.grid.5km) %>%
-  select(.,vars)
+  dplyr::select(.,vars)
 
 source.1A2gvii$sources$polygon <- clc133.int
 
-sf.1A2gvii <- corsum2sf_polygon(source.1A2gvii, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2gvii <- corsum2sf_polygon(source.1A2gvii, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1344,7 +1411,7 @@ sf.1A2gvii <- sf.1A2gvii %>%
          PM2.5 = ((diff.1A2gvii$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.1A2gvii$NMVOC/sum_Area)*Area),
          NH3 = ((diff.1A2gvii$NH3/sum_Area)*Area))
-sf.1A2gvii %<>% select(vars)
+sf.1A2gvii %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
