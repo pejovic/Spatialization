@@ -205,8 +205,8 @@ source.1A2a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D
 source.1A2a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D34:I34", sheet = source.sheet, col_names = vars)
 
 
-sf.1A2a <- corsum2sf(source.1A2a) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2a <- corsum2sf(source.1A2a) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -288,8 +288,8 @@ source.1A2b$sources$points <- readxl::read_xlsx(path = source.file, range = "D35
 source.1A2b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D49:I49", sheet = source.sheet, col_names = vars)
 source.1A2b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D54:I54", sheet = source.sheet, col_names = vars)
 
-sf.1A2b <- corsum2sf(source.1A2b) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2b <- corsum2sf(source.1A2b) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #'
@@ -372,8 +372,8 @@ source.1A2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D55
 source.1A2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
 source.1A2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
 
-sf.1A2c <- corsum2sf(source.1A2c) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2c <- corsum2sf(source.1A2c) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 sf.1A2c %>% 
@@ -457,8 +457,8 @@ source.1A2d$sources$points <- readxl::read_xlsx(path = source.file, range = "D88
 source.1A2d$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D104:I104", sheet = source.sheet, col_names = vars)
 source.1A2d$total$inventory <- readxl::read_xlsx(path = source.file, range = "D110:I110", sheet = source.sheet, col_names = vars)
 
-sf.1A2d <- corsum2sf(source.1A2d, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2d <- corsum2sf(source.1A2d, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #'
@@ -543,8 +543,8 @@ source.1A2e$sources$points <- readxl::read_xlsx(path = source.file, range = "D11
 source.1A2e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "U152:Z152", sheet = source.sheet, col_names = vars)
 source.1A2e$total$inventory <- readxl::read_xlsx(path = source.file, range = "U152:Z152", sheet = source.sheet, col_names = vars)
 
-sf.1A2e <- corsum2sf(source.1A2e, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2e <- corsum2sf(source.1A2e, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -636,7 +636,7 @@ source.1A2e.bread$total$inventory <- readxl::read_xlsx(path = source.file, range
 
 #+ include = FALSE
 osm.bread <- sf::st_read(dsn = "Data/pekare/OSM_bakery_4326.gpkg") %>%
-  sf::st_transform(32634) %>%
+  #sf::st_transform(32634) %>%
   dplyr::select()
 
 osm.bread$ID <- 1:nrow(osm.bread)
@@ -650,8 +650,8 @@ osm.bread %<>% dplyr::filter(ID != c(50)) %>%
 osm.bread[,vars] <- NA
 source.1A2e.bread$sources$points <- osm.bread %>% dplyr::select(vars)
 
-sf.1A2e.bread <- corsum2sf_point.sf(source.1A2e.bread, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A2e.bread <- corsum2sf_point.sf(source.1A2e.bread, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 
 #'
@@ -1208,14 +1208,20 @@ clc121 <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industri
 # i iskljuceni poligoni iz clc121 koji se preklapaju!!!
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
+sf.1A2a %<>% dplyr::select(vars)
+sf.1A2b %<>% dplyr::select(vars)
+sf.1A2c %<>% dplyr::select(vars)
+sf.1A2d %<>% dplyr::select(vars)
+sf.1A2e %<>% dplyr::select(vars)
+sf.1A2e.bread %<>% dplyr::select(vars) %>% dplyr::rename(geometry = geom)
+sf.1A2f %<>% dplyr::select(vars)
+sf.1A2gvi %<>% dplyr::select(vars)
 # Combine all known points into one sf object
-points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2f, sf.1A2gvi) %>% # , sf.1A2g
-  st_transform(crs = "+init=epsg:32634")
+points_all <- rbind(sf.1A2a, sf.1A2b, sf.1A2c, sf.1A2d, sf.1A2e, sf.1A2e.bread, sf.1A2f, sf.1A2gvi) #%>% # , sf.1A2g
+  #st_transform(crs = "+init=epsg:32634")
 #clc121.otherIndustries <- st_join(clc121, points_all, join = st_intersects) %>%
 #  subset(is.na(NOx) | is.na(SO2) | is.na(PM10) | is.na(PM2.5) | is.na(NMVOC) | is.na(NH3))
-
+clc121 %<>% sf::st_transform(4326)
 clc121.sp <- as(clc121, "Spatial")
 points_all.sp <- as(points_all, "Spatial")
 ind <- over(clc121.sp, points_all.sp)
@@ -1319,7 +1325,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g
   )
 
 #+ include = FALSE
-#st_write(p.1A2g, dsn="Products/1A2 - Industry/1A2g.gpkg", layer='1A2g')
+# st_write(p.1A2g, dsn="Products/1A2 - Industry/1A2g.gpkg", layer='1A2g')
 
 
 #'

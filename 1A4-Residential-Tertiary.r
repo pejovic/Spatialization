@@ -36,6 +36,7 @@ library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
 library(stringr)
+library(s2)
 #' 
 #' 
 #+ include = FALSE
@@ -186,12 +187,14 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A4-Residential-Tertiary"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km) 
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
+
 
 #'
 #'
@@ -268,14 +271,14 @@ sf_final <- st_join(sf_final, sf_opstine, largest = TRUE)
 
 sf_final %<>% dplyr::select(.,grejanje_ukupno, NAME_2)
 sf_final[,vars] <- NA
-
+sf_final %<>% sf::st_transform(4326)
 sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>% 
   filter(!is.na(grejanje_ukupno))
 
 source.1A4ai$sources$polygon <- sf_final.int
 
-sf.1A4ai <- corsum2sf_polygon(source.1A4ai, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A4ai <- corsum2sf_polygon(source.1A4ai, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -419,14 +422,14 @@ sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE)
 
 sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva, NAME_2)
 sf_clc18_urb[,vars] <- NA
-
+sf_clc18_urb %<>% sf::st_transform(4326)
 sf_clc18_urb.int <- st_intersection(sf_clc18_urb, sf.grid.5km) %>% 
   filter(!is.na(Br_domacinstva))
 
 source.1A4bi$sources$polygon <- sf_clc18_urb.int
 
-sf.1A4bi <- corsum2sf_polygon(source.1A4bi, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A4bi <- corsum2sf_polygon(source.1A4bi, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 
 #'
@@ -538,12 +541,13 @@ source.1A4ci$total$inventory <- readxl::read_xlsx(path = source.file, range = "D
 # source.1A4ci$sources$polygon <- sf_clc18_polj.int
 rural_art_zones <- st_read(dsn = "Data/seoska_podrucja_naseljena/rural_artificial_zones.gpkg")
 rural_art_zones[,vars] <- NA
+rural_art_zones %<>% sf::st_transform(4326)
 rural_art_zones.int <- st_intersection(rural_art_zones, sf.grid.5km)
 
 source.1A4ci$sources$polygon <- rural_art_zones.int
 
-sf.1A4ci <- corsum2sf_polygon(source.1A4ci, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A4ci <- corsum2sf_polygon(source.1A4ci, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -682,14 +686,14 @@ sf_rur %<>% st_intersection(., sf_opstine)
 sf_rur %<>% dplyr::select(.,Br_traktori, NAME_2) %>% 
   filter(!is.na(Br_traktori))
 sf_rur[,vars] <- NA
-
+sf_rur %<>% sf::st_transform(4326)
 sf_rur.int <- st_intersection(sf_rur, sf.grid.5km) %>% 
   filter(!is.na(Br_traktori))
 
 source.1A4cii$sources$polygon <- sf_rur.int
 
-sf.1A4cii <- corsum2sf_polygon(source.1A4cii, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A4cii <- corsum2sf_polygon(source.1A4cii, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'

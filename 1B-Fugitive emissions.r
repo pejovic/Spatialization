@@ -36,6 +36,7 @@ library(DT)
 library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
+library(s2)
 #' 
 #' 
 #+ include = FALSE
@@ -218,12 +219,15 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1B-Fugitive emissions"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km) 
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
+
+
 
 #'
 #'
@@ -235,11 +239,11 @@ sf.grid.5km <- st_as_sf(grid.5km)
 source.1B1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 # source.1B1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S21", sheet = source.sheet, col_names = header)
-source.1B1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
-source.1B1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D29:I29", sheet = source.sheet, col_names = vars)
+source.1B1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D18:I18", sheet = source.sheet, col_names = vars)
+source.1B1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D19:I19", sheet = source.sheet, col_names = vars)
 
-sf.1B1a <- corsum2sf(source.1B1a) %>%
-  st_transform(crs = "+init=epsg:32634")
+#sf.1B1a <- corsum2sf(source.1B1a) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #
 ##+ include = FALSE
 #clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
@@ -258,12 +262,14 @@ sf.1B1a <- corsum2sf(source.1B1a) %>%
 
 coal_mining_polygons <- st_read(dsn = "Data/coal_mining/coal_mining_polygons.gpkg")
 coal_mining_polygons[, vars] <- NA
+coal_mining_polygons %<>% sf::st_transform(4326)
+
 coal_mining_polygons.int <- st_intersection(coal_mining_polygons, sf.grid.5km) %>%
   dplyr::select(.,vars)
 source.1B1a$sources$polygon <- coal_mining_polygons.int
 
-sf.1B1a <- corsum2sf_polygon(source.1B1a, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B1a <- corsum2sf_polygon(source.1B1a, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 # st_write(sf.1B1a, dsn="D:/coal_polygons.gpkg", layer='sf.1B1a')
 # st_write(sf.1B1a, dsn="D:/coal_mining_points.gpkg", layer='sf.1B1a')
@@ -368,19 +374,19 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B1a, total.1B1a
 #+ include = FALSE
 source.1B2ai <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1B2ai$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
-source.1B2ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
+source.1B2ai$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D29:I29", sheet = source.sheet, col_names = vars)
+source.1B2ai$total$inventory <- readxl::read_xlsx(path = source.file, range = "D30:I30", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
-source.sheet =  "1A1-Energy"
-header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
-vars <- header[1:6]
+source.file1 = "Pollutant inventory spatialized-d-v3.xlsx"
+source.sheet1 =  "1A1-Energy"
+header1 <- readxl::read_xlsx(path = source.file1, range = "D8:S8", sheet = source.sheet1) %>% names()
+vars1 <- header1[1:6]
 
 source.1A1b <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A1b$sources$points <- readxl::read_xlsx(path = source.file, range = "D47:S50", sheet = source.sheet, col_names = header)
+source.1A1b$sources$points <- readxl::read_xlsx(path = source.file1, range = "D47:S50", sheet = source.sheet1, col_names = header1)
 
 rafineries <-  source.1A1b$sources$points
 
@@ -393,8 +399,8 @@ sum.r_NH3 <- sum(rafineries$NH3)
 
 source.1B2ai$sources$points <- rafineries
 
-sf.1B2ai <- corsum2sf(source.1B2ai, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B2ai <- corsum2sf(source.1B2ai, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 sf.1B2ai$NOx <- 0
 sf.1B2ai$SO2 <- 0
 sf.1B2ai$PM10 <- 0
@@ -493,39 +499,39 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2ai, total.1B2
 #+ include = FALSE
 source.1B2av <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1B2av$sources$points <- readxl::read_xlsx(path = source.file, range = "D42:S42", sheet = source.sheet, col_names = header)
-source.1B2av$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D52:I52", sheet = source.sheet, col_names = vars)
-source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D53:I53", sheet = source.sheet, col_names = vars)
+source.1B2av$sources$points <- readxl::read_xlsx(path = source.file, range = "D31:S31", sheet = source.sheet, col_names = header)
+source.1B2av$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
+source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D40:I41", sheet = source.sheet, col_names = vars)
 
 
-sf.1B2av <- corsum2sf(source.1B2av, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B2av <- corsum2sf(source.1B2av, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 
 # :::::::::::::::::::::::::::::::::::::::::::
 # :::::::::::::::::::::::::::::::::::::::::::
 
 # RAFINERIJE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
-source.sheet =  "1A1-Energy"
-header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
-vars <- header[1:6]
-
-source.1A1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
-
-source.1A1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S37", sheet = source.sheet, col_names = header)
-source.1A1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
-source.1A1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
-
-
-sf.1A1a <- corsum2sf(source.1A1a) %>%
-  st_transform(crs = "+init=epsg:32634") %>%
-                 dplyr::select()
-
+# source.file = "Pollutant inventory spatialized-d-v3.xlsx"
+# source.sheet =  "1A1-Energy"
+# header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
+# vars <- header[1:6]
+# 
+# source.1A1a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
+# 
+# source.1A1a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S37", sheet = source.sheet, col_names = header)
+# source.1A1a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
+# source.1A1a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
+# 
+# 
+# sf.1A1a <- corsum2sf(source.1A1a) %>%
+#   st_transform(crs = "+init=epsg:32634") %>%
+#                  dplyr::select()
+sf.1A1a <- sf.1B2ai
 # :::::::::::::::::::::::::::::::::::::::::::
 # :::::::::::::::::::::::::::::::::::::::::::
 
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1B-Fugitive emissions"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -576,7 +582,7 @@ stanovnistvo$Opština[stanovnistvo$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Br_stanovnistvo <- stanovnistvo$Stanovništvo[match(sf_opstine$NAME_2, stanovnistvo$Opština)]
 
 sf_opstine[,vars] <- NA
-
+sf_opstine %<>% st_transform(4326)
 sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km)  
 
 
@@ -606,19 +612,19 @@ sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE) %>%
 sf.1B2av1 <- sf.1B2av
 
 fuel.s %<>% dplyr::select() %>% dplyr::rename(geometry = geom)
-
+fuel.s %<>% st_transform(4326)
 fuel.s %<>% st_intersection(., sf_opstine.int) %>%
   dplyr::select(Br_stanovnistvo)
 fuel.s[, vars] <- NA
 
 source.1B2av$sources$points <- fuel.s
-sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE)# %>%
+  #st_transform(crs = "+init=epsg:32634")
 
 sf.1B2av2 <- sf.1B2av
-
+sf.1B2av1 %<>% st_transform(4326)
 sf.1B2av <- rbind(sf.1B2av1, sf.1B2av2)
-source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D53:I53", sheet = source.sheet, col_names = vars)
+source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
 
 #'
 #'
@@ -716,15 +722,15 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2av, total.1B2
 #+ include = FALSE
 source.1B2b <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1B2b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D63:I63", sheet = source.sheet, col_names = vars)
-source.1B2b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D64:I64", sheet = source.sheet, col_names = vars)
+source.1B2b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D51:I51", sheet = source.sheet, col_names = vars)
+source.1B2b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D52:I52", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
 
 source.1B2b$sources$points <- rafineries
 
-sf.1B2b <- corsum2sf(source.1B2b, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B2b <- corsum2sf(source.1B2b, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 sf.1B2b$NOx <- 0
 sf.1B2b$SO2 <- 0
 sf.1B2b$PM10 <- 0

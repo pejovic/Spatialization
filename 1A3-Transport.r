@@ -35,6 +35,7 @@ library(DT)
 library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
+library(s2)
 #' 
 #' 
 #+ include = FALSE
@@ -260,12 +261,13 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A3-Transport"
 header <- readxl::read_xlsx(path = source.file, range = "D9:S9", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km) 
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
 
 
 #'
@@ -293,13 +295,13 @@ sf.1A3ai <- corsum2sf(source.1A3ai, distribute = FALSE) %>%
 sf.air <- sf::st_join(sf_clc18_air, sf.1A3ai)
 sf.air %<>% filter(`...10` == 'Aerodrom "Konstantin Veliki" Nis' | `...10` == 'Aerodorm "Nikola Tesla" Beograd') %>% dplyr::select(geometry)
 sf.air[, vars] <- NA
-
+sf.air %<>% sf::st_transform(4326)
 sf.air.int <- st_intersection(sf.air, sf.grid.5km)
 source.1A3ai$sources$points <- NA
 source.1A3ai$sources$polygon <- sf.air.int
 
-sf.1A3ai <- corsum2sf_polygon(source.1A3ai, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A3ai <- corsum2sf_polygon(source.1A3ai, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 
 #'
@@ -407,8 +409,8 @@ source.1A3aii$sources$points <- readxl::read_xlsx(path = source.file, range = "D
 source.1A3aii$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D48:I48", sheet = source.sheet, col_names = vars)
 source.1A3aii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D49:I49", sheet = source.sheet, col_names = vars)
 
-sf.1A3aii <- corsum2sf(source.1A3aii, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A3aii <- corsum2sf(source.1A3aii, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -501,10 +503,10 @@ sf_urban_roads <- st_as_sf(urban_roads) %>%
 
 
 sf_urban_roads[,vars] <- NA
-
+sf_urban_roads %<>% sf::st_transform(4326)
 sf_urban_roads.int <- st_intersection(sf_urban_roads, sf.grid.5km) %>%
-  select(.,vars) %>%
-  mutate(Length = st_length(.))
+  dplyr::select(.,vars) %>%
+  dplyr::mutate(Length = st_length(.))
 
 
 source.1A3bi_U$sources$lines <- sf_urban_roads.int
@@ -561,7 +563,7 @@ sf.1A3bi_U <- sf.1A3bi_U %>%
          PM2.5 = ((diff.1A3bi_U$PM2.5/sum_LengthUrban)*Length),
          NMVOC = ((diff.1A3bi_U$NMVOC/sum_LengthUrban)*Length),
          NH3 = ((diff.1A3bi_U$NH3/sum_LengthUrban)*Length))
-sf.1A3bi_U %<>% select(vars)
+sf.1A3bi_U %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -618,7 +620,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -679,7 +681,7 @@ sf.1A3bi_R <- sf.1A3bi_R %>%
          PM2.5 = ((diff.1A3bi_R$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3bi_R$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3bi_R$NH3/sum_PGDSL)*PGDSL))
-sf.1A3bi_R %<>% select(vars)
+sf.1A3bi_R %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -736,7 +738,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% sf::st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -797,7 +799,7 @@ sf.1A3bi_H <- sf.1A3bi_H %>%
          PM2.5 = ((diff.1A3bi_H$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3bi_H$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3bi_H$NH3/sum_PGDSL)*PGDSL))
-sf.1A3bi_H %<>% select(vars)
+sf.1A3bi_H %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -914,7 +916,7 @@ sf.1A3bii_U <- sf.1A3bii_U %>%
          PM2.5 = ((diff.1A3bii_U$PM2.5/sum_LengthUrban)*Length),
          NMVOC = ((diff.1A3bii_U$NMVOC/sum_LengthUrban)*Length),
          NH3 = ((diff.1A3bii_U$NH3/sum_LengthUrban)*Length))
-sf.1A3bii_U %<>% select(vars)
+sf.1A3bii_U %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -967,7 +969,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% sf::st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -1027,7 +1029,7 @@ sf.1A3bii_R <- sf.1A3bii_R %>%
          PM2.5 = ((diff.1A3bii_R$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3bii_R$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3bii_R$NH3/sum_PGDSL)*PGDSL))
-sf.1A3bii_R %<>% select(vars)
+sf.1A3bii_R %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1083,7 +1085,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% sf::st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -1144,7 +1146,7 @@ sf.1A3bii_H <- sf.1A3bii_H %>%
          PM2.5 = ((diff.1A3bii_H$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3bii_H$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3bii_H$NH3/sum_PGDSL)*PGDSL))
-sf.1A3bii_H %<>% select(vars)
+sf.1A3bii_H %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1258,7 +1260,7 @@ sf.1A3biii_U <- sf.1A3biii_U %>%
          PM2.5 = ((diff.1A3biii_U$PM2.5/sum_LengthUrban)*Length),
          NMVOC = ((diff.1A3biii_U$NMVOC/sum_LengthUrban)*Length),
          NH3 = ((diff.1A3biii_U$NH3/sum_LengthUrban)*Length))
-sf.1A3biii_U %<>% select(vars)
+sf.1A3biii_U %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1312,6 +1314,7 @@ sf_roads[,vars] <- NA
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
 
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -1371,7 +1374,7 @@ sf.1A3biii_R <- sf.1A3biii_R %>%
          PM2.5 = ((diff.1A3biii_R$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3biii_R$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3biii_R$NH3/sum_PGDSL)*PGDSL))
-sf.1A3biii_R %<>% select(vars)
+sf.1A3biii_R %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1428,6 +1431,7 @@ sf_roads[,vars] <- NA
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
 
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -1488,7 +1492,7 @@ sf.1A3biii_H <- sf.1A3biii_H %>%
          PM2.5 = ((diff.1A3biii_H$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3biii_H$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3biii_H$NH3/sum_PGDSL)*PGDSL))
-sf.1A3biii_H %<>% select(vars)
+sf.1A3biii_H %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1606,7 +1610,7 @@ sf.1A3biii_bc_U <- sf.1A3biii_bc_U %>%
          PM2.5 = ((diff.1A3biii_bc_U$PM2.5/sum_LengthUrban)*Length),
          NMVOC = ((diff.1A3biii_bc_U$NMVOC/sum_LengthUrban)*Length),
          NH3 = ((diff.1A3biii_bc_U$NH3/sum_LengthUrban)*Length))
-sf.1A3biii_bc_U %<>% select(vars)
+sf.1A3biii_bc_U %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1659,6 +1663,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
+sf_roads %<>% st_transform(4326)
 
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
@@ -1719,7 +1724,7 @@ sf.1A3biii_bc_R <- sf.1A3biii_bc_R %>%
          PM2.5 = ((diff.1A3biii_bc_R$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3biii_bc_R$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3biii_bc_R$NH3/sum_PGDSL)*PGDSL))
-sf.1A3biii_bc_R %<>% select(vars)
+sf.1A3biii_bc_R %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1775,7 +1780,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% st_transform(4326) 
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -1836,7 +1841,7 @@ sf.1A3biii_bc_H <- sf.1A3biii_bc_H %>%
          PM2.5 = ((diff.1A3biii_bc_H$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3biii_bc_H$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3biii_bc_H$NH3/sum_PGDSL)*PGDSL))
-sf.1A3biii_bc_H %<>% select(vars)
+sf.1A3biii_bc_H %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1950,7 +1955,7 @@ sf.1A3biv_U <- sf.1A3biv_U %>%
          PM2.5 = ((diff.1A3biv_U$PM2.5/sum_LengthUrban)*Length),
          NMVOC = ((diff.1A3biv_U$NMVOC/sum_LengthUrban)*Length),
          NH3 = ((diff.1A3biv_U$NH3/sum_LengthUrban)*Length))
-sf.1A3biv_U %<>% select(vars)
+sf.1A3biv_U %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2002,7 +2007,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -2062,7 +2067,7 @@ sf.1A3biv_R <- sf.1A3biv_R %>%
          PM2.5 = ((diff.1A3biv_R$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3biv_R$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3biv_R$NH3/sum_PGDSL)*PGDSL))
-sf.1A3biv_R %<>% select(vars)
+sf.1A3biv_R %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2118,7 +2123,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -2179,7 +2184,7 @@ sf.1A3biv_H <- sf.1A3biv_H %>%
          PM2.5 = ((diff.1A3biv_H$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3biv_H$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3biv_H$NH3/sum_PGDSL)*PGDSL))
-sf.1A3biv_H %<>% select(vars)
+sf.1A3biv_H %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2295,7 +2300,7 @@ sf.1A3bv_U <- sf.1A3bv_U %>%
          PM2.5 = ((diff.1A3bv_U$PM2.5/sum_LengthUrban)*Length),
          NMVOC = ((diff.1A3bv_U$NMVOC/sum_LengthUrban)*Length),
          NH3 = ((diff.1A3bv_U$NH3/sum_LengthUrban)*Length))
-sf.1A3bv_U %<>% select(vars)
+sf.1A3bv_U %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2347,7 +2352,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -2407,7 +2412,7 @@ sf.1A3bv_R <- sf.1A3bv_R %>%
          PM2.5 = ((diff.1A3bv_R$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3bv_R$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3bv_R$NH3/sum_PGDSL)*PGDSL))
-sf.1A3bv_R %<>% select(vars)
+sf.1A3bv_R %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2463,7 +2468,7 @@ sf_roads[,vars] <- NA
 
 sf_roads <- dplyr::mutate(sf_roads, PGDS = PGDS_2015.est)
 sf_roads$PGDS[sf_roads$is.PGDS] <- sf_roads$PGDS_2015[sf_roads$is.PGDS]
-
+sf_roads %<>% st_transform(4326)
 sf_roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars, PGDS) %>%
   mutate(Length = st_length(.), PGDSL = PGDS*Length/1000) %>%
@@ -2524,7 +2529,7 @@ sf.1A3bv_H <- sf.1A3bv_H %>%
          PM2.5 = ((diff.1A3bv_H$PM2.5/sum_PGDSL)*PGDSL),
          NMVOC = ((diff.1A3bv_H$NMVOC/sum_PGDSL)*PGDSL),
          NH3 = ((diff.1A3bv_H$NH3/sum_PGDSL)*PGDSL))
-sf.1A3bv_H %<>% select(vars)
+sf.1A3bv_H %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2579,14 +2584,15 @@ sf_roads <- st_as_sf(roads) %>%
 
 
 sf_roads[,vars] <- NA
+sf_roads %<>% st_transform(4326)
 roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
-  select(.,vars)%>%
-  mutate(Length = st_length(.)) %>%
+  dplyr::select(.,vars)%>%
+  dplyr::mutate(Length = st_length(.)) %>%
   dplyr::select(.,vars, Length)
 
 source.1A3bvi$sources$lines <- roads.int
-sf.1A3bvi <- corsum2sf_lines(source.1A3bvi, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A3bvi <- corsum2sf_lines(source.1A3bvi, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2638,7 +2644,7 @@ sf.1A3bvi <- sf.1A3bvi %>%
          PM2.5 = ((diff.1A3bvi$PM2.5/sum_Length)*Length),
          NMVOC = ((diff.1A3bvi$NMVOC/sum_Length)*Length),
          NH3 = ((diff.1A3bvi$NH3/sum_PGDSL)*Length))
-sf.1A3bvi %<>% select(vars)
+sf.1A3bvi %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2685,8 +2691,8 @@ source.1A3bvii$total$spatialize <- readxl::read_xlsx(path = source.file, range =
 source.1A3bvii$total$inventory <- readxl::read_xlsx(path = source.file, range = "D149:I149", sheet = source.sheet, col_names = vars)
 
 source.1A3bvii$sources$lines <- roads.int
-sf.1A3bvii <- corsum2sf_lines(source.1A3bvii, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A3bvii <- corsum2sf_lines(source.1A3bvii, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2738,7 +2744,7 @@ sf.1A3bvii <- sf.1A3bvii %>%
          PM2.5 = ((diff.1A3bvii$PM2.5/sum_Length)*Length),
          NMVOC = ((diff.1A3bvii$NMVOC/sum_Length)*Length),
          NH3 = ((diff.1A3bvii$NH3/sum_PGDSL)*Length))
-sf.1A3bvii %<>% select(vars)
+sf.1A3bvii %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2789,15 +2795,15 @@ railways <- readOGR("Data/pruge/Pruge_osm_32634.shp",
                  use_iconv=TRUE,  
                  encoding = "UTF-8",
                  stringsAsFactors = FALSE)
-sf_railways <- st_as_sf(railways) %>%
-  st_transform(crs = "+init=epsg:32634") 
+sf_railways <- st_as_sf(railways) #%>%
+  #st_transform(crs = "+init=epsg:32634") 
 
 
 sf_railways[,vars] <- NA
-
+sf_railways %<>% st_transform(4326)
 sf_railways.int <- st_intersection(sf_railways, sf.grid.5km) %>%
-  select(.,vars) %>%
-  mutate(Length = st_length(.))
+  dplyr::select(.,vars) %>%
+  dplyr::mutate(Length = st_length(.))
 
 
 source.1A3c$sources$lines <- sf_railways.int
@@ -2854,7 +2860,7 @@ sf.1A3c <- sf.1A3c %>%
          PM2.5 = ((diff.1A3c$PM2.5/sum_Length)*Length),
          NMVOC = ((diff.1A3c$NMVOC/sum_Length)*Length),
          NH3 = ((diff.1A3c$NH3/sum_Length)*Length))
-sf.1A3c %<>% select(vars)
+sf.1A3c %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2905,11 +2911,12 @@ n.navigation <- readOGR("Data/plovni_putevi/Plovni_putevi_32634.shp",
                     use_iconv=TRUE,  
                     encoding = "UTF-8",
                     stringsAsFactors = FALSE)
-sf_navigation <- st_as_sf(n.navigation) %>%
-  st_transform(crs = "+init=epsg:32634") 
+sf_navigation <- st_as_sf(n.navigation) #%>%
+  #st_transform(crs = "+init=epsg:32634") 
 sf_navigation[,vars] <- NA
+sf_navigation %<>% st_transform(4326)
 sf_navigation.int <- st_intersection(sf_navigation, sf.grid.5km) %>%
-  select(.,vars)
+  dplyr::select(.,vars)
 source.1A3dii$sources$polygon <- sf_navigation.int
 sf.1A3dii <- corsum2sf_polygon(source.1A3dii, distribute = FALSE)
 
@@ -2939,7 +2946,7 @@ sum.1A3dii <- sf.1A3dii %>%
   dplyr::select(., vars) %>% 
   apply(., 2, sum) %>% 
   t(.) %>% 
-  as.data.frame() %>%``
+  as.data.frame() %>%
   dplyr::mutate_if(is.numeric, round, 2)
 total.1A3dii <- source.1A3dii[[2]][[2]][, vars] %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
@@ -2966,7 +2973,7 @@ sf.1A3dii <- sf.1A3dii %>%
          PM2.5 = ((diff.1A3dii$PM2.5/sum_Area)*Area),
          NMVOC = ((diff.1A3dii$NMVOC/sum_Area)*Area),
          NH3 = ((diff.1A3dii$NH3/sum_Area)*Area))
-sf.1A3dii %<>% select(vars)
+sf.1A3dii %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE

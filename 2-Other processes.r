@@ -37,6 +37,7 @@ library(rgdal)
 library(SerbianCyrLat)
 library(raster)
 library(stars)
+library(s2)
 #' 
 #' 
 #+ include = FALSE
@@ -217,12 +218,15 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "2-Other processes"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km) 
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
+
+
 
 #'
 #'
@@ -233,14 +237,13 @@ sf.grid.5km <- st_as_sf(grid.5km)
 #+ include = FALSE
 source.2A5a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S15", sheet = source.sheet, col_names = header)
+source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S19", sheet = source.sheet, col_names = header)
 source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
 source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
 
   
-sf.2A5a <- corsum2sf(source.2A5a, distribute = FALSE) %>%
-   st_transform(crs = "+init=epsg:32634")
-
+sf.2A5a <- corsum2sf(source.2A5a, distribute = FALSE) #%>%
+   #st_transform(crs = "+init=epsg:32634")
 #st_write(sf.2A5a, dsn="D:/other_than_coal.gpkg", layer='sf.2A5a')
 
 
@@ -323,6 +326,7 @@ clc131.quarries <- sf::st_read(dsn = "Data/mineral_sites_quarries/clc131_without
 clc131.quarries %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
 
 clc131.quarries[,vars] <- NA
+clc131.quarries %<>% sf::st_transform(4326)
 clc131.quarries.int <- st_intersection(clc131.quarries, sf.grid.5km) %>%
   dplyr::select(.,vars)
 
@@ -360,8 +364,8 @@ clc131.quarries.int$ID <- dplyr::row_number(clc131.quarries.int$NOx)
 source.2A5a$sources$points <- NA
 source.2A5a$sources$polygon <- clc131.quarries.int
 
-sf.2A5a <- corsum2sf_polygon(source.2A5a, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2A5a <- corsum2sf_polygon(source.2A5a, distribute = FALSE)#%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -538,13 +542,14 @@ sf_final <- st_join(sf.final, sf_opstine, largest = TRUE)
 
 sf_final %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
 sf_final[,vars] <- NA
+sf_final %<>% sf::st_transform(4326)
 
 sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>%
   filter(!is.na(Br_stanovnistvo))
 source.2A5b$sources$polygon <- sf_final.int
 
-sf.2A5b <- corsum2sf_polygon(source.2A5b, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2A5b <- corsum2sf_polygon(source.2A5b, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -599,7 +604,7 @@ sf.2A5b <- sf.2A5b %>%
          PM2.5 = ((diff.2A5b$PM2.5/sum_s)*Br_stanovnistvo),
          NMVOC = ((diff.2A5b$NMVOC/sum_s)*Br_stanovnistvo),
          NH3 = ((diff.2A5b$NH3/sum_s)*Br_stanovnistvo))
-sf.2A5b %<>% select(vars)
+sf.2A5b %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -673,11 +678,13 @@ source.2A5c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D5
 # sf.2A5c <- corsum2sf_lines(source.2A5c, distribute = FALSE) %>%
 #   st_transform(crs = "+init=epsg:32634")
 
-
+clc131.quarries[, vars] <- 0
+clc131.quarries.int <- st_intersection(clc131.quarries, sf.grid.5km) %>%
+  dplyr::select(.,vars)
 source.2A5c$sources$polygon <- clc131.quarries.int
 
-sf.2A5c <- corsum2sf_polygon(source.2A5c, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2A5c <- corsum2sf_polygon(source.2A5c, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 
 #'
@@ -807,14 +814,19 @@ source.2D3b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D
 source.2D3b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D73:I73", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-
+roads <- readOGR("Data/putevi/Saobracajne_deonice_i_odseci_sa_brojaca.shp", 
+                 use_iconv=TRUE,  
+                 encoding = "UTF-8",
+                 stringsAsFactors = FALSE)
+sf_roads <- st_as_sf(roads) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 sf_roads[,vars] <- NA
 roads.int <- st_intersection(sf_roads, sf.grid.5km) %>%
   dplyr::select(.,vars)
 
 source.2D3b$sources$lines <- roads.int
-sf.2D3b <- corsum2sf_lines(source.2D3b, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3b <- corsum2sf_lines(source.2D3b, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -866,7 +878,7 @@ sf.2D3b <- sf.2D3b %>%
          PM2.5 = ((diff.2D3b$PM2.5/sum_Length)*Length),
          NMVOC = ((diff.2D3b$NMVOC/sum_Length)*Length),
          NH3 = ((diff.2D3b$NH3/sum_Length)*Length))
-sf.2D3b %<>% select(vars)
+sf.2D3b %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -896,7 +908,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3b, total.2D3b
   )
 
 #+ include = FALSE
-# st_write(p.2D3b, dsn="Products/2 - Other processes/2D3b.gpkg", layer='2D3b')
+#st_write(p.2D3b, dsn="Products/2 - Other processes/2D3b.gpkg", layer='2D3b')
 
 #'
 #'
@@ -907,13 +919,13 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3b, total.2D3b
 #+ include = FALSE
 source.2D3c <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2D3c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D40:I40", sheet = source.sheet, col_names = vars)
+source.2D3c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
 source.2D3c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D74:I74", sheet = source.sheet, col_names = vars)
 
 source.2D3c$sources$polygon <- sf_final.int
 
-sf.2D3c <- corsum2sf_polygon(source.2D3c, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3c <- corsum2sf_polygon(source.2D3c, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -968,7 +980,7 @@ sf.2D3c <- sf.2D3c %>%
          PM2.5 = ((diff.2D3c$PM2.5/sum_s)*Br_stanovnistvo),
          NMVOC = ((diff.2D3c$NMVOC/sum_s)*Br_stanovnistvo),
          NH3 = ((diff.2D3c$NH3/sum_s)*Br_stanovnistvo))
-sf.2D3c %<>% select(vars)
+sf.2D3c %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -1027,13 +1039,14 @@ pop.dens.sf <- st_as_sf(pop.dens.spdf)
 pop.dens.sf %<>% dplyr::filter(., !(popdens_32634 == 251))
 
 # Ukloniti tacke izvan grida za Srbiju
+pop.dens.sf %<>% sf::st_transform(4326)
 pop.dens.sf %<>% st_intersection(., sf.grid.5km)
 
 pop.dens.sf[,vars] <- NA
 source.2D3d.pfc$sources$points <- pop.dens.sf
 
-sf.2D3d.pfc <- corsum2sf_point.sf(source.2D3d.pfc, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3d.pfc <- corsum2sf_point.sf(source.2D3d.pfc, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1143,13 +1156,14 @@ clc121 <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Indu
 clc121 %<>% dplyr::mutate(Area_Ha = unclass(st_area(.)/10000), SHAPE_Area = unclass(st_area(.)))
 
 clc121[,vars] <- NA
+clc121 %<>% sf::st_transform(4326)
 clc121.int <- st_intersection(clc121, sf.grid.5km) %>%
   dplyr::select(.,vars)
 
 source.2D3d.cbtlf$sources$polygon <- clc121.int
 
-sf.2D3d.cbtlf <- corsum2sf_polygon(source.2D3d.cbtlf, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3d.cbtlf <- corsum2sf_polygon(source.2D3d.cbtlf, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1249,12 +1263,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3d.cbtlf, tota
 source.2D3g.rp <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3g.rp$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3g.rp$total$inventory <- readxl::read_xlsx(path = source.file, range = "D81:I81", sheet = source.sheet, col_names = vars)
+source.2D3g.rp$total$inventory <- readxl::read_xlsx(path = source.file, range = "D80:I80", sheet = source.sheet, col_names = vars)
 
 source.2D3g.rp$sources$polygon <- clc121.int
 
-sf.2D3g.rp <- corsum2sf_polygon(source.2D3g.rp, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3g.rp <- corsum2sf_polygon(source.2D3g.rp, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1355,12 +1369,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.rp, total.2
 source.2D3g.pigm <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3g.pigm$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3g.pigm$total$inventory <- readxl::read_xlsx(path = source.file, range = "D82:I82", sheet = source.sheet, col_names = vars)
+source.2D3g.pigm$total$inventory <- readxl::read_xlsx(path = source.file, range = "D81:I81", sheet = source.sheet, col_names = vars)
 
 source.2D3g.pigm$sources$polygon <- clc121.int
 
-sf.2D3g.pigm <- corsum2sf_polygon(source.2D3g.pigm, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3g.pigm <- corsum2sf_polygon(source.2D3g.pigm, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1462,12 +1476,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.pigm, total
 source.2D3g.ms <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3g.ms$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3g.ms$total$inventory <- readxl::read_xlsx(path = source.file, range = "D83:I83", sheet = source.sheet, col_names = vars)
+source.2D3g.ms$total$inventory <- readxl::read_xlsx(path = source.file, range = "D82:I82", sheet = source.sheet, col_names = vars)
 
 source.2D3g.ms$sources$polygon <- clc121.int
 
-sf.2D3g.ms <- corsum2sf_polygon(source.2D3g.ms, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3g.ms <- corsum2sf_polygon(source.2D3g.ms, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1570,12 +1584,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.ms, total.2
 source.2D3g.lt <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3g.lt$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3g.lt$total$inventory <- readxl::read_xlsx(path = source.file, range = "D84:I84", sheet = source.sheet, col_names = vars)
+source.2D3g.lt$total$inventory <- readxl::read_xlsx(path = source.file, range = "D83:I83", sheet = source.sheet, col_names = vars)
 
 source.2D3g.lt$sources$polygon <- clc121.int
 
-sf.2D3g.lt <- corsum2sf_polygon(source.2D3g.lt, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3g.lt <- corsum2sf_polygon(source.2D3g.lt, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1678,12 +1692,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.lt, total.2
 source.2D3i.feneox <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3i.feneox$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3i.feneox$total$inventory <- readxl::read_xlsx(path = source.file, range = "D86:I86", sheet = source.sheet, col_names = vars)
+source.2D3i.feneox$total$inventory <- readxl::read_xlsx(path = source.file, range = "D84:I84", sheet = source.sheet, col_names = vars)
 
 source.2D3i.feneox$sources$polygon <- clc121.int
 
-sf.2D3i.feneox <- corsum2sf_polygon(source.2D3i.feneox, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3i.feneox <- corsum2sf_polygon(source.2D3i.feneox, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1790,12 +1804,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.feneox, tot
 source.2D3i.pow <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3i.pow$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3i.pow$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
+source.2D3i.pow$total$inventory <- readxl::read_xlsx(path = source.file, range = "D85:I85", sheet = source.sheet, col_names = vars)
 
 source.2D3i.pow$sources$points <- pop.dens.sf
 
-sf.2D3i.pow <- corsum2sf_point.sf(source.2D3i.pow, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3i.pow <- corsum2sf_point.sf(source.2D3i.pow, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -1899,13 +1913,13 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.pow, total.
 source.2D3i.utcv <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3i.utcv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3i.utcv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D88:I88", sheet = source.sheet, col_names = vars)
+source.2D3i.utcv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D86:I86", sheet = source.sheet, col_names = vars)
 
 
 source.2D3i.utcv$sources$polygon <- clc121.int
 
-sf.2D3i.utcv <- corsum2sf_polygon(source.2D3i.utcv, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3i.utcv <- corsum2sf_polygon(source.2D3i.utcv, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2014,12 +2028,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.utcv, total
 source.2D3i.t <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3i.t$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3i.t$total$inventory <- readxl::read_xlsx(path = source.file, range = "D89:I89", sheet = source.sheet, col_names = vars)
+source.2D3i.t$total$inventory <- readxl::read_xlsx(path = source.file, range = "D87:I87", sheet = source.sheet, col_names = vars)
 
 source.2D3i.t$sources$points <- pop.dens.sf
 
-sf.2D3i.t <- corsum2sf_point.sf(source.2D3i.t, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3i.t <- corsum2sf_point.sf(source.2D3i.t, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2121,12 +2135,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.t, total.2D
 source.2D3i.uos <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3i.uos$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3i.uos$total$inventory <- readxl::read_xlsx(path = source.file, range = "D90:I90", sheet = source.sheet, col_names = vars)
+source.2D3i.uos$total$inventory <- readxl::read_xlsx(path = source.file, range = "D88:I88", sheet = source.sheet, col_names = vars)
 
 source.2D3i.uos$sources$points <- pop.dens.sf
 
-sf.2D3i.uos <- corsum2sf_point.sf(source.2D3i.uos, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3i.uos <- corsum2sf_point.sf(source.2D3i.uos, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2226,30 +2240,30 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.uos, total.
 source.2D3a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D92:I92", sheet = source.sheet, col_names = vars)
+source.2D3a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D89:I89", sheet = source.sheet, col_names = vars)
 
 
 
-library(raster)
-library(stars)
-#+ include = FALSE
-
-pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/popdens_32634.tif")
-pop_star <- st_as_stars(pop_raster)
-
-pop.dens.spdf <- as(pop_raster, "SpatialPixelsDataFrame") 
-
-pop.dens.sf <- st_as_sf(pop.dens.spdf)
-pop.dens.sf %<>% dplyr::filter(., !(popdens_32634 == 251))
-
-# Ukloniti tacke izvan grida za Srbiju
-pop.dens.sf %<>% st_intersection(., sf.grid.5km)
-
-pop.dens.sf[,vars] <- NA
+# library(raster)
+# library(stars)
+# #+ include = FALSE
+# 
+# pop_raster <- raster("Version_2_update/Spatialization/Proxy_data_new/popdens_32634.tif")
+# pop_star <- st_as_stars(pop_raster)
+# 
+# pop.dens.spdf <- as(pop_raster, "SpatialPixelsDataFrame") 
+# 
+# pop.dens.sf <- st_as_sf(pop.dens.spdf)
+# pop.dens.sf %<>% dplyr::filter(., !(popdens_32634 == 251))
+# 
+# # Ukloniti tacke izvan grida za Srbiju
+# pop.dens.sf %<>% st_intersection(., sf.grid.5km)
+# 
+# pop.dens.sf[,vars] <- NA
 source.2D3a$sources$points <- pop.dens.sf
 
-sf.2D3a <- corsum2sf_point.sf(source.2D3a, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3a <- corsum2sf_point.sf(source.2D3a, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2347,12 +2361,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3a, total.2D3a
 source.2D3e <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3e$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3e$total$inventory <- readxl::read_xlsx(path = source.file, range = "D93:I93", sheet = source.sheet, col_names = vars)
+source.2D3e$total$inventory <- readxl::read_xlsx(path = source.file, range = "D90:I90", sheet = source.sheet, col_names = vars)
 
 source.2D3e$sources$polygon <- clc121.int
 
-sf.2D3e <- corsum2sf_polygon(source.2D3e, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3e <- corsum2sf_polygon(source.2D3e, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2450,12 +2464,21 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3e, total.2D3e
 source.2D3f <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D94:I94", sheet = source.sheet, col_names = vars)
-#sf_clc18_urb[,vars] <- NA # za kartu
-source.2D3f$sources$polygon <- sf_clc18_urb.int
+source.2D3f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D91:I91", sheet = source.sheet, col_names = vars)
 
-sf.2D3f <- corsum2sf_polygon(source.2D3f, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf_opstine %<>% sf::st_transform(4326)
+sf_final.urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
+
+sf_final.urb %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
+sf_final.urb[,vars] <- NA
+
+sf_final.int.urb <- st_intersection(sf_final.urb, sf.grid.5km) %>%
+  filter(!is.na(Br_stanovnistvo))
+
+source.2D3f$sources$polygon <- sf_final.int.urb
+
+sf.2D3f <- corsum2sf_polygon(source.2D3f, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2510,7 +2533,7 @@ sf.2D3f <- sf.2D3f %>%
          PM2.5 = ((diff.2D3f$PM2.5/sum_s)*Br_stanovnistvo),
          NMVOC = ((diff.2D3f$NMVOC/sum_s)*Br_stanovnistvo),
          NH3 = ((diff.2D3f$NH3/sum_s)*Br_stanovnistvo))
-sf.2D3f %<>% select(vars)
+sf.2D3f %<>% dplyr::select(vars)
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
@@ -2553,12 +2576,12 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3f, total.2D3f
 source.2D3h <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
 source.2D3h$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
-source.2D3h$total$inventory <- readxl::read_xlsx(path = source.file, range = "D95:I95", sheet = source.sheet, col_names = vars)
+source.2D3h$total$inventory <- readxl::read_xlsx(path = source.file, range = "D92:I92", sheet = source.sheet, col_names = vars)
 
 source.2D3h$sources$polygon <- clc121.int
 
-sf.2D3h <- corsum2sf_polygon(source.2D3h, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2D3h <- corsum2sf_polygon(source.2D3h, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2657,8 +2680,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3h, total.2D3h
 
 source.2I <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2I$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D113:I113", sheet = source.sheet, col_names = vars)
-source.2I$total$inventory <- readxl::read_xlsx(path = source.file, range = "D114:I114", sheet = source.sheet, col_names = vars)
+source.2I$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D110:I110", sheet = source.sheet, col_names = vars)
+source.2I$total$inventory <- readxl::read_xlsx(path = source.file, range = "D111:I111", sheet = source.sheet, col_names = vars)
 
 
 #+ include = FALSE
@@ -2709,18 +2732,18 @@ sf_opstine$tcp <- wood$`Tehničko_četinara_procenat`[match(sf_opstine$NAME_2, w
 
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634")
-sf_final <- st_join(sf_final, sf_opstine, largest = TRUE) 
+sf_final <- st_join(sf.final, sf_opstine, largest = TRUE) 
 
 sf_final %<>% dplyr::select(.,pl, pc, tlp, tcp)
 sf_final[,vars] <- NA
-
+sf_final %<>% sf::st_transform(4326)
 sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>%
   filter(!is.na(pl) & !is.na(pc) & !is.na(tlp) & !is.na(tcp))
 
 source.2I$sources$polygon <- sf_final.int
 
-sf.2I <- corsum2sf_polygon(source.2I, distribute = FALSE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.2I <- corsum2sf_polygon(source.2I, distribute = FALSE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'

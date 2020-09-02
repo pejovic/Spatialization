@@ -36,6 +36,7 @@ library(mapview)
 library(rgdal)
 library(SerbianCyrLat)
 library(stringr)
+library(s2)
 #' 
 #' 
 #+ include = FALSE
@@ -218,13 +219,13 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d30102019.xlsx"
+source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "5-Waste"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km) 
-
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
 
 #'
 #'
@@ -244,13 +245,13 @@ sf_clc18 <- st_as_sf(clc_18)
 clc132 <- subset(sf_clc18, CODE_18 == "132") %>% # Dump sites
   st_transform(32634)
 clc132[,vars] <- NA
-
+clc132 %<>% st_transform(4326)
 clc132.int <- st_intersection(clc132, sf.grid.5km) %>% # Intersection with grid cells
   dplyr::select(.,vars)
 
 source.5A$sources$polygon <- clc132.int
-sf.5A <- corsum2sf_polygon(source.5A, distribute = FALSE) %>% # Preparing data for final spatialization
-  st_transform(crs = "+init=epsg:32634")
+sf.5A <- corsum2sf_polygon(source.5A, distribute = FALSE) #%>% # Preparing data for final spatialization
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -351,8 +352,8 @@ source.5C1bv$sources$points <- readxl::read_xlsx(path = source.file, range = "D2
 source.5C1bv$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D34:I34", sheet = source.sheet, col_names = vars)
 source.5C1bv$total$inventory <- readxl::read_xlsx(path = source.file, range = "D35:I35", sheet = source.sheet, col_names = vars)
 
-sf.5C1bv <- corsum2sf(source.5C1bv, distribute = TRUE) %>% # Preparing data for final spatialization
-  st_transform(crs = "+init=epsg:32634")
+sf.5C1bv <- corsum2sf(source.5C1bv, distribute = TRUE) #%>% # Preparing data for final spatialization
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -469,13 +470,13 @@ sf_opstine[,vars] <- NA
 
 urbana <- sf::st_read("GIS_layers/Urban_areas.gpkg")
 urbana_opstine <- st_join(urbana, sf_opstine, join = st_intersects)
-
+urbana_opstine %<>% st_transform(4326)
 sf_opstine.int <- st_intersection(urbana_opstine, sf.grid.5km) %>%
   filter(!is.na(Otpadne_vode))
 
 source.5D1$sources$polygon <- sf_opstine.int
-sf.5D1 <- corsum2sf_polygon(source.5D1, distribute = FALSE) %>% # Preparing data for final spatialization
-  st_transform(crs = "+init=epsg:32634")
+sf.5D1 <- corsum2sf_polygon(source.5D1, distribute = FALSE) #%>% # Preparing data for final spatialization
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -591,17 +592,16 @@ sf.waste[,vars] <- NA
 sf.waste$ID <- 1:nrow(sf.waste)
 
 sf.waste.oI.cen <- st_centroid(sf.waste) %>%
-  select(ID, Area_Ha, SHAPE_Area, NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
-  rename(ID_CLC = ID)
-
+  dplyr::select(ID, Area_Ha, SHAPE_Area, NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  dplyr::rename(ID_CLC = ID)
+sf.waste.oI.cen %<>% st_transform(4326)
 sf.waste.oI.cen <- st_join(sf.waste.oI.cen, sf.grid.5km) %>%
   subset(!is.na(ID))
 
 sf.waste.oI.cen %<>% dplyr::select(vars)
-
 source.5D2$sources$points <- sf.waste.oI.cen
-sf.5D2 <- corsum2sf_point.sf(source.5D2, distribute = TRUE) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.5D2 <- corsum2sf_point.sf(source.5D2, distribute = TRUE) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 
 
