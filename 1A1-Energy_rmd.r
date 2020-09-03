@@ -35,6 +35,7 @@ library(kableExtra)
 library(DT)
 library(mapview)
 library(rgdal)
+library(s2)
 
 #' 
 #' 
@@ -116,8 +117,13 @@ source.file = "Pollutant inventory spatialized-d-v3.xlsx"
 source.sheet =  "1A1-Energy"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
-grid.5km <- readOGR("Grid/Grid_5km_Serbia_new.gpkg")
+#grid.5km <- readOGR("Grid/Grid_5km_Serbia_new.gpkg")
+#sf.grid.5km <- st_as_sf(grid.5km)
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
 sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
+
+
 #'
 #'
 #' ## 1A1a - Public electricity production
@@ -132,8 +138,8 @@ source.1A1a_ep$total$spatialize <- readxl::read_xlsx(path = source.file, range =
 source.1A1a_ep$total$inventory <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
 
 
-sf.1A1a_ep <- corsum2sf(source.1A1a_ep) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A1a_ep <- corsum2sf(source.1A1a_ep) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -207,7 +213,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1a_ep, total.1
 
 # p.1A1a_ep %>% dplyr::arrange(., ID)
 #+ include = FALSE
-p.1A1a_ep %<>% sf::st_transform(4326)
+#p.1A1a_ep %<>% sf::st_transform(4326)
 # st_write(p.1A1a_ep, dsn = "Products/1A1 - Energy/1A1a_ep.gpkg", layer = '1A1a_ep')
 
 
@@ -226,8 +232,8 @@ source.1A1a_hp$total$spatialize <- readxl::read_xlsx(path = source.file, range =
 source.1A1a_hp$total$inventory <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
 
 
-sf.1A1a_hp <- corsum2sf(source.1A1a_hp) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A1a_hp <- corsum2sf(source.1A1a_hp) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -300,8 +306,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1a_hp, total.1
   )
 
 #+ include = FALSE
-p.1A1a_hp %<>% sf::st_transform(4326)
-st_write(p.1A1a_hp, dsn = "Products/1A1 - Energy/1A1a_hp.gpkg", layer = '1A1a_hp')
+#p.1A1a_hp %<>% sf::st_transform(4326)
+# st_write(p.1A1a_hp, dsn = "Products/1A1 - Energy/1A1a_hp.gpkg", layer = '1A1a_hp')
 
 #'
 #'
@@ -314,8 +320,8 @@ source.1A1b$sources$points <- readxl::read_xlsx(path = source.file, range = "D47
 source.1A1b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D51:I51", sheet = source.sheet, col_names = vars)
 source.1A1b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D52:I52", sheet = source.sheet, col_names = vars)
 
-sf.1A1b <- corsum2sf(source.1A1b) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A1b <- corsum2sf(source.1A1b) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #'
@@ -387,8 +393,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1b, total.1A1b
   )
 
 #+ include = FALSE
-p.1A1b %<>% sf::st_transform(4326)
-st_write(p.1A1b, dsn="Products/1A1 - Energy/1A1b_1B2aiv.gpkg", layer='1A1b_1B2aiv')
+#p.1A1b %<>% sf::st_transform(4326)
+# st_write(p.1A1b, dsn="Products/1A1 - Energy/1A1b_1B2aiv.gpkg", layer='1A1b_1B2aiv')
 
 
 # !!!!!!!!!!!!!!!!!!!!!!
@@ -492,8 +498,8 @@ source.1B2c$sources$points <- readxl::read_xlsx(path = source.file, range = "D53
 source.1B2c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D57:I57", sheet = source.sheet, col_names = vars)
 source.1B2c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D58:I58", sheet = source.sheet, col_names = vars)
 
-sf.1B2c <- corsum2sf(source.1B2c) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B2c <- corsum2sf(source.1B2c) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #'
@@ -564,7 +570,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2c, total.1B2c
   )
 
 #+ include = FALSE
-p.1B2c %<>% sf::st_transform(4326)
+#p.1B2c %<>% sf::st_transform(4326)
 # st_write(p.1B2c, dsn="Products/1A1 - Energy/1B2c.gpkg", layer='1B2c')
 
 #'
@@ -579,8 +585,8 @@ source.1A1c$sources$points <- readxl::read_xlsx(path = source.file, range = "D59
 source.1A1c$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D75:I75", sheet = source.sheet, col_names = vars)
 source.1A1c$total$inventory <- readxl::read_xlsx(path = source.file, range = "D76:I76", sheet = source.sheet, col_names = vars)
 
-sf.1A1c <- corsum2sf(source.1A1c) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1A1c <- corsum2sf(source.1A1c) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -654,8 +660,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1c, total.1A1c
   )
 
 #+ include = FALSE
-p.1A1c %<>% sf::st_transform(4326)
-# st_write(p.1A1c, dsn="Products/1A1 - Energy/1A1c.gpkg", layer='1A1c')
+# p.1A1c %<>% sf::st_transform(4326)
+#  st_write(p.1A1c, dsn="Products/1A1 - Energy/1A1c.gpkg", layer='1A1c')
 
 #'
 #'
@@ -672,8 +678,8 @@ source.1B1b$sources$points <- readxl::read_xlsx(path = source.file, range = "D77
 source.1B1b$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D79:I79", sheet = source.sheet, col_names = vars)
 source.1B1b$total$inventory <- readxl::read_xlsx(path = source.file, range = "D80:I80", sheet = source.sheet, col_names = vars)
 
-sf.1B1b <- corsum2sf(source.1B1b) %>%
-  st_transform(crs = "+init=epsg:32634")
+sf.1B1b <- corsum2sf(source.1B1b) #%>%
+  #st_transform(crs = "+init=epsg:32634")
 #'
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -744,7 +750,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B1b, total.1B1b
   )
 
 #+ include = FALSE
-p.1B1b %<>% sf::st_transform(4326)
+#p.1B1b %<>% sf::st_transform(4326)
 # st_write(p.1B1b, dsn="Products/1A1 - Energy/1B1b.gpkg", layer='1B1b')
 
 #'

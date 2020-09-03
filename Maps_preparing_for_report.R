@@ -651,12 +651,12 @@ ggsave(plot = map.ind, filename = "Maps/Subcategories/Map_1A2c-1A2e.jpg", width 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 sf_data_energy <- st_read(dsn = "Products/Sum-up_By_category/1A1 - Energy.gpkg")
 
-classes.NOx <- classIntervals(sf_data_energy$NOx, n = 30, style = "fisher")
-classes.SO2 <- classIntervals(sf_data_energy$SO2, n = 30, style = "fisher")
-classes.PM10 <- classIntervals(sf_data_energy$PM10, n = 30, style = "fisher")
-classes.PM2.5 <- classIntervals(sf_data_energy$PM2.5, n = 30, style = "fisher")
-classes.NMVOC <- classIntervals(sf_data_energy$NMVOC, n = 30, style = "fisher")
-classes.NH3 <- classIntervals(sf_data_energy$NH3, n = 30, style = "fisher")
+classes.NOx <- classIntervals(sf_data_energy$NOx, n = 12, style = "fisher")
+classes.SO2 <- classIntervals(sf_data_energy$SO2, n = 12, style = "fisher")
+classes.PM10 <- classIntervals(sf_data_energy$PM10, n = 12, style = "fisher")
+classes.PM2.5 <- classIntervals(sf_data_energy$PM2.5, n = 12, style = "fisher")
+classes.NMVOC <- classIntervals(sf_data_energy$NMVOC, n = 12, style = "fisher")
+classes.NH3 <- classIntervals(sf_data_energy$NH3, n = 12, style = "fisher")
 
 sf_data_energy <- sf_data_energy %>%
   mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
@@ -667,12 +667,19 @@ sf_data_energy <- sf_data_energy %>%
          percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
   )
 
-pal1 <- viridisLite::viridis(30)
-pal2 <- viridisLite::viridis(30)
-pal3 <- viridisLite::viridis(30)
-pal4 <- viridisLite::viridis(30)
-pal5 <- viridisLite::viridis(30)
-pal6 <- viridisLite::viridis(30)
+pal1 <- viridisLite::viridis(12, direction = -1)
+pal2 <- viridisLite::viridis(12, direction = -1)
+pal3 <- viridisLite::viridis(12, direction = -1)
+pal4 <- viridisLite::viridis(12, direction = -1)
+pal5 <- viridisLite::viridis(12, direction = -1)
+pal6 <- viridisLite::viridis(12, direction = -1)
+
+
+opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+                   use_iconv=TRUE,  
+                   encoding = "UTF-8")
+sf_opstine <- st_as_sf(opstine)
+
 
 #+ include = FALSE 
 a<-ggplot() +
@@ -687,10 +694,11 @@ a<-ggplot() +
   theme(line = element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank(),
-        legend.position = "None", ###################### legend
-        panel.background = element_blank()) +
-  coord_sf(datum = NA)
-
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank())  +
+  geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))
+a
 b<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_SO2)) +

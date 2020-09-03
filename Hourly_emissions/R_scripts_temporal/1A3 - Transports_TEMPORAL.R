@@ -3015,33 +3015,33 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #   fwrite(sf.1A3dii.tl[[i]], file = paste("sf.1A3dii", paste(vars[i],"csv", sep = "."), sep = "_"))
 # }
 
-#  temporalProfile_Transports<- activity.df$times %>% cbind(he.1A3ai[,1:6], 
-#                                                             he.1A3aii[,1:6], 
-#                                                             he.1A3bi_H[,1:6], 
-#                                                             he.1A3bi_R[,1:6], 
-#                                                             he.1A3bi_U[,1:6], 
-#                                                             he.1A3bii_H[,1:6], 
-#                                                             he.1A3bii_R[,1:6], 
-#                                                             he.1A3bii_U[,1:6], 
-#                                                             he.1A3biii_bc_H[,1:6], 
-#                                                             he.1A3biii_bc_R[,1:6], 
-#                                                             he.1A3biii_bc_U[,1:6], 
-#                                                             he.1A3biii_H[,1:6], 
-#                                                             he.1A3biii_R[,1:6], 
-#                                                             he.1A3biii_U[,1:6], 
-#                                                           he.1A3biv_H[,1:6], 
-#                                                           he.1A3biv_R[,1:6], 
-#                                                           he.1A3biv_U[,1:6], 
-#                                                           he.1A3bv_H[,1:6], 
-#                                                           he.1A3bv_R[,1:6], 
-#                                                           he.1A3bv_U[,1:6], 
-#                                                           he.1A3bvi[,1:6], 
-#                                                           he.1A3bvii[,1:6], 
-#                                                           he.1A3c[,1:6], 
-#                                                           he.1A3dii[,1:6]) %>% 
-#    as.data.frame()
-#  
-#  writexl::write_xlsx(temporalProfile_Transports, path = 'Hourly_emissions/Products/TemporalProfile_Transports.xlsx')
+temporalProfile_Transports<- activity.df$times %>% cbind(he.1A3ai[,1:6], 
+                                                           he.1A3aii[,1:6], 
+                                                           he.1A3bi_H[,1:6], 
+                                                           he.1A3bi_R[,1:6], 
+                                                           he.1A3bi_U[,1:6], 
+                                                           he.1A3bii_H[,1:6], 
+                                                           he.1A3bii_R[,1:6], 
+                                                           he.1A3bii_U[,1:6], 
+                                                           he.1A3biii_bc_H[,1:6], 
+                                                           he.1A3biii_bc_R[,1:6], 
+                                                           he.1A3biii_bc_U[,1:6], 
+                                                           he.1A3biii_H[,1:6], 
+                                                           he.1A3biii_R[,1:6], 
+                                                           he.1A3biii_U[,1:6], 
+                                                         he.1A3biv_H[,1:6], 
+                                                         he.1A3biv_R[,1:6], 
+                                                         he.1A3biv_U[,1:6], 
+                                                         he.1A3bv_H[,1:6], 
+                                                         he.1A3bv_R[,1:6], 
+                                                         he.1A3bv_U[,1:6], 
+                                                         he.1A3bvi[,1:6], 
+                                                         he.1A3bvii[,1:6], 
+                                                         he.1A3c[,1:6], 
+                                                         he.1A3dii[,1:6]) %>% 
+  as.data.frame()
+
+writexl::write_xlsx(temporalProfile_Transports, path = 'Hourly_emissions/Products/TemporalProfile_Transports.xlsx')
 
 
 

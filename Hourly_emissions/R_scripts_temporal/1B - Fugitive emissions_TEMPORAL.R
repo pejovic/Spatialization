@@ -584,13 +584,13 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #   fwrite(sf.1B2b.tl[[i]], file = paste("sf.1B2b", paste(vars[i],"csv", sep = "."), sep = "_"))
 # }
 
-#  temporalProfile_Fugitive_emissions <- activity.df$times %>% cbind(he.1B1a[,1:6], 
-#                                                             he.1B2ai[,1:6], 
-#                                                             he.1B2av[,1:6], 
-#                                                             he.1B2b[,1:6]) %>% 
-#    as.data.frame()
-#  
-#  writexl::write_xlsx(temporalProfile_Fugitive_emissions, path = 'Hourly_emissions/Products/TemporalProfile_Fugitive_emissions.xlsx')
+temporalProfile_Fugitive_emissions <- activity.df$times %>% cbind(he.1B1a[,1:6], 
+                                                           he.1B2ai[,1:6], 
+                                                           he.1B2av[,1:6], 
+                                                           he.1B2b[,1:6]) %>% 
+  as.data.frame()
+
+writexl::write_xlsx(temporalProfile_Fugitive_emissions, path = 'Hourly_emissions/Products/TemporalProfile_Fugitive_emissions.xlsx')
 
 
 

@@ -274,7 +274,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2a, total.1A2a
   )
 
 #+ include = FALSE
-p.1A2a %<>% sf::st_transform(4326)
+#p.1A2a %<>% sf::st_transform(4326)
 # st_write(p.1A2a, dsn="Products/1A2 - Industry/1A2a.gpkg", layer='1A2a')
 
 #'
@@ -357,7 +357,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2b, total.1A2b
   )
 
 #+ include = FALSE
-p.1A2b %<>% sf::st_transform(4326)
+# p.1A2b %<>% sf::st_transform(4326)
 # st_write(p.1A2b, dsn="Products/1A2 - Industry/1A2b.gpkg", layer='1A2b')
 
 #'
@@ -439,8 +439,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2c, total.1A2c
   )
 
 #+ include = FALSE
-p.1A2c %<>% sf::st_transform(4326)
-# st_write(p.1A2c, dsn="Products/1A2 - Industry/1A2c.gpkg", layer='1A2c')
+# p.1A2c %<>% sf::st_transform(4326)
+#  st_write(p.1A2c, dsn="Products/1A2 - Industry/1A2c.gpkg", layer='1A2c')
 
 #'
 #'
@@ -528,7 +528,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2d, total.1A2d
   )
 
 #+ include = FALSE
-p.1A2d %<>% sf::st_transform(4326)
+# p.1A2d %<>% sf::st_transform(4326)
 # st_write(p.1A2d, dsn="Products/1A2 - Industry/1A2d.gpkg", layer='1A2d')
 
 #'
@@ -615,8 +615,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e, total.1A2e
   )
 
 #+ include = FALSE
-p.1A2e %<>% sf::st_transform(4326)
-# st_write(p.1A2e, dsn="Products/1A2 - Industry/1A2e.gpkg", layer='1A2e')
+# p.1A2e %<>% sf::st_transform(4326)
+ st_write(p.1A2e, dsn="Products/1A2 - Industry/1A2e.gpkg", layer='1A2e')
 
 
 
@@ -723,7 +723,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.bread, tota
   )
 
 #+ include = FALSE
-p.1A2e.bread %<>% sf::st_transform(4326)
+# p.1A2e.bread %<>% sf::st_transform(4326)
 # st_write(p.1A2e.bread, dsn="Products/1A2 - Industry/1A2e.bread.gpkg", layer='1A2e.bread')
 
 

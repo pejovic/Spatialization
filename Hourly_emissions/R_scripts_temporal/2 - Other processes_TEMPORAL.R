@@ -717,7 +717,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3d - Coating application - paint for construction
 #+ include = FALSE
 
-sf.2D3d.pfc <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3d.gpkg")  # PROMENIII
+sf.2D3d.pfc <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3d.pfc.gpkg")  # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -841,7 +841,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3d - Coating application - Car/bus/truck/van coating + leather finishing
 #+ include = FALSE
 
-sf.2D3d.cbtlf <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3d.gpkg") # PROMENIII
+sf.2D3d.cbtlf <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3d.cbtlf.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -965,7 +965,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3g - Chemical products - - Rubber processing
 #+ include = FALSE
 
-sf.2D3g.rp <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.gpkg") # PROMENIII
+sf.2D3g.rp <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.rp.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1085,7 +1085,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3g - Chemical products - Paint/ink/glue manufacturing
 #+ include = FALSE
 
-sf.2D3g.pigm <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.gpkg") # PROMENIII
+sf.2D3g.pigm <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.pigm.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1207,7 +1207,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3g - Chemical products - Manufacture of shoes
 #+ include = FALSE
 
-sf.2D3g.ms <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.gpkg") # PROMENIII
+sf.2D3g.ms <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.ms.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1331,7 +1331,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3g - Chemical products - Leather tanning
 #+ include = FALSE
 
-sf.2D3g.lt <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.gpkg") # PROMENIII
+sf.2D3g.lt <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3g.lt.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1452,7 +1452,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3i - Other solvent and product use - Fat, edible and non-edible oil extraction (kg seed)
 #+ include = FALSE
 
-sf.2D3i.feneox <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.gpkg") # PROMENIII
+sf.2D3i.feneox <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.feneox.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1572,7 +1572,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3i - Other solvent and product use - Preservation of wood
 #+ include = FALSE
 
-sf.2D3i.pow <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.gpkg") # PROMENIII
+sf.2D3i.pow <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.pow.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1696,7 +1696,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3i - Other solvent and product use - Underseal treatment and conservation of vehicles
 #+ include = FALSE
 
-sf.2D3i.utcv <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.gpkg") # PROMENIII
+sf.2D3i.utcv <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.utcv.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1819,7 +1819,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3i - Other solvent and product use - Tobacco (t tobacco)
 #+ include = FALSE
 
-sf.2D3i.t <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.gpkg") # PROMENIII
+sf.2D3i.t <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.t.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -1944,7 +1944,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 2D3i - Other solvent and product use  - Use of shoes
 #+ include = FALSE
 
-sf.2D3i.uos <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.gpkg") # PROMENIII
+sf.2D3i.uos <- st_read("D:/R_projects/Spatialization/Products/2 - Other processes/2D3i.uos.gpkg") # PROMENIII
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
@@ -2672,20 +2672,28 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 
 
-# temporalProfile_Other_processes <- activity.df$times %>% cbind(he.2A5a[,1:6], 
-#                                                            he.2A5b[,1:6],
-#                                                            he.2A5c[,1:6],
-#                                                            he.2D3a[,1:6], 
-#                                                            he.2D3b[,1:6], 
-#                                                            he.2D3c[,1:6], 
-#                                                            he.2D3d[,1:6], # DODATI
-#                                                            he.2D3e[,1:6], 
-#                                                            he.2D3f[,1:6], 
-#                                                            he.2D3g[,1:6], # DODATI
-#                                                            he.2D3h[,1:6], 
-#                                                            he.2D3i[,1:6], # DODATI
-#                                                            he.2I[,1:6]) %>% 
-#   as.data.frame()
-# 
-# writexl::write_xlsx(temporalProfile_Other_processes, path = 'Hourly_emissions/Products/TemporalProfile_Other_processes.xlsx')
+temporalProfile_Other_processes <- activity.df$times %>% cbind(he.2A5a[,1:6], 
+                                                          he.2A5b[,1:6],
+                                                          he.2A5c[,1:6],
+                                                          he.2D3a[,1:6], 
+                                                          he.2D3b[,1:6], 
+                                                          he.2D3c[,1:6], 
+                                                          he.2D3d.cbtlf[,1:6],
+                                                          he.2D3d.pfc[,1:6],# DODATI
+                                                          he.2D3e[,1:6], 
+                                                          he.2D3f[,1:6], 
+                                                          he.2D3g.lt[,1:6],
+                                                          he.2D3g.ms[,1:6],
+                                                          he.2D3g.pigm[,1:6],
+                                                          he.2D3g.rp[,1:6],# DODATI
+                                                          he.2D3h[,1:6], 
+                                                          he.2D3i.feneox[,1:6],
+                                                          he.2D3i.pow[,1:6],
+                                                          he.2D3i.t[,1:6],
+                                                          he.2D3i.uos[,1:6],
+                                                          he.2D3i.utcv[,1:6],# DODATI
+                                                          he.2I[,1:6]) %>% 
+ as.data.frame()
+
+writexl::write_xlsx(temporalProfile_Other_processes, path = 'Hourly_emissions/Products/TemporalProfile_Other_processes.xlsx')
 

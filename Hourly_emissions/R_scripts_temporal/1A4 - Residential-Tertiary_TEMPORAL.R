@@ -635,11 +635,11 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #   fwrite(sf.1A4cii.tl[[i]], file = paste("sf.1A4cii", paste(vars[i],"csv", sep = "."), sep = "_"))
 # }
 
-#  temporalProfile_ResidentialTertiary <- activity.df$times %>% 
-#    cbind(he.1A4ai[,1:6], 
-#          he.1A4bi[,1:6], 
-#          he.1A4ci[,1:6], 
-#          he.1A4cii[,1:6]) %>% 
-#    as.data.frame()
-#  
-#  writexl::write_xlsx(temporalProfile_ResidentialTertiary, path = 'Hourly_emissions/Products/TemporalProfile_Residential_Tertiary.xlsx')
+temporalProfile_ResidentialTertiary <- activity.df$times %>% 
+  cbind(he.1A4ai[,1:6], 
+        he.1A4bi[,1:6], 
+        he.1A4ci[,1:6], 
+        he.1A4cii[,1:6]) %>% 
+  as.data.frame()
+
+writexl::write_xlsx(temporalProfile_ResidentialTertiary, path = 'Hourly_emissions/Products/TemporalProfile_Residential_Tertiary.xlsx')

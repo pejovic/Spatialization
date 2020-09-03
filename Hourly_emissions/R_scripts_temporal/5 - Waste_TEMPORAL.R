@@ -586,14 +586,13 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #   fwrite(sf.5D2.tl[[i]], file = paste("sf.5D2", paste(vars[i],"csv", sep = "."), sep = "_"))
 # }
 
+temporalProfile_Waste <- activity.df$times %>% cbind(he.5A[,1:6], 
+                                                           he.5C1bv[,1:6], 
+                                                           he.5D1[,1:6], 
+                                                           he.5D2[,1:6]) %>% 
+  as.data.frame()
 
-#  temporalProfile_Waste <- activity.df$times %>% cbind(he.5A[,1:6], 
-#                                                             he.5C1bv[,1:6], 
-#                                                             he.5D1[,1:6], 
-#                                                             he.5D2[,1:6]) %>% 
-#    as.data.frame()
-#  
-#  writexl::write_xlsx(temporalProfile_Waste, path = 'Hourly_emissions/Products/TemporalProfile_Waste.xlsx')
+writexl::write_xlsx(temporalProfile_Waste, path = 'Hourly_emissions/Products/TemporalProfile_Waste.xlsx')
 
 
 

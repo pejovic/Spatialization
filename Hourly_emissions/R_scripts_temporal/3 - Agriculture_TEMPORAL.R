@@ -1811,24 +1811,22 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #   fwrite(sf.3De.tl[[i]], file = paste("sf.3De", paste(vars[i],"csv", sep = "."), sep = "_"))
 # }
 
-# temporalProfile_Agriculture <- activity.df$times %>% cbind(he.3B1a[,1:6], 
-#                                                            he.3B1b[,1:6], 
-#                                                            he.3B2[,1:6], 
-#                                                            he.3B3[,1:6], 
-#                                                            he.3B4d[,1:6], 
-#                                                            he.3B4e[,1:6], 
-#                                                            he.3B4gi_gii[,1:6], 
-#                                                            he.3B4giii[,1:6], 
-#                                                            he.3B4giv[,1:6], 
-#                                                            he.3Da1[,1:6], 
-#                                                            he.3Da2a[,1:6], 
-#                                                            he.3Da3[,1:6], 
-#                                                            he.3Dc[,1:6], 
-#                                                            he.3De[,1:6]) %>% 
-#   as.data.frame()
-# 
-# writexl::write_xlsx(temporalProfile_Agriculture, path = 'Hourly_emissions/Products/TemporalProfile_Agriculture.xlsx')
+temporalProfile_Agriculture <- activity.df$times %>% cbind(he.3B1a[,1:6], 
+                                                          he.3B1b[,1:6], 
+                                                          he.3B2[,1:6], 
+                                                          he.3B3[,1:6], 
+                                                          he.3B4d[,1:6], 
+                                                          he.3B4e[,1:6], 
+                                                          he.3B4gi_gii[,1:6], 
+                                                          he.3B4giii[,1:6], 
+                                                          he.3B4giv[,1:6], 
+                                                          he.3Da1[,1:6], 
+                                                          he.3Da2a[,1:6], 
+                                                          he.3Da3[,1:6], 
+                                                          he.3Dc[,1:6], 
+                                                          he.3De[,1:6]) %>% 
+ as.data.frame()
 
-
+writexl::write_xlsx(temporalProfile_Agriculture, path = 'Hourly_emissions/Products/TemporalProfile_Agriculture.xlsx')
 
 
