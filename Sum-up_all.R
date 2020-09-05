@@ -37,6 +37,30 @@ library(stringr)
 library(classInt)
 library(viridis)
 library(gridExtra)
+
+my_theme <- function(base_size = 10, base_family = "sans"){
+  theme_minimal(base_size = base_size, base_family = base_family) +
+    theme(
+      axis.text = element_text(size = 10),
+      axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      panel.grid.major = element_line(color = "grey"),
+      panel.grid.minor = element_blank(),
+      panel.background = element_rect(fill = "#fffcfc"),
+      strip.background = element_rect(fill = "#820000", color = "#820000", size =0.5),
+      strip.text = element_text(face = "bold", size = 10, color = "white"),
+      legend.position = "bottom",
+      legend.justification = "center",
+      legend.background = element_blank(),
+      panel.border = element_rect(color = "grey30", fill = NA, size = 0.5)
+    )
+}
+
+theme_set(my_theme())
+mycolors=c("#f32440","#2185ef","#d421ef")
+
+
+
 #+ include = FALSE 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Read all data files
@@ -567,7 +591,16 @@ ggsave(plot = f.bg,
        device = "jpeg",
        dpi=600)
 
+bg <- grid.arrange(a.bg, b.bg, c.bg, d.bg, e.bg, f.bg, ncol = 2)
 
+
+ggsave(plot = bg, 
+       filename = "Maps/FINAL2015/Zoomed_maps/Beograd.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Bor
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -753,6 +786,16 @@ ggsave(plot = f.bo,
        filename = "Maps/FINAL2015/Zoomed_maps/Bor_NH3.jpg", 
        width = 30, 
        height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+bo <- grid.arrange(a.bo, b.bo, c.bo, d.bo, e.bo, f.bo, ncol = 2)
+
+
+ggsave(plot = bo, 
+       filename = "Maps/FINAL2015/Zoomed_maps/Bor.jpg", 
+       width = 40, 
+       height = 40, 
        units = "cm", 
        device = "jpeg",
        dpi=600)
@@ -945,15 +988,21 @@ ggsave(plot = f.ns,
        units = "cm", 
        device = "jpeg",
        dpi=600)
-grid.arrange(a.ns, b.ns, c.ns, d.ns, e.ns, f.ns, ncol = 2)
+ns <- grid.arrange(a.ns, b.ns, c.ns, d.ns, e.ns, f.ns, ncol = 2)
 
-
+ggsave(plot = ns, 
+       filename = "Maps/FINAL2015/Zoomed_maps/NoviSad.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Pančevo
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 unique(sf_opstine$NAME_1)
-sf_opstine_pa <- sf_opstine %>% dplyr::filter(NAME_2 == "Pancevo")
+sf_opstine_pa <- sf_opstine %>% dplyr::filter(NAME_2 == "Pančevo")
 
 sf_data_pa <- sf_data[sf_opstine_pa, ] 
 Sys.setlocale(locale = 'Serbian (Latin)')
@@ -1137,9 +1186,15 @@ ggsave(plot = f.pa,
        units = "cm", 
        device = "jpeg",
        dpi=600)
-grid.arrange(a.pa, b.pa, c.pa, d.pa, e.pa, f.pa, ncol = 2)
+pa <- grid.arrange(a.pa, b.pa, c.pa, d.pa, e.pa, f.pa, ncol = 2)
 
-
+ggsave(plot = pa, 
+       filename = "Maps/FINAL2015/Zoomed_maps/Pancevo.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Smederevo
@@ -1329,9 +1384,15 @@ ggsave(plot = f.sd,
        units = "cm", 
        device = "jpeg",
        dpi=600)
-grid.arrange(a.sd, b.sd, c.sd, d.sd, e.sd, f.sd, ncol = 2)
+sd <- grid.arrange(a.sd, b.sd, c.sd, d.sd, e.sd, f.sd, ncol = 2)
 
-
+ggsave(plot = sd, 
+       filename = "Maps/FINAL2015/Zoomed_maps/Smederevo.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Užice
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1520,4 +1581,50 @@ ggsave(plot = f.uz,
        units = "cm", 
        device = "jpeg",
        dpi=600)
-grid.arrange(a.uz, b.uz, c.uz, d.uz, e.uz, f.uz, ncol = 2)
+aaa <- grid.arrange(a.uz, b.uz, c.uz, d.uz, e.uz, f.uz, ncol = 2)
+ggsave(plot = aaa, 
+       filename = "Maps/FINAL2015/Zoomed_maps/Uzice.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+sf_opstine_bg$NAME_1[2:17] <- NA
+library(ggspatial)
+library(ggsflabel)
+# Opstine
+sf_opstine_sel <- rbind(sf_opstine_bo, sf_opstine_ns, sf_opstine_pa, sf_opstine_sd, sf_opstine_uz)
+map_cities <- ggplot() +
+  geom_sf(data = sf_opstine_sel, fill = "red") +
+  geom_sf(data = sf_opstine_bg, fill = "red")+
+  #scale_fill_manual(name = "Cities")+
+  labs(x = NULL, y = NULL,
+       title = "Municipalities with specific air quality plans",
+       subtitle = "Territory of the Republic of Serbia",
+       caption = "UBFCE (2020)",
+       fill = "Cities") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true", 
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)+
+  geom_sf_label_repel(data = sf_opstine_sel, aes(label = NAME_2), nudge_x = 0.3, nudge_y = 0.3, seed = 10)+
+  geom_sf_label_repel(data = sf_opstine_bg, aes(label = NAME_1))
+map_cities
+
+ggsave(plot = map_cities, 
+       filename = "Maps/FINAL2015/Zoomed_maps/cities.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
