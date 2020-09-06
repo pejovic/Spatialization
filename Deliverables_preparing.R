@@ -1,7 +1,21 @@
-grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
-sf.grid.5km <- st_as_sf(grid.5km) 
-st_write(sf.grid.5km, dsn="Grid/Grid_5km_Serbia.gpkg", layer='Grid_5km_Serbia')
-
+library(tidyverse)
+library(sf)
+library(readxl)
+library(ggpubr)
+library(ggfortify)
+library(here)
+library(knitr)
+library(kableExtra)
+library(DT)
+library(mapview)
+library(rgdal)
+library(s2)
+# grid.5km <- readOGR("Grid/Polygons_5km_UTM_34N.shp")
+# sf.grid.5km <- st_as_sf(grid.5km) 
+# st_write(sf.grid.5km, dsn="Grid/Grid_5km_Serbia.gpkg", layer='Grid_5km_Serbia')
+grid.5km <- readOGR("Grid/Grid_Serbia_0.05deg.gpkg")
+sf.grid.5km <- st_as_sf(grid.5km)
+sf.grid.5km %<>% dplyr::mutate(ID = id)
 
 # Temporal profiles all in one
 data.tprofiles <- list.files('Hourly_emissions/Products/')
@@ -35,7 +49,7 @@ writexl::write_xlsx(temporal_Profiles, path = 'Hourly_emissions/Products/Tempora
 ###########################################################
 
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
-sf_clc18 <- st_as_sf(clc_18)
+sf_clc18 <- st_as_sf(clc_18) %>% st_transform(4326)
 st_write(sf_clc18, dsn="GIS_layers/CLC_12-18.gpkg", layer='CLC_12-18_complete')
 
 ###########################################################
@@ -44,7 +58,7 @@ clc131 <- subset(sf_clc18, CODE_18 == "131") %>% # Mine, dump and construction s
   st_set_crs(32634)
 
 clc131 %<>% dplyr::mutate(Area = st_area(.)) %>%
-  dplyr::select(Area)
+  dplyr::select(Area)%>% st_transform(4326)
 
 st_write(clc131, dsn="GIS_layers/CLC_class_131.gpkg", layer='CLC_class_131')
 
@@ -76,12 +90,17 @@ sf_opstine$ind[sf_opstine$NAME_2 == "Kragujevac"] <- 1
 sf_opstine$ind[sf_opstine$NAME_2 == "Žitorađa"] <- 0
 
 sf_opstine %<>% select(NAME_2, ind) %>%
-  st_transform(crs = "+init=epsg:32634") %>%
+  #st_transform(crs = "+init=epsg:32634") %>%
   dplyr::rename(Name = NAME_2) 
   
 sf_opstine %<>% dplyr::mutate(Area = st_area(.))
 
 st_write(sf_opstine, dsn="GIS_layers/Municipalities.gpkg", layer='Municipalities')
+
+sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km)%>%
+  dplyr::mutate(Area = st_area(.))  %>% select(Name, Area)
+st_write(sf_opstine.int, dsn="GIS_layers/Municipalities_intersected.gpkg", layer='Municipalities_intersected')
+
 
 
 #+ include = FALSE
@@ -109,7 +128,9 @@ st_write(sf_opstine, dsn="GIS_layers/Municipalities_Number_of_habitants.gpkg", l
 
 sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km)%>%
   dplyr::mutate(Area = st_area(.)) %>%
-  dplyr::rename(No_habitants = Br_stanovnistvo)
+  dplyr::rename(No_habitants = Br_stanovnistvo) %>%
+  select(Area, No_habitants)
+
 st_write(sf_opstine.int, dsn="GIS_layers/Municipalities_Number_of_habitants_intersected.gpkg", layer='Municipalities_Number_of_habitants_intersected')
 
 ###########################################################
@@ -121,10 +142,10 @@ rn.IB
 rn.IIA
 rn.IB <- dplyr::mutate(rn.IB, PGDS = PGDS_2015.est)
 rn.IB$PGDS[rn.IB$is.PGDS] <- rn.IB$PGDS_2015[rn.IB$is.PGDS]
-
+rn.IB %<>% st_transform(4326)
 rn.IIA <- dplyr::mutate(rn.IIA, PGDS = PGDS_2015.est)
 rn.IIA$PGDS[rn.IIA$is.PGDS] <- rn.IIA$PGDS_2015[rn.IIA$is.PGDS]
-
+rn.IIA %<>% st_transform(4326)
 
 st_write(rn.IB, dsn="GIS_layers/Roads_with_PGDS2015_IB.gpkg", layer='Roads_with_PGDS2015_IB')
 st_write(rn.IIA, dsn="GIS_layers/Roads_with_PGDS2015_IIA.gpkg", layer='Roads_with_PGDS2015_IIA')
@@ -150,7 +171,7 @@ rn.IA <- dplyr::mutate(rn.IA, PGDS = PGDS_2015.est)
 rn.IA$PGDS[rn.IA$is.PGDS] <- rn.IA$PGDS_2015[rn.IA$is.PGDS] 
 
 rn.IA %<>% dplyr::select(-fid)
-
+rn.IA %<>% st_transform(4326)
 st_write(rn.IA, dsn="GIS_layers/Roads_with_PGDS2015_IA.gpkg", layer='Roads_with_PGDS2015_IA')
 
 sf_IA.int <- st_intersection(rn.IA, sf.grid.5km) %>%
@@ -170,7 +191,7 @@ urban_roads <- readOGR("Data/putevi/OSM_putevi_urbana_podrucja.gpkg",
                        encoding = "UTF-8",
                        stringsAsFactors = FALSE)
 sf_urban_roads <- st_as_sf(urban_roads) %>%
-  st_transform(crs = "+init=epsg:32634") 
+  st_transform(crs = "+init=epsg:4326") 
 
 sf_urban_roads %<>% dplyr::mutate(Length = st_length(.)) %>% 
   dplyr::select(Length)
@@ -196,7 +217,7 @@ railways <- readOGR("Data/pruge/Pruge_osm_32634.shp",
                     encoding = "UTF-8",
                     stringsAsFactors = FALSE)
 sf_railways <- st_as_sf(railways) %>%
-  st_transform(crs = "+init=epsg:32634") 
+  st_transform(4326) 
 
 
 sf_railways %<>% mutate(Length = st_length(.)) %>%
@@ -216,7 +237,7 @@ n.navigation <- readOGR("Data/plovni_putevi/Plovni_putevi_32634.shp",
                         encoding = "UTF-8",
                         stringsAsFactors = FALSE)
 sf_navigation <- st_as_sf(n.navigation) %>%
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(4326)
 
 sf_navigation %<>% dplyr::mutate(Area = st_area(.)) %>%
   dplyr::select(Area)
@@ -236,7 +257,7 @@ st_write(sf_navigation.int, dsn="GIS_layers/Navigable_rivers_intersected.gpkg", 
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
 sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   dplyr::mutate(Area = st_area(.)) %>%
   dplyr::select(Area)
 
@@ -262,7 +283,7 @@ toplane <- readxl::read_xls(path = "Data/toplane/Toplane_2015.xls") %>%
 sf_opstine$Toplane <- toplane$`Ukupna grejna povrsina (m2)`[match(sf_opstine$NAME_2, toplane$GRAD)] 
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634") %>% 
+  st_transform(4326) %>% 
   mutate_all(~replace(., is.na(.), 0))
 
 sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
@@ -281,18 +302,18 @@ st_write(sf_clc18_urb.int, dsn="GIS_layers/Urban_areas_Toplane_Srbije_Heating_ar
 
 ###########################################################
 
-sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
+sf_rur <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/rural_areas_new.gpkg")
 
-sf_rur %<>% dplyr::mutate(Area = st_area(.)) %>%
-  select(NAME_2, Area) %>%
-  dplyr::rename(Name = NAME_2)
+sf_rur %<>% dplyr::mutate(Area = st_area(.)) %>% st_transform(4326)
+  #select(NAME_2, Area) %>%
+  #dplyr::rename(Name = NAME_2)
 
 
 st_write(sf_rur, dsn="GIS_layers/Rural_areas.gpkg", layer='Rural_areas')
 
 sf_rur.int <- st_intersection(sf_rur, sf.grid.5km) %>%
   dplyr::mutate(Area = st_area(.)) %>%
-  dplyr::select(Name, Area)
+  dplyr::select(Area)
 
 st_write(sf_rur.int, dsn="GIS_layers/Rural_areas_intersected.gpkg", layer='Rural_areas_intersected')
 
@@ -303,7 +324,8 @@ sf_rur <- st_read(dsn = "Products/rural_areas.gpkg", layer = "rural_areas")
 
 sf_rur %<>% dplyr::mutate(Area = st_area(.)) %>%
   select(NAME_2, Area, Br_traktori) %>%
-  dplyr::rename(Name = NAME_2, No_tractors = Br_traktori)
+  dplyr::rename(Name = NAME_2, No_tractors = Br_traktori) %>% 
+  st_transform(4326)
 
 
 st_write(sf_rur, dsn="GIS_layers/Rural_areas_with_Number_of_tractors.gpkg", layer='Rural_areas_with_Number_of_tractors')
@@ -318,7 +340,7 @@ st_write(sf_rur.int, dsn="GIS_layers/Rural_areas_with_Number_of_tractors_interse
 ###########################################################
 
 sf_clc18_polj <- subset(sf_clc18, CODE_18 == "211" | CODE_18 == "221" | CODE_18 == "222" | CODE_18 == "231" | CODE_18 == "242" | CODE_18 == "243") %>% # CLC agricultural areas
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(4326)
 
 sf_clc18_polj %<>% dplyr::mutate(Area = st_area(.)) %>%
   select(Area)
@@ -336,7 +358,7 @@ st_write(sf_clc18_polj.int, dsn="GIS_layers/Agricultural_areas_intersected.gpkg"
 clc133 <- subset(sf_clc18, CODE_18 == "133" | CODE_18 == "121") %>% # Construction sites and industrial sites
   st_set_crs(32634)
 clc133 %<>% dplyr::mutate(Area = st_area(.)) %>%
-  select(Area)
+  select(Area)%>% st_transform(4326)
 
 st_write(clc133, dsn="GIS_layers/Construction_and_industrial_sites.gpkg", layer='Construction_and_industrial_sites')
 
@@ -352,11 +374,13 @@ st_write(clc133.int, dsn="GIS_layers/Construction_and_industrial_sites_intersect
 ###########################################################
 
 
-clc121 <- subset(sf_clc18, CODE_18 == "121") %>% # Industrial sites
-  st_transform(32634) # Transform to UTM projection
+#clc121 <- subset(sf_clc18, CODE_18 == "121") %>% # Industrial sites
+#  st_transform(32634) # Transform to UTM projection
+
+clc121 <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Industrial_sites_new.gpkg")
 
 clc121 %<>% dplyr::mutate(Area = st_area(.)) %>%
-  select(Area)
+  select(Area) %>% st_transform(4326)
 st_write(clc121, dsn="GIS_layers/Industrial_sites.gpkg", layer='Industrial_sites')
 
 
@@ -366,6 +390,66 @@ clc121.int <- st_intersection(clc121, sf.grid.5km) %>%
   select(Area)
 
 st_write(clc121.int, dsn="GIS_layers/Industrial_sites_intersected.gpkg", layer='Industrial_sites_intersected')
+
+###########################################################
+
+wtposm <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Wastewater_plants_OSM_32634.gpkg")
+
+wtposm %<>% dplyr::mutate(Area = st_area(.)) %>%
+  select(Area) %>% st_transform(4326)
+st_write(wtposm, dsn="GIS_layers/Wastewater_plants_OSM.gpkg", layer='Wastewater_plants_OSM')
+
+
+
+wtposm.int <- st_intersection(wtposm, sf.grid.5km) %>%
+  dplyr::mutate(Area = st_area(.)) %>%
+  select(Area)
+
+st_write(wtposm.int, dsn="GIS_layers/Wastewater_plants_OSM_intersected.gpkg", layer='Wastewater_plants_OSM_intersected')
+
+
+###########################################################
+
+fsosm <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Fuel_stations_OSM_32634.gpkg")
+
+fsosm %<>% select(fclass) %>% st_transform(4326)
+st_write(fsosm, dsn="GIS_layers/Fuel_stations_OSM.gpkg", layer='Fuel_stations_OSM')
+
+
+
+
+###########################################################
+
+icunits <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/industrial_and_commercial.gpkg")
+
+icunits %<>% dplyr::mutate(Area = st_area(.)) %>%
+  select(Area) %>% st_transform(4326)
+st_write(icunits, dsn="GIS_layers/Industrial_and_commercial.gpkg", layer='industrial_and_commercial')
+
+
+icunits.int <- st_intersection(icunits, sf.grid.5km) %>%
+  dplyr::mutate(Area = st_area(.)) %>%
+  select(Area)
+
+st_write(icunits.int, dsn="GIS_layers/Industrial_and_commercial_intersected.gpkg", layer='industrial_and_commercial_intersected')
+
+
+###########################################################
+
+comosm <- st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/OSM_commercial_Serbia.gpkg")
+
+comosm %<>% dplyr::mutate(Area = st_area(.)) %>%
+  select(Area) %>% st_transform(4326)
+st_write(comosm, dsn="GIS_layers/OSM_commercial_Serbia.gpkg", layer='OSM_commercial_Serbia')
+
+
+comosm.int <- st_intersection(comosm, sf.grid.5km) %>%
+  dplyr::mutate(Area = st_area(.)) %>%
+  select(Area)
+
+st_write(comosm.int, dsn="GIS_layers/OSM_commercial_Serbia_intersected.gpkg", layer='OSM_commercial_Serbia_intersected')
+
+
 
 ###########################################################
 
@@ -395,7 +479,7 @@ otpadne_vode$Opština[otpadne_vode$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Otpadne_vode <- otpadne_vode$`Ukupne ispuštene otpadne vode`[match(sf_opstine$NAME_2, otpadne_vode$Opština)] # Matching data 
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(4326)
 sf_opstine %<>% dplyr::select(.,Otpadne_vode, NAME_2) %>%
   dplyr::rename(Waste_water = Otpadne_vode, Name = NAME_2)
 
@@ -410,7 +494,7 @@ st_write(sf_opstine.int, dsn="GIS_layers/Municipalities_Waste_water_intersected.
 ###########################################################
 
 clc132 <- subset(sf_clc18, CODE_18 == "132") %>% # Dump sites
-  st_transform(32634)
+  st_transform(4326)
 
 clc132 %<>% dplyr::mutate(Area = st_area(.)) %>%
   select(Area) 
@@ -427,7 +511,7 @@ st_write(clc132.int, dsn="GIS_layers/Dump_sites_intersected.gpkg", layer='Dump_s
 
 
 sf_clc18_242 <- subset(sf_clc18, CODE_18 == "242") %>% # CLC complex cultivated areas (including farms)
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   dplyr::mutate(Area = st_area(.)) %>%
   select(Area) 
 st_write(sf_clc18_242, dsn="GIS_layers/Complex_cultivated_areas.gpkg", layer='complex_cultivated_areas')
@@ -442,14 +526,15 @@ st_write(sf_clc18_242.int, dsn="GIS_layers/Complex_cultivated_areas_intersected.
 ###########################################################
 
 sf_clc18_pasnjaci <- subset(sf_clc18, CODE_18 == "231") %>% # CLC pastures
-  st_transform(crs = "+init=epsg:32634")%>%
+  st_transform(4326)%>%
   dplyr::mutate(Area = st_area(.)) %>%
   select(Area) 
 
 st_write(sf_clc18_pasnjaci, dsn="GIS_layers/Pastures.gpkg", layer='Pastures')
 
 
-sf_clc18_pasnjaci.int <- st_intersection(sf_clc18_pasnjaci, sf.grid.5km)
+sf_clc18_pasnjaci.int <- st_intersection(sf_clc18_pasnjaci, sf.grid.5km) %>% dplyr::mutate(Area = st_area(.)) %>%
+  select(Area)
 
 st_write(sf_clc18_pasnjaci.int, dsn="GIS_layers/Pastures_intersected.gpkg", layer='Pastures_intersected')
 
@@ -476,7 +561,7 @@ zivina$Opština[zivina$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Br_zivina <- zivina$Živina[match(sf_opstine$Name, zivina$Opština)]
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   select(Name, Br_zivina) %>%
   rename(No_polutry = Br_zivina)
 
@@ -511,7 +596,7 @@ konji$Opština[konji$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$No_farms <- konji$`Broj gazdinstava`[match(sf_opstine$Name, konji$Opština)]
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   select(Name, No_farms) 
 
 st_write(sf_opstine, dsn="GIS_layers/Municipalities_Number_of_farms.gpkg", layer='Municipalities_Number_of_farms')
@@ -547,7 +632,7 @@ sf_opstine$No_sheeps <- ovce$Ovce[match(sf_opstine$Name, ovce$Opština)]
 
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   select(Name, No_sheeps) 
 
 st_write(sf_opstine, dsn="GIS_layers/Municipalities_Number_of_sheeps.gpkg", layer='Municipalities_Number_of_sheeps')
@@ -587,7 +672,7 @@ sf_opstine$No_cattle <- goveda$Goveda[match(sf_opstine$NAME_2, goveda$Opština)]
 
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   dplyr::rename(Name = NAME_2) %>%
   select(Name, No_cattle) 
 
@@ -621,7 +706,7 @@ svinje$Opština[svinje$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Br_svinje <- svinje$Svinje[match(sf_opstine$Name, svinje$Opština)]
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634") %>%
+  st_transform(4326) %>%
   dplyr::rename(No_swine = Br_svinje) %>%
   select(Name, No_swine) 
 
@@ -662,7 +747,8 @@ sf_opstine$tcp <- wood$`Tehničko_četinara_procenat`[match(sf_opstine$Name, woo
 
 sf_opstine %<>%
   mutate(Wood_stock = ((pl/100)*tlp) + ((pc/100)*tcp)) %>%
-  select(Wood_stock, Name)
+  select(Wood_stock, Name)%<>% 
+  st_transform(4326)
 
 
 st_write(sf_opstine, dsn="GIS_layers/Municipalities_Volume_of_industrial_woods.gpkg", layer='Municipalities_Volume_of_industrial_woods')
