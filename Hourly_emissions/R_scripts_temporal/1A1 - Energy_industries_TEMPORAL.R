@@ -160,6 +160,7 @@ he.1A1a_ep <- activity.df %>%
   dplyr::mutate(he_1A1a_ep = he_sig) %>%
   dplyr::select(times, he_1A1a_ep, he_1A1a_ep_n)
 
+sum(he.1A1a_ep$he_1A1a_ep_n)
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-02-01 12"),
                        by   = dhours(1)) 
@@ -219,19 +220,17 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #+
-# sf.1A1a_ep_df <- sf.1A1a_ep %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.1A1a_ep.tl <- lapply(sf.1A1a_ep_df[,-1], function(x) t((x %o% he.1A1a_ep$he_1A1a_ep_n)[,,1]))
-# 
-# sf.1A1a_ep.tl <- lapply(sf.1A1a_ep.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # writexl::write_xlsx(sf.1A1a_ep.tle, "sf.1A1a_ep.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.1A1a_ep_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.1A1a_ep.tl[[i]], file = paste("sf.1A1a_ep", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+ sf.1A1a_ep_df <- sf.1A1a_ep %>% st_drop_geometry() #%>% dplyr::select(NOx)
+ #sf.1A1a_ep_df %>% filter(ID == 1820)
+ sf.1A1a_ep.tl <- lapply(sf.1A1a_ep_df[,-1], function(x) t((x %o% he.1A1a_ep$he_1A1a_ep_n)[,,1]))
+ sf.1A1a_ep.tl <- lapply(sf.1A1a_ep.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(sf.1A1a_ep_df$ID)))
+ sum(as.numeric(sf.1A1a_ep.tl$NOx))
+ # writexl::write_xlsx(sf.1A1a_ep.tle, "sf.1A1a_ep.tle.xlsx") # Mnogo traje...
+ vars <- names(sf.1A1a_ep_df)[-1]
+ 
+ for(i in 1:length(vars)){
+   fwrite(sf.1A1a_ep.tl[[i]], file = paste("sf.1A1a_ep", paste(vars[i],"csv", sep = "."), sep = "_"))
+ }
 
 
 
@@ -346,19 +345,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #+
-# sf.1A1a_hp_df <- sf.1A1a_hp %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.1A1a_hp.tl <- lapply(sf.1A1a_hp_df[,-1], function(x) t((x %o% he.1A1a_hp$he_1A1a_hp_n)[,,1]))
-# 
-# sf.1A1a_hp.tl <- lapply(sf.1A1a_hp.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # writexl::write_xlsx(sf.1A1a_hp.tle, "sf.1A1a_hp.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.1A1a_hp_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.1A1a_hp.tl[[i]], file = paste("sf.1A1a_hp", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.1A1a_hp_df <- sf.1A1a_hp %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1A1a_hp.tl <- lapply(sf.1A1a_hp_df[,-1], function(x) t((x %o% he.1A1a_hp$he_1A1a_hp_n)[,,1]))
+
+sf.1A1a_hp.tl <- lapply(sf.1A1a_hp.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(sf.1A1a_hp_df$ID)))
+
+# writexl::write_xlsx(sf.1A1a_hp.tle, "sf.1A1a_hp.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1A1a_hp_df)[-1]
+
+for(i in 1:length(vars)){
+ fwrite(sf.1A1a_hp.tl[[i]], file = paste("sf.1A1a_hp", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # PREBACUJE SE U INDUSTRY kao 1A1b_1B2aiv
@@ -710,21 +709,21 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 #'
 #+
-# sf.1B2c_df <- sf.1B2c %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.1B2c.tl <- lapply(sf.1B2c_df[,-1], function(x) t((x %o% he.1B2c$he_1B2c_n)[,,1]))
-# 
-# sf.1B2c.tl <- lapply(sf.1B2c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # str(sf.1B2c.tl)
-# 
-# # writexl::write_xlsx(sf.1B2c.tle, "sf.1B2c.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.1B2c_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.1B2c.tl[[i]], file = paste("sf.1B2c", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.1B2c_df <- sf.1B2c %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1B2c.tl <- lapply(sf.1B2c_df[,-1], function(x) t((x %o% he.1B2c$he_1B2c_n)[,,1]))
+
+sf.1B2c.tl <- lapply(sf.1B2c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+
+# str(sf.1B2c.tl)
+
+# writexl::write_xlsx(sf.1B2c.tle, "sf.1B2c.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1B2c_df)[-1]
+
+for(i in 1:length(vars)){
+ fwrite(sf.1B2c.tl[[i]], file = paste("sf.1B2c", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 #'
 #'
@@ -770,7 +769,7 @@ he.1A1c <- activity.df %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1A1c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1A1c = he_sig) %>%
   dplyr::mutate(he_1A1c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1A1c)#, he_1A1c_n)
+  select(times, he_1A1c, he_1A1c_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -828,21 +827,21 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 #'
 #+
-# sf.1A1c_df <- sf.1A1c %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.1A1c.tl <- lapply(sf.1A1c_df[,-1], function(x) t((x %o% he.1A1c$he_1A1c_n)[,,1]))
-# 
-# sf.1A1c.tl <- lapply(sf.1A1c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # str(sf.1A1c.tl)
-# 
-# # writexl::write_xlsx(sf.1A1c.tle, "sf.1A1c.tle.xlsx") # Mnogo traje...
-# 
-# # vars <- names(sf.1A1c_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.1A1c.tl[[i]], file = paste("sf.1A1c", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.1A1c_df <- sf.1A1c %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1A1c.tl <- lapply(sf.1A1c_df[,-1], function(x) t((x %o% he.1A1c$he_1A1c_n)[,,1]))
+
+sf.1A1c.tl <- lapply(sf.1A1c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+
+# str(sf.1A1c.tl)
+
+# writexl::write_xlsx(sf.1A1c.tle, "sf.1A1c.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1A1c_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.1A1c.tl[[i]], file = paste("sf.1A1c", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 #'
 #'
@@ -890,7 +889,7 @@ he.1B1b <- activity.df %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_1B1b))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_1B1b = he_sig) %>%
   dplyr::mutate(he_1B1b_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1B1b)#, he_1B1b_n)
+  select(times, he_1B1b, he_1B1b_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -947,25 +946,25 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 
 #'
 #+
-# sf.1B1b_df <- sf.1B1b %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.1B1b.tl <- lapply(sf.1B1b_df[,-1], function(x) t((x %o% he.1B1b$he_1B1b_n)[,,1]))
-# 
-# sf.1B1b.tl <- lapply(sf.1B1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # str(sf.1B1b.tl)
-# 
-# # writexl::write_xlsx(sf.1B1b.tle, "sf.1B1b.tle.xlsx") # Mnogo traje...
-# 
-# # vars <- names(sf.1B1b_df)[-1]
-# 
-# # for(i in 1:length(vars)){
-# #   fwrite(sf.1B1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B1b", paste(vars[i],"csv", sep = "."), sep = "_")))
-# # }
-# 
+sf.1B1b_df <- sf.1B1b %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.1B1b.tl <- lapply(sf.1B1b_df[,-1], function(x) t((x %o% he.1B1b$he_1B1b_n)[,,1]))
+
+sf.1B1b.tl <- lapply(sf.1B1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+
+# str(sf.1B1b.tl)
+
+# writexl::write_xlsx(sf.1B1b.tle, "sf.1B1b.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.1B1b_df)[-1]
+
 # for(i in 1:length(vars)){
-#   fwrite(sf.1B1b.tl[[i]], file = paste("sf.1B1b", paste(vars[i],"csv", sep = "."), sep = "_"))
+#   fwrite(sf.1B1b.tl[[i]], file = here::here("Hourly_emissions", "Products", "Energy_TemporalByCell", paste("1B1b", paste(vars[i],"csv", sep = "."), sep = "_")))
 # }
+
+for(i in 1:length(vars)){
+ fwrite(sf.1B1b.tl[[i]], file = paste("sf.1B1b", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 
 

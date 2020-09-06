@@ -151,10 +151,10 @@ he.5A <- activity.df %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   # dplyr::mutate(he_5A = ((WT0816+0.5)) * PH2 * (TEMP+30))  %>%
   dplyr::mutate(he_5A = 1 * (TEMP+30))  %>%
-  # dplyr::mutate(he_sig = sigmoid(scale(he_5A))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
-  # dplyr::mutate(he_5A = he_sig) %>%
-  # dplyr::mutate(he_5A_n = he_sig/sum(he_sig))%>%
-  select(times, he_5A)#, he_5A_n)
+   dplyr::mutate(he_sig = sigmoid(scale(he_5A))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+   dplyr::mutate(he_5A = he_sig) %>%
+   dplyr::mutate(he_5A_n = he_sig/sum(he_sig))%>%
+  select(times, he_5A, he_5A_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -211,19 +211,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-# sf.5A_df <- sf.5A %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.5A.tl <- lapply(sf.5A_df[,-1], function(x) t((x %o% he.5A$he_5A_n)[,,1]))
-# 
-# sf.5A.tl <- lapply(sf.5A.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # writexl::write_xlsx(sf.5A.tle, "sf.5A.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.5A_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.5A.tl[[i]], file = paste("sf.5A", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.5A_df <- sf.5A %>% st_drop_geometry() #%>% dplyr::select(NOx)
+ids <- sf.5A$ID
+sf.5A.tl <- lapply(sf.5A_df[,-1], function(x) t((x %o% he.5A$he_5A_n)[,,1]))
+
+sf.5A.tl <- lapply(sf.5A.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+
+# writexl::write_xlsx(sf.5A.tle, "sf.5A.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.5A_df)[-1]
+
+for(i in 1:length(vars)){
+ fwrite(sf.5A.tl[[i]], file = paste("sf.5A", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 #'
 #'
@@ -273,8 +273,8 @@ he.5C1bv <- activity.df %>%
   dplyr::mutate(he_5C1bv = 1)  %>%
   # dplyr::mutate(he_sig = sigmoid(scale(he_5C1bv))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   # dplyr::mutate(he_5C1bv = he_sig) %>%
-  # dplyr::mutate(he_5C1bv_n = he_sig/sum(he_sig))%>%
-  select(times, he_5C1bv)#, he_5C1bv_n)
+   dplyr::mutate(he_5C1bv_n = as.matrix(he_5C1bv))%>%
+  select(times, he_5C1bv, he_5C1bv_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -331,19 +331,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-# sf.5C1bv_df <- sf.5C1bv %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.5C1bv.tl <- lapply(sf.5C1bv_df[,-1], function(x) t((x %o% he.5C1bv$he_5C1bv_n)[,,1]))
-# 
-# sf.5C1bv.tl <- lapply(sf.5C1bv.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # writexl::write_xlsx(sf.5C1bv.tle, "sf.5C1bv.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.5C1bv_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.5C1bv.tl[[i]], file = paste("sf.5C1bv", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.5C1bv_df <- sf.5C1bv %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.5C1bv.tl <- lapply(sf.5C1bv_df[,-1], function(x) t((x %o% (he.5C1bv$he_5C1bv_n/8760))[,,1]))
+
+sf.5C1bv.tl <- lapply(sf.5C1bv.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+
+# writexl::write_xlsx(sf.5C1bv.tle, "sf.5C1bv.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.5C1bv_df)[-1]
+
+for(i in 1:length(vars)){
+ fwrite(sf.5C1bv.tl[[i]], file = paste("sf.5C1bv", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 #'
 #'
@@ -394,8 +394,8 @@ he.5D1 <- activity.df %>%
   dplyr::mutate(he_5D1 = 1)  %>%
   # dplyr::mutate(he_sig = sigmoid(scale(he_5D1))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   # dplyr::mutate(he_5D1 = he_sig) %>%
-  # dplyr::mutate(he_5D1_n = he_sig/sum(he_sig))%>%
-  select(times, he_5D1)# , he_5D1_n)
+   dplyr::mutate(he_5D1_n = as.matrix(he_5D1))%>%
+  select(times, he_5D1 , he_5D1_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -452,19 +452,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-# sf.5D1_df <- sf.5D1 %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.5D1.tl <- lapply(sf.5D1_df[,-1], function(x) t((x %o% he.5D1$he_5D1_n)[,,1]))
-# 
-# sf.5D1.tl <- lapply(sf.5D1.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # writexl::write_xlsx(sf.5D1.tle, "sf.5D1.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.5D1_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.5D1.tl[[i]], file = paste("sf.5D1", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.5D1_df <- sf.5D1 %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.5D1.tl <- lapply(sf.5D1_df[,-1], function(x) t((x %o% (he.5D1$he_5D1_n/8760))[,,1]))
+
+sf.5D1.tl <- lapply(sf.5D1.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+
+# writexl::write_xlsx(sf.5D1.tle, "sf.5D1.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.5D1_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.5D1.tl[[i]], file = paste("sf.5D1", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 #'
 #'
@@ -514,8 +514,8 @@ he.5D2 <- activity.df %>%
   dplyr::mutate(he_5D2 = 1)  %>%
   # dplyr::mutate(he_sig = sigmoid(scale(he_5D2))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   # dplyr::mutate(he_5D2 = he_sig) %>%
-  # dplyr::mutate(he_5D2_n = he_sig/sum(he_sig))%>%
-  select(times, he_5D2)#, he_5D2_n)
+   dplyr::mutate(he_5D2_n = as.matrix(he_5D2))%>%
+  select(times, he_5D2, he_5D2_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -572,19 +572,19 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #'
 #'
 #'
-# sf.5D2_df <- sf.5D2 %>% st_drop_geometry() #%>% dplyr::select(NOx)
-# 
-# sf.5D2.tl <- lapply(sf.5D2_df[,-1], function(x) t((x %o% he.5D2$he_5D2_n)[,,1]))
-# 
-# sf.5D2.tl <- lapply(sf.5D2.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
-# 
-# # writexl::write_xlsx(sf.5D2.tle, "sf.5D2.tle.xlsx") # Mnogo traje...
-# 
-# vars <- names(sf.5D2_df)[-1]
-# 
-# for(i in 1:length(vars)){
-#   fwrite(sf.5D2.tl[[i]], file = paste("sf.5D2", paste(vars[i],"csv", sep = "."), sep = "_"))
-# }
+sf.5D2_df <- sf.5D2 %>% st_drop_geometry() #%>% dplyr::select(NOx)
+sf.5D2_df %>% filter(ID == 549)
+sf.5D2.tl <- lapply(sf.5D2_df[,-1], function(x) t((x %o% (he.5D2$he_5D2_n/8760))[,,1]))
+
+sf.5D2.tl <- lapply(sf.5D2.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+
+# writexl::write_xlsx(sf.5D2.tle, "sf.5D2.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.5D2_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.5D2.tl[[i]], file = paste("sf.5D2", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
 
 temporalProfile_Waste <- activity.df$times %>% cbind(he.5A[,1:6], 
                                                            he.5C1bv[,1:6], 
