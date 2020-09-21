@@ -7,11 +7,11 @@
 # From geopackeges to CSV
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 library(data.table)
-data.spat <- list.files('D:/R_projects/Spatialization/Products/1A2 - Industry/')
+data.spat <- list.files('D:/R_projects/Spatialization/Products/3 - Agriculture/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
-  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/1A2 - Industry/",data.spat[i], sep = ""))
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/3 - Agriculture/",data.spat[i], sep = ""))
 }
 
 
@@ -45,11 +45,11 @@ file.rename(from = old_files, to = new_files)
 # Sum-up by category
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-data.spat <- list.files('D:/R_projects/Spatialization/Products/5 - Waste/')
+data.spat <- list.files('D:/R_projects/Spatialization/Products/3 - Agriculture/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/5 - Waste/",data.spat[i], sep = ""))
+ data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/3 - Agriculture/",data.spat[i], sep = ""))
 }
 
 
@@ -75,7 +75,7 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-st_write(sf_data, dsn="Products/Sum-up_By_category/5 - Waste.gpkg", layer='Waste')
+st_write(sf_data, dsn="Products/Sum-up_By_category/3 - Agriculture.gpkg", layer='Agriculture')
 
 #### CSvs
 

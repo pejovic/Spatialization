@@ -2245,7 +2245,8 @@ source.3Dc$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D1
 source.3Dc$total$inventory <- readxl::read_xlsx(path = source.file, range = "D137:I137", sheet = source.sheet, col_names = vars)
 
 #+ include = FALSE
-sf_clc18_242 <- subset(sf_clc18, CODE_18 == "242") %>% # CLC complex cultivated areas (including farms)
+# U dopuni trazeno da se ne koristi samo 242 nego i ostale agriculture klase
+sf_clc18_242 <- subset(sf_clc18,CODE_18 == "211" | CODE_18 == "221" | CODE_18 == "222"| CODE_18 == "242" | CODE_18 == "243" ) %>% # CLC complex cultivated areas (including farms)
   st_transform(crs = "+init=epsg:32634")
 sf_clc18_242[,vars] <- NA
 sf_clc18_242 %<>% st_transform(4326)
