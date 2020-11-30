@@ -687,12 +687,12 @@ classes.NMVOC <- classIntervals(sf_data_energy$NMVOC, n = 12, style = "fisher")
 classes.NH3 <- classIntervals(sf_data_energy$NH3, n = 12, style = "fisher")
 
 sf_data_energy <- sf_data_energy %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -714,7 +714,7 @@ a1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 1A1 - Energy",
@@ -725,14 +725,18 @@ a1<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 a1
 
 b1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 1A1 - Energy",
@@ -743,13 +747,17 @@ b1<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b1
 c1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 1A1 - Energy",
@@ -759,13 +767,17 @@ c1<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c1
 d1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 1A1 - Energy",
@@ -775,8 +787,13 @@ d1<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d1
+
 e1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_NMVOC)) +
@@ -791,13 +808,17 @@ e1<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e1
 f1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal2,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 1A1 - Energy",
@@ -807,7 +828,11 @@ f1<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f1
 energy_map <- grid.arrange(a1, b1, c1, d1, e1, f1, ncol = 2, nrow = 3)
 
@@ -833,12 +858,12 @@ classes.NMVOC <- classIntervals(sf_data_industry$NMVOC, n = 12, style = "fisher"
 classes.NH3 <- classIntervals(sf_data_industry$NH3, n = 12, style = "fisher")
 
 sf_data_industry <- sf_data_industry %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -853,7 +878,7 @@ a2<-ggplot() +
   geom_sf(data = sf_data_industry,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 1A2 - Industry",
@@ -863,14 +888,18 @@ a2<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 a2
 b2<-ggplot() +
   geom_sf(data = sf_data_industry,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 1A2 - Industry",
@@ -880,13 +909,17 @@ b2<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b2
 c2<-ggplot() +
   geom_sf(data = sf_data_industry,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 1A2 - Industry",
@@ -896,13 +929,17 @@ c2<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c2
 d2<-ggplot() +
   geom_sf(data = sf_data_industry,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 1A2 - Industry",
@@ -912,13 +949,17 @@ d2<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d2
 e2<-ggplot() +
   geom_sf(data = sf_data_industry,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 1A2 - Industry",
@@ -928,13 +969,17 @@ e2<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e2
 f2<-ggplot() +
   geom_sf(data = sf_data_industry,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 1A2 - Industry",
@@ -944,7 +989,11 @@ f2<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f2
 industry_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
@@ -989,7 +1038,7 @@ a3<-ggplot() +
   geom_sf(data = sf_data_transport,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 1A3 - Transport",
@@ -999,13 +1048,17 @@ a3<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 b3<-ggplot() +
   geom_sf(data = sf_data_transport,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 1A3 - Transport",
@@ -1015,13 +1068,17 @@ b3<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 c3<-ggplot() +
   geom_sf(data = sf_data_transport,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 1A3 - Transport",
@@ -1031,13 +1088,17 @@ c3<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 d3<-ggplot() +
   geom_sf(data = sf_data_transport,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 1A3 - Transport",
@@ -1047,13 +1108,17 @@ d3<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 e3<-ggplot() +
   geom_sf(data = sf_data_transport,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 1A3 - Transport",
@@ -1063,13 +1128,17 @@ e3<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 f3<-ggplot() +
   geom_sf(data = sf_data_transport,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 1A3 - Transport",
@@ -1079,7 +1148,11 @@ f3<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 
 transport_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
@@ -1104,12 +1177,12 @@ classes.NMVOC <- classIntervals(sf_data_residential$NMVOC, n = 12, style = "fish
 classes.NH3 <- classIntervals(sf_data_residential$NH3, n = 12, style = "fisher")
 
 sf_data_residential <- sf_data_residential %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -1124,7 +1197,7 @@ a4<-ggplot() +
   geom_sf(data = sf_data_residential,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
@@ -1134,13 +1207,17 @@ a4<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 a4
 b4<-ggplot() +
   geom_sf(data = sf_data_residential,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
@@ -1150,13 +1227,17 @@ b4<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b4
 c4<-ggplot() +
   geom_sf(data = sf_data_residential,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
@@ -1166,13 +1247,17 @@ c4<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c4
 d4<-ggplot() +
   geom_sf(data = sf_data_residential,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
@@ -1182,13 +1267,17 @@ d4<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d4
 e4<-ggplot() +
   geom_sf(data = sf_data_residential,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
@@ -1198,13 +1287,17 @@ e4<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e4
 f4<-ggplot() +
   geom_sf(data = sf_data_residential,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
@@ -1214,7 +1307,11 @@ f4<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f4
 residential_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
@@ -1238,12 +1335,12 @@ classes.NMVOC <- classIntervals(sf_data_fugitive$NMVOC, n = 12, style = "fisher"
 classes.NH3 <- classIntervals(sf_data_fugitive$NH3, n = 12, style = "fisher")
 
 sf_data_fugitive <- sf_data_fugitive %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -1258,7 +1355,7 @@ a5<-ggplot() +
   geom_sf(data = sf_data_fugitive,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
@@ -1268,13 +1365,17 @@ a5<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 a5
 b5<-ggplot() +
   geom_sf(data = sf_data_fugitive,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
@@ -1284,13 +1385,17 @@ b5<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b5
 c5<-ggplot() +
   geom_sf(data = sf_data_fugitive,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
@@ -1300,13 +1405,17 @@ c5<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c5
 d5<-ggplot() +
   geom_sf(data = sf_data_fugitive,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
@@ -1316,13 +1425,17 @@ d5<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d5
 e5<-ggplot() +
   geom_sf(data = sf_data_fugitive,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
@@ -1332,13 +1445,17 @@ e5<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e5
 f5<-ggplot() +
   geom_sf(data = sf_data_fugitive,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
@@ -1348,12 +1465,16 @@ f5<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f5
 fugitive_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 ggsave(plot = f5, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_NMVOC.jpg", 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1372,12 +1493,12 @@ classes.NMVOC <- classIntervals(sf_data_other$NMVOC, n = 12, style = "fisher")
 classes.NH3 <- classIntervals(sf_data_other$NH3, n = 12, style = "fisher")
 
 sf_data_other <- sf_data_other %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -1392,7 +1513,7 @@ a6<-ggplot() +
   geom_sf(data = sf_data_other,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 2 - Other processes",
@@ -1402,13 +1523,17 @@ a6<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 a6
 b6<-ggplot() +
   geom_sf(data = sf_data_other,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 2 - Other processes",
@@ -1418,13 +1543,17 @@ b6<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b6
 c6<-ggplot() +
   geom_sf(data = sf_data_other,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 2 - Other processes",
@@ -1434,13 +1563,17 @@ c6<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c6
 d6<-ggplot() +
   geom_sf(data = sf_data_other,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 2 - Other processes",
@@ -1450,13 +1583,17 @@ d6<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d6
 e6<-ggplot() +
   geom_sf(data = sf_data_other,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 2 - Other processes",
@@ -1466,13 +1603,17 @@ e6<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e6
 f6<-ggplot() +
   geom_sf(data = sf_data_other,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 2 - Other processes",
@@ -1482,13 +1623,17 @@ f6<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f6
 other_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
-ggsave(plot = f6, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_NH3.jpg", 
+ggsave(plot = d6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1506,12 +1651,12 @@ classes.NMVOC <- classIntervals(sf_data_agriculture$NMVOC, n = 12, style = "fish
 classes.NH3 <- classIntervals(sf_data_agriculture$NH3, n = 12, style = "fisher")
 
 sf_data_agriculture <- sf_data_agriculture %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -1525,7 +1670,7 @@ a7<-ggplot() +
   geom_sf(data = sf_data_agriculture,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal1,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 3 - Agriculture",
@@ -1535,13 +1680,17 @@ a7<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 a7
 b7<-ggplot() +
   geom_sf(data = sf_data_agriculture,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal1,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 3 - Agriculture",
@@ -1551,13 +1700,17 @@ b7<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b7
 c7<-ggplot() +
   geom_sf(data = sf_data_agriculture,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal1,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 3 - Agriculture",
@@ -1567,13 +1720,17 @@ c7<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c7
 d7<-ggplot() +
   geom_sf(data = sf_data_agriculture,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal1,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 3 - Agriculture",
@@ -1583,13 +1740,17 @@ d7<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d7
 e7<-ggplot() +
   geom_sf(data = sf_data_agriculture,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 3 - Agriculture",
@@ -1599,13 +1760,17 @@ e7<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e7
 f7<-ggplot() +
   geom_sf(data = sf_data_agriculture,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 3 - Agriculture",
@@ -1615,14 +1780,18 @@ f7<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f7
 agriculture_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 
-ggsave(plot = f7, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_NH3.jpg", 
+ggsave(plot = c7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1640,12 +1809,12 @@ classes.NMVOC <- classIntervals(sf_data_waste$NMVOC, n = 12, style = "fisher")
 classes.NH3 <- classIntervals(sf_data_waste$NH3, n = 12, style = "fisher")
 
 sf_data_waste <- sf_data_waste %>%
-  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T),
-         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T),
-         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T),
-         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T),
-         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T),
-         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T)
+  mutate(percent_class_NOx = cut(NOx, classes.NOx$brks, include.lowest = T,dig.lab=7),
+         percent_class_SO2 = cut(SO2, classes.SO2$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM10 = cut(PM10, classes.PM10$brks, include.lowest = T,dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, classes.PM2.5$brks, include.lowest = T,dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, classes.NMVOC$brks, include.lowest = T,dig.lab=7),
+         percent_class_NH3 = cut(NH3, classes.NH3$brks, include.lowest = T,dig.lab=7)
   )
 
 pal1 <- viridisLite::inferno(12, direction = -1)
@@ -1660,7 +1829,7 @@ a8<-ggplot() +
   geom_sf(data = sf_data_waste,
           aes(fill = percent_class_NOx)) +
   scale_fill_manual(values = pal2,
-                    name = "NOx") +
+                    name = "NOx [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NOx",
        subtitle = "GNFR sector: 5 - Waste",
@@ -1670,13 +1839,17 @@ a8<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 a8
 b8<-ggplot() +
   geom_sf(data = sf_data_waste,
           aes(fill = percent_class_SO2)) +
   scale_fill_manual(values = pal2,
-                    name = "SO2") +
+                    name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - SO2",
        subtitle = "GNFR sector: 5 - Waste",
@@ -1686,13 +1859,17 @@ b8<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 b8
 c8<-ggplot() +
   geom_sf(data = sf_data_waste,
           aes(fill = percent_class_PM10)) +
   scale_fill_manual(values = pal2,
-                    name = "PM10") +
+                    name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM10",
        subtitle = "GNFR sector: 5 - Waste",
@@ -1702,13 +1879,17 @@ c8<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 c8
 d8<-ggplot() +
   geom_sf(data = sf_data_waste,
           aes(fill = percent_class_PM2.5)) +
   scale_fill_manual(values = pal2,
-                    name = "PM2.5") +
+                    name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - PM2.5",
        subtitle = "GNFR sector: 5 - Waste",
@@ -1718,13 +1899,17 @@ d8<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 d8
 e8<-ggplot() +
   geom_sf(data = sf_data_waste,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 5 - Waste",
@@ -1734,13 +1919,17 @@ e8<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 e8
 f8<-ggplot() +
   geom_sf(data = sf_data_waste,
           aes(fill = percent_class_NH3)) +
   scale_fill_manual(values = pal1,
-                    name = "NH3") +
+                    name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NH3",
        subtitle = "GNFR sector: 5 - Waste",
@@ -1750,7 +1939,11 @@ f8<-ggplot() +
         legend.position = "bottom", ###################### legend
         panel.background = element_blank())  +
   geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
-  coord_sf(datum = sf::st_crs(4326))
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
 f8
 waste_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
