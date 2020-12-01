@@ -1808,6 +1808,211 @@ for(i in 1:length(vars)){
  fwrite(sf.3De.tl[[i]], file = paste("sf.3De", paste(vars[i],"csv", sep = "."), sep = "_"))
 }
 
+
+#'
+#'
+#'
+#'
+#'
+#'
+#' ## 3F - Field burning of agricultural residues   
+#+ include = FALSE
+
+sf.3F <- st_read("D:/R_projects/Spatialization/Products/3 - Agriculture/3F.gpkg")
+
+
+tBurning <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
+                  to   = ymd_h("2015-11-30 23"),
+                  by   = dhours(1)) 
+
+activity.df$indBurning[activity.df$times %in% tBurning] <- TRUE 
+activity.df$indBurning[!(activity.df$times %in% tBurning)] <- FALSE 
+
+activity.df %<>% 
+  dplyr::mutate(AS = sin(((2*pi)/4)*(indBurning)))
+
+
+p <- ggplot(activity.df, aes(x = times, y = AS, colour = "red")) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw()
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
+                       to   = ymd_h("2015-10-30 23"),
+                       by   = dhours(1))
+
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+
+
+
+
+# during dry days - veca temperatura
+# less air humidity - As humidity increases pressure decreases, znaci sa vecim vazdusnim pritiskom
+# without rain or no rain foreseen - bez padavina 
+
+load("Hourly_emissions/Data/Perticipation/ogimet_serbia08_prcp.rda")
+ogimet_serbia
+
+prcp <- as.data.frame(ogimet_serbia)
+prcp$time1 <- as.Date.POSIXct(prcp$date)
+
+time_per_day <- seq(from = ymd('2015-01-01'),
+                    to   = ymd('2015-12-31'),
+                    by   = 'day')
+
+
+
+prcp_2015 <- prcp %>% dplyr::filter(date %in% time_per_day)
+
+prcp_2015 %<>% 
+  tidyr::drop_na(prcp) %>%
+  dplyr::group_by(date) %>%
+  dplyr::summarize(meanPrcp = mean(prcp))
+
+
+
+prcp_2015 <- prcp_2015[rep(seq.int(1,nrow(prcp_2015)), each = 24),]
+
+activity.df$PRCP <- prcp_2015$meanPrcp
+
+p <- ggplot(activity.df, aes(x = times, y = PRCP)) +
+  geom_point(size = 0.5) +
+  geom_line() + 
+  theme_bw() +
+  geom_smooth(formula =  ~ TEMP, colour = "orange")
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
+                       to   = ymd_h("2015-02-28 24"),
+                       by   = dhours(1)) 
+
+p + ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)
+
+
+# 
+
+
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+t.3F <- sf.3F %>%
+  summarize(NOx = sum(NOx),
+            SO2 = sum(SO2),
+            PM10 = sum(PM10),
+            PM2.5 = sum(PM2.5),
+            NMVOC = sum(NMVOC),
+            NH3 = sum(NH3)) %>%
+  dplyr::select(NOx, SO2, PM10, PM2.5, NMVOC, NH3) %>%
+  st_drop_geometry()
+
+data.frame(t.3F%>%
+             dplyr::mutate_if(is.numeric, round, 2)) %>%
+  datatable(., caption = 'Table 1: Total spatialized inventory',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# Building function for Hourly emissions - HE:
+# ---  HE = WDWW + (k+DL) + !PH + (k+SAAG) + inverse(TEMP) + SLP
+#
+
+he.3F <- activity.df %>%
+  dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
+                                       RP == FALSE ~ 0)) %>%
+  dplyr::mutate(RP2 = (sin(((2*pi)/12)*(!RP1))+0.5)) %>%
+  dplyr::mutate(PH1 = dplyr::case_when(PH == TRUE ~ 1,
+                                       PH == FALSE ~ 0)) %>%
+  dplyr::mutate(PH2 = (sin(((2*pi)/12)*(!PH1))+1)) %>%
+  dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
+                                       WE == FALSE ~ 0)) %>%
+  dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
+  dplyr::mutate(he_3F = AS * (TEMP+30) * SLP * (PRCP*(-1)+100)) %>%
+  dplyr::mutate(he_sig = sigmoid(scale(he_3F))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_3F = he_sig) %>%
+  dplyr::mutate(he_3F_n = he_sig/sum(he_sig))%>%
+  dplyr::select(times, he_3F, he_3F_n)
+
+time_seq <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
+                       to   = ymd_h("2015-10-31 24"),
+                       by   = dhours(1)) 
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+ggplot(he.3F, aes(x = times, y = he_3F)) +
+  geom_point(size = 0.1) +
+  geom_line(colour = "red") + 
+  # geom_smooth() +
+  theme_bw() + 
+  ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
+  #labs( caption = "he_3F = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f) * (0.5+SAAG.fl)")+
+  theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.3F$he_3F), max(he.3F$he_3F), sum(he.3F$he_3F))) %>%
+  datatable(., caption = 'Table 2: Function summary',
+            options = list(pageLength = 5)
+  ) # min mora biti veci od 0 !!!!!
+
+#'
+#+ include = FALSE
+t.3F$sumF <- sum(he.3F$he_3F)
+he.3F %<>% 
+  dplyr::mutate(NOx_3F = (t.3F$NOx/t.3F$sumF)*he_3F, 
+                NOx_3F_p = (NOx_3F/sum(NOx_3F))*100,
+                SO2_3F = (t.3F$SO2/t.3F$sumF)*he_3F, 
+                SO2_3F_p = (SO2_3F/sum(SO2_3F))*100,
+                PM10_3F = (t.3F$PM10/t.3F$sumF)*he_3F, 
+                PM10_3F_p = (PM10_3F/sum(PM10_3F))*100,
+                PM2.5_3F = (t.3F$PM2.5/t.3F$sumF)*he_3F, 
+                PM2.5_3F_p = (PM2.5_3F/sum(PM2.5_3F))*100,
+                NMVOC_3F = (t.3F$NMVOC/t.3F$sumF)*he_3F, 
+                NMVOC_3F_p = (NMVOC_3F/sum(NMVOC_3F))*100,
+                NH3_3F = (t.3F$NH3/t.3F$sumF)*he_3F, 
+                NH3_3F_p = (NH3_3F/sum(NH3_3F))*100) %>%
+  #replace_all(., is.na(.), 0) %>%
+  select(NOx_3F_p, SO2_3F_p, PM10_3F_p, PM2.5_3F_p, NMVOC_3F_p, NH3_3F_p) %>%
+  rename(`3F_NOx` = NOx_3F_p,
+         `3F_SO2` = SO2_3F_p,
+         `3F_PM10` = PM10_3F_p,
+         `3F_PM2.5` = PM2.5_3F_p,
+         `3F_NMVOC` = NMVOC_3F_p,
+         `3F_NH3` = NH3_3F_p) %>% 
+  mutate_all(~replace_na(., 0))
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]", "NH3 [%]"), 
+           Sum = rbind(sum(he.3F$`3F_NOx`), sum(he.3F$`3F_SO2`), sum(he.3F$`3F_PM10`), sum(he.3F$`3F_PM2.5`), sum(he.3F$`3F_NMVOC`), sum(he.3F$`3F_NH3`))) %>%
+  datatable(., caption = 'Table 3: Summary',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#'
+sf.3F_df <- sf.3F %>% st_drop_geometry() #%>% dplyr::select(NOx)
+
+sf.3F.tl <- lapply(sf.3F_df[,-1], function(x) t((x %o% he.3F$he_3F_n)[,,1]))
+
+sf.3F.tl <- lapply(sf.3F.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+
+# writexl::write_xlsx(sf.3F.tle, "sf.3F.tle.xlsx") # Mnogo traje...
+
+vars <- names(sf.3F_df)[-1]
+
+for(i in 1:length(vars)){
+  fwrite(sf.3F.tl[[i]], file = paste("sf.3F", paste(vars[i],"csv", sep = "."), sep = "_"))
+}
+
+
+
+
+
+
+
+
+
+
+####  DODATI za filed burning --- dodato
+
 temporalProfile_Agriculture <- activity.df$times %>% cbind(he.3B1a[,1:6], 
                                                           he.3B1b[,1:6], 
                                                           he.3B2[,1:6], 
@@ -1821,7 +2026,8 @@ temporalProfile_Agriculture <- activity.df$times %>% cbind(he.3B1a[,1:6],
                                                           he.3Da2a[,1:6], 
                                                           he.3Da3[,1:6], 
                                                           he.3Dc[,1:6], 
-                                                          he.3De[,1:6]) %>% 
+                                                          he.3De[,1:6],
+                                                          he.3F[,1:6]) %>% 
  as.data.frame()
 
 writexl::write_xlsx(temporalProfile_Agriculture, path = 'Hourly_emissions/Products/TemporalProfile_Agriculture.xlsx')

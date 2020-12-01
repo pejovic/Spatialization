@@ -1826,4 +1826,38 @@ map.3De <- ggplot()+
 map.3De
 ggsave(plot = map.3De, filename = "Maps/Subcategories/Agriculture/Map_3De.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
 
+
+
+# 3F - Field burning of agricultural residues
+sf.3F
+
+sf.3F %<>% dplyr::select() %>% dplyr::mutate(`Sub-category: ` = "3F - Field burning of agricultural residues") %>% 
+  sf::st_transform(4326)
+
+map.3F <- ggplot()+
+  labs(x = "Longitude [deg]", y="Latitude [deg]",
+       caption = "Coordinate Reference System - WGS84",
+       subtitle = "Category: 3 - Agriculture",
+       title = "Spatial locations - GIS layers")+#,
+  geom_sf(data = sf.3F, aes(fill = `Sub-category: `), colour = NA)+
+  geom_sf(data = sf_granica, colour = "black", fill = NA)+
+  scale_fill_manual(values=c("red"))+
+  theme(panel.grid = element_line(color = "black"), 
+        panel.background = element_rect(fill = "white"), 
+        axis.text.x = element_text(colour = "black"), 
+        axis.text.y = element_text(colour = "black"),
+        legend.position = "bottom")+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+map.3F
+ggsave(plot = map.3F, filename = "Maps/Subcategories/Agriculture/Map_3F.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
+
+
+
+
 # #####################################################

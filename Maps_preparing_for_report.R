@@ -16,6 +16,32 @@ library(viridis)
 library(gridExtra)
 library(ggsflabel)
 library(ggspatial)
+
+
+my_theme <- function(base_size = 10, base_family = "sans"){
+  theme_minimal(base_size = base_size, base_family = base_family) +
+    theme(
+      axis.text = element_text(size = 10),
+      axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.5),
+      axis.title = element_text(size = 12),
+      panel.grid.major = element_line(color = "grey"),
+      panel.grid.minor = element_blank(),
+      panel.background = element_rect(fill = "#fffcfc"),
+      strip.background = element_rect(fill = "#820000", color = "#820000", size =0.5),
+      strip.text = element_text(face = "bold", size = 10, color = "white"),
+      legend.position = "bottom",
+      legend.justification = "center",
+      legend.background = element_blank(),
+      panel.border = element_rect(color = "grey30", fill = NA, size = 0.5)
+    )
+}
+
+theme_set(my_theme())
+mycolors=c("#f32440","#2185ef","#d421ef")
+
+
+
+
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Map of grid
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,6 +130,47 @@ Map_mun <- ggplot() +
 
 
 ggsave(plot = Map_mun,filename = "Maps/Map_Municipalities.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Administrative zones – regions
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+sf_reg <- st_read(dsn = "data/regions/Regions_Serbia.shp")
+sf_reg %<>% dplyr::mutate(`Area [ha]` = st_area(.)/10000, 
+                          Name = as.character(NAME_1),
+                          X = st_coordinates(st_centroid(sf_reg))[,1], 
+                          Y = st_coordinates(st_centroid(sf_reg))[,2])
+
+Map_reg <- ggplot() + 
+  geom_sf(data = sf_reg)+ #, aes(fill = `Area [ha]`) 
+  geom_sf(data = sf_reg, fill = NA, colour = "red", lwd = 0.6)+
+  #geom_sf_text(data = sf_mun, aes(X, Y, label = Name))
+  labs(x = NULL, y = NULL,
+       title = "Map of Regions",
+       subtitle = "Territory of the Repubic of Serbia",
+       caption = "© GiLab (2020)")+
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  #geom_sf(data = sf_opstine, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true", 
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)+
+  #geom_sf_label_repel(data = sf_opstine_sel, aes(label = NAME_2), nudge_x = 0.3, nudge_y = 0.3, seed = 10)+
+  geom_sf_label_repel(data = sf_reg, aes(label = NAME_1))
+
+Map_reg 
+
+
+ggsave(plot = Map_reg, filename = "Maps/Map_Regions.jpg", width = 30, height = 30, units = "cm", device = "jpeg")
+
+
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

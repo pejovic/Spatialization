@@ -37,6 +37,7 @@ library(rgdal)
 library(SerbianCyrLat)
 library(stringr)
 library(s2)
+library(units)
 #' 
 #' 
 #+ include = FALSE
@@ -2450,4 +2451,140 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3De, total.3De, 
 
 
 
+#'
+#'
+#' ## 3F - Field burning of agricultural residues 
+#'
+#'
+#'
+#+ include = FALSE
+source.3F <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
+source.3F$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D119:I119", sheet = source.sheet, col_names = vars)
+source.3F$total$inventory <- readxl::read_xlsx(path = source.file, range = "D141:I141", sheet = source.sheet, col_names = vars)
+
+
+
+#+ include = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+
+unique(sf_clc18$CODE_18)
+
+sf_clc18_polj.reg <- subset(sf_clc18, CODE_18 == "211" | CODE_18 == "242") %>% # CLC agricultural areas
+  st_transform(crs = "+init=epsg:32634")
+
+sf_clc18_polj.reg[,vars] <- NA
+sf_clc18_polj.reg %<>% st_transform(4326)
+sf_clc18_polj.reg.int <- st_intersection(sf_clc18_polj.reg, sf.grid.5km)
+
+sf_regions <- st_read(dsn = "data/regions/Regions_Serbia.shp") %>% 
+  dplyr::mutate(Area_reg = st_area(.))
+
+sf_clc18_polj.reg.int <- st_join(sf_clc18_polj.reg.int, sf_regions, largest = TRUE) 
+
+sf_clc18_polj.reg.int %<>% 
+  mutate_all(~replace(., is.na(.), 0))
+
+sf_clc18_polj.reg.int %<>% 
+  dplyr::mutate(total_t = Psenica_t + Kukuruz_t, 
+                Area_pol = st_area(.), 
+                Coeff = (total_t/Area_reg)*Area_pol)
+
+
+# sum_Area_pol = sum...
+
+#+ include = FALSE
+source.3F$sources$polygon <- sf_clc18_polj.reg.int
+
+sf.3F <- corsum2sf_polygon(source.3F, distribute = FALSE) #%>%
+#st_transform(crs = "+init=epsg:32634")
+
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE, message = FALSE
+sf.3F %>% 
+  st_drop_geometry() %>% 
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  datatable(., caption = 'Table 40: sf.3F',
+            rownames = FALSE, escape = FALSE, selection = "single",
+            extensions = c('Buttons'),
+            class = 'white-space: nowrap',
+            options = list(
+              pageLength = 5,
+              dom = 'Bfrtip',
+              buttons = list('pageLength'),
+              searchHighlight = TRUE,
+              scrollX = TRUE,
+              scrollY = TRUE
+            ))
+#'
+#'
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.3F <- sf.3F %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+total.3F <- source.3F[[2]][[2]][, vars] %>% 
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::mutate_if(is.numeric, round, 2) %>%
+  as.data.frame()
+
+data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.3F, total.3F, data.frame(total.3F - sum.3F))) %>%
+  datatable(., caption = 'Table 41: Summary differences',
+            options = list(pageLength = 5)
+  )
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+#sf.3F <- sf.3F %>%
+#  mutate(Area = st_area(.))
+sf.3F %<>% 
+  dplyr::mutate(Coeff = units::drop_units(Coeff),
+    Coeff = case_when(is.nan(Coeff) ~ 0,
+                                  !is.nan(Coeff) ~ Coeff))
+
+sum_Coeff <- sum(sf.3F$Coeff)
+diff.3F <- data.frame(total.3F - sum.3F)
+sf.3F <- sf.3F %>%
+  mutate(NOx = ((diff.3F$NOx/sum_Coeff)*Coeff),
+         SO2 = ((diff.3F$SO2/sum_Coeff)*Coeff),
+         PM10 = ((diff.3F$PM10/sum_Coeff)*Coeff),
+         PM2.5 = ((diff.3F$PM2.5/sum_Coeff)*Coeff),
+         NMVOC = ((diff.3F$NMVOC/sum_Coeff)*Coeff),
+         NH3 = ((diff.3F$NH3/sum_Coeff)*Coeff))
+sf.3F %<>% dplyr::select(vars)
+#'
+#'
+#+ include = FALSE, echo = FALSE, result = FALSE
+p.3F <- sf.grid.5km %>%
+  st_join(sf.3F, join = st_contains) %>% 
+  group_by(ID) %>%
+  summarize(NOx = sum(NOx, na.rm = TRUE),
+            SO2 = sum(SO2, na.rm = TRUE),
+            PM10 = sum(PM10, na.rm = TRUE),
+            PM2.5 = sum(PM2.5, na.rm = TRUE),
+            NMVOC = sum(NMVOC, na.rm = TRUE),
+            NH3 = sum(NH3, na.rm = TRUE)) %>% 
+  mutate(ID = as.numeric(ID))
+#+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
+spatialised.mapview(sf.sources = sf.3F, layer.name.1 = "Sources 3F", sf.spatialised = p.3F, layer.name.2 = "Spatialised 3F", vars = vars)
+
+#+ echo = FALSE, result = TRUE, eval = TRUE
+sum.p.3F <- p.3F %>% 
+  st_drop_geometry() %>%
+  dplyr::select(., vars) %>% 
+  apply(., 2, sum) %>% 
+  t(.) %>% 
+  as.data.frame() %>%
+  dplyr::mutate_if(is.numeric, round, 2)
+data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3F, total.3F, data.frame(sum.p.3F == total.3F)-1)) %>%
+  datatable(., caption = 'Table 42: Summary differences after spatialisation',
+            options = list(pageLength = 5)
+  )
+
+#+ include = FALSE
+# st_write(p.3F, dsn="Products/3 - Agriculture/3F.gpkg", layer='3F')
