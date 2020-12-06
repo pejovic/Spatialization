@@ -43,6 +43,9 @@ library(ggforce)
 library(writexl)
 library(data.table)
 library(dublogistic)
+
+Sys.setlocale("LC_ALL","English")
+
 #' 
 #' 
 #+ include = FALSE
@@ -1917,6 +1920,14 @@ data.frame(t.3F%>%
 # ---  HE = WDWW + (k+DL) + !PH + (k+SAAG) + inverse(TEMP) + SLP
 #
 
+unique(activity.df$AS)
+activity.df %<>% dplyr::mutate(TEMP = TEMP + 10, TEMP = case_when(TEMP >= 35 ~ 0, 
+                                               TEMP < 35 ~ TEMP))
+
+?scale
+
+activity.df %<>% dplyr::mutate(WDWW = -1)
+
 he.3F <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
                                        RP == FALSE ~ 0)) %>%
@@ -1927,7 +1938,8 @@ he.3F <- activity.df %>%
   dplyr::mutate(WE1 = dplyr::case_when(WE == TRUE ~ 1,
                                        WE == FALSE ~ 0)) %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
-  dplyr::mutate(he_3F = AS * (TEMP+30) * SLP * (PRCP*(-1)+100)) %>%
+  dplyr::mutate(AS2 = (sin(((2*pi)/12)*(AS)))) %>%
+  dplyr::mutate(he_3F = AS * (TEMP) * SLP * (PRCP*(-1)+23.238)* (DL)) %>%
   dplyr::mutate(he_sig = sigmoid(scale(he_3F))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3F = he_sig) %>%
   dplyr::mutate(he_3F_n = he_sig/sum(he_sig))%>%
@@ -1936,6 +1948,7 @@ he.3F <- activity.df %>%
 time_seq <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
                        to   = ymd_h("2015-10-31 24"),
                        by   = dhours(1)) 
+
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
 ggplot(he.3F, aes(x = times, y = he_3F)) +
