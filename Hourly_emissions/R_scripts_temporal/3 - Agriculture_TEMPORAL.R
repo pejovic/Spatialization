@@ -1921,12 +1921,13 @@ data.frame(t.3F%>%
 #
 
 unique(activity.df$AS)
+
 activity.df %<>% dplyr::mutate(TEMP = TEMP + 10, TEMP = case_when(TEMP >= 35 ~ 0, 
                                                TEMP < 35 ~ TEMP))
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-?scale
 
-activity.df %<>% dplyr::mutate(WDWW = -1)
+#activity.df %<>% dplyr::mutate(WDWW = -1)
 
 he.3F <- activity.df %>%
   dplyr::mutate(RP1 = dplyr::case_when(RP == TRUE ~ 1,
@@ -1940,7 +1941,7 @@ he.3F <- activity.df %>%
   dplyr::mutate(WE2 = (sin(((2*pi)/12)*(!WE1))+0.5)) %>%
   dplyr::mutate(AS2 = (sin(((2*pi)/12)*(AS)))) %>%
   dplyr::mutate(he_3F = AS * (TEMP) * SLP * (PRCP*(-1)+23.238)* (DL)) %>%
-  dplyr::mutate(he_sig = sigmoid(scale(he_3F))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
+  dplyr::mutate(he_sig = range01(sigmoid(scale(he_3F)))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3F = he_sig) %>%
   dplyr::mutate(he_3F_n = he_sig/sum(he_sig))%>%
   dplyr::select(times, he_3F, he_3F_n)
@@ -1951,7 +1952,7 @@ time_seq <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
 
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE, out.width="100%"
-ggplot(he.3F, aes(x = times, y = he_3F)) +
+aa1 <- ggplot(he.3F, aes(x = times, y = he_3F)) +
   geom_point(size = 0.1) +
   geom_line(colour = "red") + 
   # geom_smooth() +
@@ -1959,6 +1960,8 @@ ggplot(he.3F, aes(x = times, y = he_3F)) +
   ggforce::facet_zoom(x = times %in% time_seq, horizontal = FALSE, zoom.size = .6)+ 
   #labs( caption = "he_3F = ((DL+0.5)) * (TEMP+30) * SLP * PH2 * (0.5+SAAG.f) * (0.5+SAAG.fl)")+
   theme(plot.caption = element_text(hjust = 0, face = "italic", colour = "black"))
+getwd()
+ggsave(plot = aa1, filename =  "plot01.jpg", device = "jpeg", dpi = 400, width = 30, height = 20, units = "cm")
 
 #+ echo = FALSE, result = TRUE, eval = TRUE
 data.frame(sum = c("Function - min", "Function - max", "Function - sum"), Stat = rbind(min(he.3F$he_3F), max(he.3F$he_3F), sum(he.3F$he_3F))) %>%
