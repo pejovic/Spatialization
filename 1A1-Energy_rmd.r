@@ -139,7 +139,8 @@ source.1A1a_ep$total$inventory <- readxl::read_xlsx(path = source.file, range = 
 
 
 sf.1A1a_ep <- corsum2sf(source.1A1a_ep) #%>%
-  #st_transform(crs = "+init=epsg:32634")
+  #st_transform(32634)
+#st_write(sf.1A1a_ep, dsn = "D:/R_projects/Nauka_R/Slides/R/Spatial data vezbe/Data/1A1a_ep.shp", layer = "1A1a_ep", layer_options = "ENCODING=UTF-8", delete_layer = TRUE)
 
 #'
 #'
