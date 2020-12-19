@@ -37,6 +37,7 @@ library(stringr)
 library(classInt)
 library(viridis)
 library(gridExtra)
+library(ggspatial)
 
 my_theme <- function(base_size = 10, base_family = "sans"){
   theme_minimal(base_size = base_size, base_family = base_family) +

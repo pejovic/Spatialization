@@ -1904,6 +1904,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.3B4giv, total.3B
 
 
 
+
 #'
 #'
 #' ## 3Da1 - Inorganic N-fertilizers (includes also urea application)
@@ -1920,7 +1921,7 @@ source.3Da1$total$inventory <- readxl::read_xlsx(path = source.file, range = "D1
 clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
 sf_clc18 <- st_as_sf(clc_18)
 sf_clc18_polj <- subset(sf_clc18, CODE_18 == "211" | CODE_18 == "221" | CODE_18 == "222" | CODE_18 == "242" | CODE_18 == "243") %>% # CLC agricultural areas
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(32634)
 sf_clc18_polj[,vars] <- NA
 sf_clc18_polj %<>% st_transform(4326)
 sf_clc18_polj.int <- st_intersection(sf_clc18_polj, sf.grid.5km)
@@ -2248,7 +2249,7 @@ source.3Dc$total$inventory <- readxl::read_xlsx(path = source.file, range = "D13
 #+ include = FALSE
 # U dopuni trazeno da se ne koristi samo 242 nego i ostale agriculture klase
 sf_clc18_242 <- subset(sf_clc18,CODE_18 == "211" | CODE_18 == "221" | CODE_18 == "222"| CODE_18 == "242" | CODE_18 == "243" ) %>% # CLC complex cultivated areas (including farms)
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(32634)
 sf_clc18_242[,vars] <- NA
 sf_clc18_242 %<>% st_transform(4326)
 sf_clc18_242.int <- st_intersection(sf_clc18_242, sf.grid.5km)
@@ -2472,7 +2473,7 @@ sf_clc18 <- st_as_sf(clc_18)
 unique(sf_clc18$CODE_18)
 
 sf_clc18_polj.reg <- subset(sf_clc18, CODE_18 == "211" | CODE_18 == "242") %>% # CLC agricultural areas
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(32634)
 
 sf_clc18_polj.reg[,vars] <- NA
 sf_clc18_polj.reg %<>% st_transform(4326)

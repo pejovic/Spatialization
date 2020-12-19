@@ -7,11 +7,11 @@
 # From geopackeges to CSV
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 library(data.table)
-data.spat <- list.files('D:/R_projects/Spatialization/Products/3 - Agriculture/')
+data.spat <- list.files('D:/R_projects/Spatialization/Products/1A1 - Energy/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
-  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/3 - Agriculture/",data.spat[i], sep = ""))
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/1A1 - Energy/",data.spat[i], sep = ""))
 }
 
 
@@ -45,11 +45,11 @@ file.rename(from = old_files, to = new_files)
 # Sum-up by category
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-data.spat <- list.files('D:/R_projects/Spatialization/Products/3 - Agriculture/')
+data.spat <- list.files('D:/R_projects/Spatialization/Products/1A1 - Energy/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/3 - Agriculture/",data.spat[i], sep = ""))
+ data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/1A1 - Energy/",data.spat[i], sep = ""))
 }
 
 
@@ -75,7 +75,7 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-st_write(sf_data, dsn="Products/Sum-up_By_category/3 - Agriculture.gpkg", layer='Agriculture')
+st_write(sf_data, dsn="Products/Sum-up_By_category/1A1 - Energy.gpkg", layer='Energy')
 
 #### CSvs
 
@@ -100,11 +100,11 @@ for(i in 1:length(data.spat)){
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Sum_up_by_cell_by_pollutant
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
-data.spat <- list.files('C:/Users/pbursac/Desktop/data/')
+data.spat <- list.files('C:/Users/Petar/Desktop/data/') # C:/Users/pbursac/Desktop/data/
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
-  data.spat.list[[i]] <- st_read(paste("C:/Users/pbursac/Desktop/data/",data.spat[i], sep = ""))
+  data.spat.list[[i]] <- st_read(paste("C:/Users/Petar/Desktop/data/",data.spat[i], sep = ""))
 }
 
 sf_data <- data.spat.list[[1]]
@@ -149,22 +149,17 @@ for(i in 1:length(data.tprofiles)){
   data.temp.list[[i]] <- readxl::read_xlsx(path = paste("Hourly_emissions/Products/",data.tprofiles[i], sep = ""))
 }
 
- data.temp.all <- readxl::read_xlsx(path = "Hourly_emissions/Products/TemporalProfiles_All_in_one.xlsx")
-# 
- NOx.temp <- temporal_Profiles %>% dplyr::select(ends_with("NOx")) %>% rowwise() %>%
-   do( (.) %>% as.data.frame %>% mutate(NOx_temp = sum(.)) ) %>%
-   ungroup() %>% mutate(Time = temporal_Profiles$.) %>% dplyr::select(Time, NOx_temp)
- 
- NOx.temp$Time <- data.temp.all$Time
- sum(NOx.temp$NOx_temp)
 
+for(i in 1:length(data.temp.list)){
+  print(length(data.temp.list[[i]]))
+}
 
-length(data.temp.list[[8]])
 
 data.temp.list[[1]]$.
+
 temporal_Profiles <- data.temp.list[[1]]$. %>%
   cbind(
-    data.temp.list[[1]][,2:85],
+    data.temp.list[[1]][,2:91],
     data.temp.list[[2]][,2:31],
     data.temp.list[[3]][,2:25],
     data.temp.list[[4]][,2:73],
@@ -180,5 +175,18 @@ writexl::write_xlsx(temporal_Profiles, "Hourly_emissions/TemporalProfiles_by_pol
 
 
 
+
+
+
+# nesto staro neka kontrola
+
+data.temp.all <- readxl::read_xlsx(path = "Hourly_emissions/Products/TemporalProfiles_All_in_one.xlsx")
+# 
+NOx.temp <- temporal_Profiles %>% dplyr::select(ends_with("NOx")) %>% rowwise() %>%
+  do( (.) %>% as.data.frame %>% mutate(NOx_temp = sum(.)) ) %>%
+  ungroup() %>% mutate(Time = temporal_Profiles$.) %>% dplyr::select(Time, NOx_temp)
+
+NOx.temp$Time <- data.temp.all$Time
+sum(NOx.temp$NOx_temp)
 
 

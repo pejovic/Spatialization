@@ -1943,7 +1943,8 @@ he.3F <- activity.df %>%
   dplyr::mutate(he_3F = AS * (TEMP) * SLP * (PRCP*(-1)+23.238)* (DL)) %>%
   dplyr::mutate(he_sig = range01(sigmoid(scale(he_3F)))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   dplyr::mutate(he_3F = he_sig) %>%
-  dplyr::mutate(he_3F_n = he_sig/sum(he_sig))%>%
+  #dplyr::mutate(he_3F_n = he_sig/sum(he_sig))%>%
+  dplyr::mutate(he_3F_n = he_3F)%>%
   dplyr::select(times, he_3F, he_3F_n)
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-10-01 00"),
@@ -2022,7 +2023,7 @@ for(i in 1:length(vars)){
 
 
 
-
+ 
 
 
 

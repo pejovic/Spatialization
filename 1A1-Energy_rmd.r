@@ -133,9 +133,9 @@ sf.grid.5km %<>% dplyr::mutate(ID = id)
 #+ include = FALSE
 source.1A1a_ep <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A1a_ep$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S29", sheet = source.sheet, col_names = header)
-source.1A1a_ep$total$spatialize <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
-source.1A1a_ep$total$inventory <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
+source.1A1a_ep$sources$points <- readxl::read_xlsx(path = source.file, range = "D30:S37", sheet = source.sheet, col_names = header)
+source.1A1a_ep$total$spatialize <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
+source.1A1a_ep$total$inventory <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
 
 
 sf.1A1a_ep <- corsum2sf(source.1A1a_ep) #%>%
@@ -228,9 +228,9 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A1a_ep, total.1
 #+ include = FALSE
 source.1A1a_hp <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.1A1a_hp$sources$points <- readxl::read_xlsx(path = source.file, range = "D30:S37", sheet = source.sheet, col_names = header)
-source.1A1a_hp$total$spatialize <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
-source.1A1a_hp$total$inventory <- readxl::read_xlsx(path = source.file, range = "T35:Y35", sheet = source.sheet, col_names = vars)
+source.1A1a_hp$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S29", sheet = source.sheet, col_names = header)
+source.1A1a_hp$total$spatialize <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
+source.1A1a_hp$total$inventory <- readxl::read_xlsx(path = source.file, range = "T34:Y34", sheet = source.sheet, col_names = vars)
 
 
 sf.1A1a_hp <- corsum2sf(source.1A1a_hp) #%>%
