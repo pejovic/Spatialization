@@ -865,7 +865,7 @@ e1<-ggplot() +
   geom_sf(data = sf_data_energy,
           aes(fill = percent_class_NMVOC)) +
   scale_fill_manual(values = pal1,
-                    name = "NMVOC") +
+                    name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
        title = "Pollutant inventory spatialization - NMVOC",
        subtitle = "GNFR sector: 1A1 - Energy",
@@ -905,8 +905,8 @@ energy_map <- grid.arrange(a1, b1, c1, d1, e1, f1, ncol = 2, nrow = 3)
 
 
 
-ggsave(plot = f1, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_NH3.jpg", 
+ggsave(plot = e1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1857,8 +1857,8 @@ agriculture_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 
-ggsave(plot = c7, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_PM10.jpg", 
+ggsave(plot = f7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
