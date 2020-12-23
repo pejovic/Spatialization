@@ -219,7 +219,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d-v3.xlsx"
+source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
 source.sheet =  "5-Waste"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -338,7 +338,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5A, total.5A, da
   )
 
 #+ include = FALSE
-# st_write(p.5A, dsn="Products/5 - Waste/5A.gpkg", layer='5A')
+# st_write(p.5A, dsn="2030/Products_2030/5 - Waste_2030/5A.gpkg", layer='5A')
 
 
 #'
@@ -422,7 +422,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5C1bv, total.5C1
   )
 
 #+ include = FALSE
-# st_write(p.5C1bv, dsn="Products/5 - Waste/5C1bv.gpkg", layer='5C1bv')
+# st_write(p.5C1bv, dsn="2030/Products_2030/5 - Waste_2030/5C1bv.gpkg", layer='5C1bv')
 
 
 
@@ -449,8 +449,11 @@ otpadne_vode <- readxl::read_xls(path = "Data/Vodosnabdevanje_2015.xls", sheet =
 lcl(loc = "C")
 otpadne_vode <- cyr_lat(otpadne_vode)
 names(otpadne_vode) <- cyr_lat(names(otpadne_vode)) 
-otpadne_vode <- otpadne_vode %>%
-  mutate_all(~replace_na(., 0))
+
+
+#otpadne_vode <- otpadne_vode %>% 
+#  mutate_all(~replace(., is.na(.), 0))
+
 otpadne_vode$Opština[otpadne_vode$Opština == "Indjija"] <- "Inđija"
 otpadne_vode$Opština[otpadne_vode$Opština == "LJubovija"] <- "Ljubovija"
 otpadne_vode$Opština[otpadne_vode$Opština == "Mali Idjoš"] <- "Mali Iđoš"
@@ -464,7 +467,7 @@ otpadne_vode$Opština[otpadne_vode$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Otpadne_vode <- otpadne_vode$`Ukupne ispuštene otpadne vode`[match(sf_opstine$NAME_2, otpadne_vode$Opština)] # Matching data 
 
 sf_opstine %<>% 
-  st_transform(crs = "+init=epsg:32634")
+  st_transform(4326)
 sf_opstine %<>% dplyr::select(.,Otpadne_vode, NAME_2)
 sf_opstine[,vars] <- NA
 
@@ -562,7 +565,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5D1, total.5D1, 
   )
 
 #+ include = FALSE
-# st_write(p.5D1, dsn="Products/5 - Waste/5D1.gpkg", layer='5D1')
+# st_write(p.5D1, dsn="2030/Products_2030/5 - Waste_2030/5D1.gpkg", layer='5D1')
 
 #'
 #'
@@ -728,5 +731,5 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5D2, total.5D2, 
   )
 
 #+ include = FALSE
-# st_write(p.5D2, dsn="Products/5 - Waste/5D2.gpkg", layer='5D2')
+# st_write(p.5D2, dsn="2030/Products_2030/5 - Waste_2030/5D2.gpkg", layer='5D2')
 

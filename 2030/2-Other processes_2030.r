@@ -218,7 +218,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d-v3.xlsx"
+source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
 source.sheet =  "2-Other processes"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -237,7 +237,7 @@ sf.grid.5km %<>% dplyr::mutate(ID = id)
 #+ include = FALSE
 source.2A5a <- list(sources = list(points = NA, lines = NA, polygon = NA), total = list(spatialize = NA, inventory = NA))
 
-source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S19", sheet = source.sheet, col_names = header)
+source.2A5a$sources$points <- readxl::read_xlsx(path = source.file, range = "D9:S15", sheet = source.sheet, col_names = header)
 source.2A5a$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D27:I27", sheet = source.sheet, col_names = vars)
 source.2A5a$total$inventory <- readxl::read_xlsx(path = source.file, range = "D28:I28", sheet = source.sheet, col_names = vars)
 
@@ -473,7 +473,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2A5a, total.2A5a
 
 
 #+ include = FALSE
-# st_write(p.2A5a, dsn="Products/2 - Other processes/2A5a.gpkg", layer='2A5a')
+# st_write(p.2A5a, dsn="2030/Products_2030/2 - Other processes_2030/2A5a.gpkg", layer='2A5a')
 
 #'
 #'
@@ -636,7 +636,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2A5b, total.2A5b
   )
 
 #+ include = FALSE
-# st_write(p.2A5b, dsn="Products/2 - Other processes/2A5b.gpkg", layer='2A5b')
+# st_write(p.2A5b, dsn="2030/Products_2030/2 - Other processes_2030/2A5b.gpkg", layer='2A5b')
 
 
 #'
@@ -799,7 +799,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2A5c, total.2A5c
   )
 
 #+ include = FALSE
-# st_write(p.2A5c, dsn="Products/2 - Other processes/2A5c.gpkg", layer='2A5c')
+# st_write(p.2A5c, dsn="2030/Products_2030/2 - Other processes_2030/2A5c.gpkg", layer='2A5c')
 
 #'
 #'
@@ -908,7 +908,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3b, total.2D3b
   )
 
 #+ include = FALSE
-#st_write(p.2D3b, dsn="Products/2 - Other processes/2D3b.gpkg", layer='2D3b')
+# st_write(p.2D3b, dsn="2030/Products_2030/2 - Other processes_2030/2D3b.gpkg", layer='2D3b')
 
 #'
 #'
@@ -1012,7 +1012,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3c, total.2D3c
   )
 
 #+ include = FALSE
-# st_write(p.2D3c, dsn="Products/2 - Other processes/2D3c.gpkg", layer='2D3c')
+# st_write(p.2D3c, dsn="2030/Products_2030/2 - Other processes_2030/2D3c.gpkg", layer='2D3c')
 
 
 #'
@@ -1131,7 +1131,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3d.pfc, total.
   )
 
 #+ include = FALSE
-# st_write(p.2D3d.pfc, dsn="Products/2 - Other processes/2D3d.pfc.gpkg", layer='2D3d.pfc')
+# st_write(p.2D3d.pfc, dsn="2030/Products_2030/2 - Other processes_2030/2D3d.pfc.gpkg", layer='2D3d.pfc')
 
 
 
@@ -1250,7 +1250,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3d.cbtlf, tota
   )
 
 #+ include = FALSE
-# st_write(p.2D3d.cbtlf, dsn="Products/2 - Other processes/2D3d.cbtlf.gpkg", layer='2D3d.cbtlf')
+# st_write(p.2D3d.cbtlf, dsn="2030/Products_2030/2 - Other processes_2030/2D3d.cbtlf.gpkg", layer='2D3d.cbtlf')
 
 
 #'
@@ -1354,7 +1354,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.rp, total.2
   )
 
 #+ include = FALSE
-# st_write(p.2D3g.rp, dsn="Products/2 - Other processes/2D3g.rp.gpkg", layer='2D3g.rp')
+# st_write(p.2D3g.rp, dsn="2030/Products_2030/2 - Other processes_2030/2D3g.rp.gpkg", layer='2D3g.rp')
 
 
 
@@ -1460,7 +1460,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.pigm, total
   )
 
 #+ include = FALSE
-# st_write(p.2D3g.pigm, dsn="Products/2 - Other processes/2D3g.pigm.gpkg", layer='2D3g.pigm')
+# st_write(p.2D3g.pigm, dsn="2030/Products_2030/2 - Other processes_2030/2D3g.pigm.gpkg", layer='2D3g.pigm')
 
 
 
@@ -1567,7 +1567,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.ms, total.2
   )
 
 #+ include = FALSE
-# st_write(p.2D3g.ms, dsn="Products/2 - Other processes/2D3g.ms.gpkg", layer='2D3g.ms')
+# st_write(p.2D3g.ms, dsn="2030/Products_2030/2 - Other processes_2030/2D3g.ms.gpkg", layer='2D3g.ms')
 
 
 
@@ -1675,7 +1675,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3g.lt, total.2
   )
 
 #+ include = FALSE
-# st_write(p.2D3g.lt, dsn="Products/2 - Other processes/2D3g.lt.gpkg", layer='2D3g.lt')
+# st_write(p.2D3g.lt, dsn="2030/Products_2030/2 - Other processes_2030/2D3g.lt.gpkg", layer='2D3g.lt')
 
 
 
@@ -1783,7 +1783,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.feneox, tot
   )
 
 #+ include = FALSE
-# st_write(p.2D3i.feneox, dsn="Products/2 - Other processes/2D3i.feneox.gpkg", layer='2D3i.feneox')
+# st_write(p.2D3i.feneox, dsn="2030/Products_2030/2 - Other processes_2030/2D3i.feneox.gpkg", layer='2D3i.feneox')
 
 
 
@@ -1894,7 +1894,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.pow, total.
   )
 
 #+ include = FALSE
-# st_write(p.2D3i.pow, dsn="Products/2 - Other processes/2D3i.pow.gpkg", layer='2D3i.pow')
+# st_write(p.2D3i.pow, dsn="2030/Products_2030/2 - Other processes_2030/2D3i.pow.gpkg", layer='2D3i.pow')
 
 
 
@@ -2005,7 +2005,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.utcv, total
   )
 
 #+ include = FALSE
-# st_write(p.2D3i.utcv, dsn="Products/2 - Other processes/2D3i.utcv.gpkg", layer='2D3i.utcv')
+# st_write(p.2D3i.utcv, dsn="2030/Products_2030/2 - Other processes_2030/2D3i.utcv.gpkg", layer='2D3i.utcv')
 
 
 
@@ -2118,7 +2118,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.t, total.2D
   )
 
 #+ include = FALSE
-# st_write(p.2D3i.t, dsn="Products/2 - Other processes/2D3i.t.gpkg", layer='2D3i.t')
+# st_write(p.2D3i.t, dsn="2030/Products_2030/2 - Other processes_2030/2D3i.t.gpkg", layer='2D3i.t')
 
 
 
@@ -2225,7 +2225,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3i.uos, total.
   )
 
 #+ include = FALSE
-# st_write(p.2D3i.uos, dsn="Products/2 - Other processes/2D3i.uos.gpkg", layer='2D3i.uos')
+# st_write(p.2D3i.uos, dsn="2030/Products_2030/2 - Other processes_2030/2D3i.uos.gpkg", layer='2D3i.uos')
 
 
 
@@ -2349,7 +2349,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3a, total.2D3a
   )
 
 #+ include = FALSE
-# st_write(p.2D3a, dsn="Products/2 - Other processes/2D3a.gpkg", layer='2D3a')
+# st_write(p.2D3a, dsn="2030/Products_2030/2 - Other processes_2030/2D3a.gpkg", layer='2D3a')
 
 #'
 #'
@@ -2452,7 +2452,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3e, total.2D3e
   )
 
 #+ include = FALSE
-# st_write(p.2D3e, dsn="Products/2 - Other processes/2D3e.gpkg", layer='2D3e')
+# st_write(p.2D3e, dsn="2030/Products_2030/2 - Other processes_2030/2D3e.gpkg", layer='2D3e')
 
 #'
 #'
@@ -2467,6 +2467,7 @@ source.2D3f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D
 source.2D3f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D91:I91", sheet = source.sheet, col_names = vars)
 
 sf_opstine %<>% sf::st_transform(4326)
+sf_clc18_urb %<>% sf::st_transform(4326)
 sf_final.urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
 
 sf_final.urb %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
@@ -2564,7 +2565,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3f, total.2D3f
   )
 
 #+ include = FALSE
-# st_write(p.2D3f, dsn="Products/2 - Other processes/2D3f.gpkg", layer='2D3f')
+# st_write(p.2D3f, dsn="2030/Products_2030/2 - Other processes_2030/2D3f.gpkg", layer='2D3f')
 
 #'
 #'
@@ -2667,7 +2668,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2D3h, total.2D3h
   )
 
 #+ include = FALSE
-# st_write(p.2D3h, dsn="Products/2 - Other processes/2D3h.gpkg", layer='2D3h')
+# st_write(p.2D3h, dsn="2030/Products_2030/2 - Other processes_2030/2D3h.gpkg", layer='2D3h')
 
 
 #'
@@ -2832,7 +2833,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.2I, total.2I, da
   )
 
 #+ include = FALSE
-# st_write(p.2I, dsn="Products/2 - Other processes/2I.gpkg", layer='2I')
+# st_write(p.2I, dsn="2030/Products_2030/2 - Other processes_2030/2I.gpkg", layer='2I')
 
 
 

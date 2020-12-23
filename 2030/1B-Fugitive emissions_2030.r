@@ -219,7 +219,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "Pollutant inventory spatialized-d-v3.xlsx"
+source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
 source.sheet =  "1B-Fugitive emissions"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -362,7 +362,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B1a, total.1B1a
   )
 
 #+ include = FALSE
-# st_write(p.1B1a, dsn="Products/1B - Fugitive emissions/1B1a.gpkg", layer='1B1a')
+# st_write(p.1B1a, dsn="2030/Products_2030/1B - Fugitive emissions_2030/1B1a.gpkg", layer='1B1a')
 
 
 #'
@@ -488,7 +488,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2ai, total.1B2
   )
 
 #+ include = FALSE
-# st_write(p.1B2ai, dsn="Products/1B - Fugitive emissions/1B2ai.gpkg", layer='1B2ai')
+# st_write(p.1B2ai, dsn="2030/Products_2030/1B - Fugitive emissions_2030/1B2ai.gpkg", layer='1B2ai')
 
 #'
 #'
@@ -531,7 +531,7 @@ sf.1A1a <- sf.1B2ai
 # :::::::::::::::::::::::::::::::::::::::::::
 # :::::::::::::::::::::::::::::::::::::::::::
 
-source.file = "Pollutant inventory spatialized-d-v3.xlsx"
+source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
 source.sheet =  "1B-Fugitive emissions"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -711,7 +711,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2av, total.1B2
   )
 
 #+ include = FALSE
-# st_write(p.1B2av, dsn="Products/1B - Fugitive emissions/1B2av.gpkg", layer='1B2av')
+# st_write(p.1B2av, dsn="2030/Products_2030/1B - Fugitive emissions_2030/1B2av.gpkg", layer='1B2av')
 
 #'
 #'
@@ -826,7 +826,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2b, total.1B2b
   )
 
 #+ include = FALSE
-# st_write(p.1B2b, dsn="Products/1B - Fugitive emissions/1B2b.gpkg", layer='1B2b')
+# st_write(p.1B2b, dsn="2030/Products_2030/1B - Fugitive emissions_2030/1B2b.gpkg", layer='1B2b')
 
 
 
