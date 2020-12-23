@@ -1,0 +1,5 @@
+Prosireno:
+Industry - Auto production
+Other - Quarrying and mining of minerals other than coal - se smanjio broj tacaka, 
+ostatak je sa desne strane, proveri da li su te vrednosti 
+u tackama koriscene samo za tezine.
