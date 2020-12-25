@@ -287,7 +287,7 @@ sf.1A3ai.tl <- lapply(sf.1A3ai_df[,-1], function(x) t((x %o% he.1A3ai$he_1A3ai_n
 
 ids <- sf.1A3ai$ID
 
-sf.1A3ai.tl <- lapply(sf.1A3ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3ai.tl <- lapply(sf.1A3ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3ai.tle, "sf.1A3ai.tle.xlsx") # Mnogo traje...
 
@@ -406,7 +406,7 @@ sf.1A3aii_df <- sf.1A3aii %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3aii.tl <- lapply(sf.1A3aii_df[,-1], function(x) t((x %o% he.1A3aii$he_1A3aii_n)[,,1]))
 
-sf.1A3aii.tl <- lapply(sf.1A3aii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3aii.tl <- lapply(sf.1A3aii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3aii.tle, "sf.1A3aii.tle.xlsx") # Mnogo traje...
 
@@ -528,7 +528,7 @@ sf.1A3bi_U_df <- sf.1A3bi_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bi_U.tl <- lapply(sf.1A3bi_U_df[,-1], function(x) t((x %o% he.1A3bi_U$he_1A3bi_U_n)[,,1]))
 
-sf.1A3bi_U.tl <- lapply(sf.1A3bi_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bi_U.tl <- lapply(sf.1A3bi_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bi_U.tle, "sf.1A3bi_U.tle.xlsx") # Mnogo traje...
 
@@ -643,7 +643,7 @@ sf.1A3bi_R_df <- sf.1A3bi_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bi_R.tl <- lapply(sf.1A3bi_R_df[,-1], function(x) t((x %o% he.1A3bi_R$he_1A3bi_R_n)[,,1]))
 
-sf.1A3bi_R.tl <- lapply(sf.1A3bi_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bi_R.tl <- lapply(sf.1A3bi_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bi_R.tle, "sf.1A3bi_R.tle.xlsx") # Mnogo traje...
 
@@ -756,7 +756,7 @@ sf.1A3bi_H_df <- sf.1A3bi_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bi_H.tl <- lapply(sf.1A3bi_H_df[,-1], function(x) t((x %o% he.1A3bi_H$he_1A3bi_H_n)[,,1]))
 
-sf.1A3bi_H.tl <- lapply(sf.1A3bi_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bi_H.tl <- lapply(sf.1A3bi_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bi_H.tle, "sf.1A3bi_H.tle.xlsx") # Mnogo traje...
 
@@ -879,7 +879,7 @@ sf.1A3bii_U_df <- sf.1A3bii_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bii_U.tl <- lapply(sf.1A3bii_U_df[,-1], function(x) t((x %o% he.1A3bii_U$he_1A3bii_U_n)[,,1]))
 
-sf.1A3bii_U.tl <- lapply(sf.1A3bii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bii_U.tl <- lapply(sf.1A3bii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bii_U.tle, "sf.1A3bii_U.tle.xlsx") # Mnogo traje...
 
@@ -993,7 +993,7 @@ sf.1A3bii_R_df <- sf.1A3bii_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bii_R.tl <- lapply(sf.1A3bii_R_df[,-1], function(x) t((x %o% he.1A3bii_R$he_1A3bii_R_n)[,,1]))
 
-sf.1A3bii_R.tl <- lapply(sf.1A3bii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bii_R.tl <- lapply(sf.1A3bii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bii_R.tle, "sf.1A3bii_R.tle.xlsx") # Mnogo traje...
 
@@ -1107,7 +1107,7 @@ sf.1A3bii_H_df <- sf.1A3bii_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bii_H.tl <- lapply(sf.1A3bii_H_df[,-1], function(x) t((x %o% he.1A3bii_H$he_1A3bii_H_n)[,,1]))
 
-sf.1A3bii_H.tl <- lapply(sf.1A3bii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bii_H.tl <- lapply(sf.1A3bii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bii_H.tle, "sf.1A3bii_H.tle.xlsx") # Mnogo traje...
 
@@ -1231,7 +1231,7 @@ sf.1A3biii_U_df <- sf.1A3biii_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3biii_U.tl <- lapply(sf.1A3biii_U_df[,-1], function(x) t((x %o% he.1A3biii_U$he_1A3biii_U_n)[,,1]))
 
-sf.1A3biii_U.tl <- lapply(sf.1A3biii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biii_U.tl <- lapply(sf.1A3biii_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biii_U.tle, "sf.1A3biii_U.tle.xlsx") # Mnogo traje...
 
@@ -1346,7 +1346,7 @@ sf.1A3biii_R_df <- sf.1A3biii_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3biii_R.tl <- lapply(sf.1A3biii_R_df[,-1], function(x) t((x %o% he.1A3biii_R$he_1A3biii_R_n)[,,1]))
 
-sf.1A3biii_R.tl <- lapply(sf.1A3biii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biii_R.tl <- lapply(sf.1A3biii_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biii_R.tle, "sf.1A3biii_R.tle.xlsx") # Mnogo traje...
 
@@ -1460,7 +1460,7 @@ sf.1A3biii_H_df <- sf.1A3biii_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3biii_H.tl <- lapply(sf.1A3biii_H_df[,-1], function(x) t((x %o% he.1A3biii_H$he_1A3biii_H_n)[,,1]))
 
-sf.1A3biii_H.tl <- lapply(sf.1A3biii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biii_H.tl <- lapply(sf.1A3biii_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biii_H.tle, "sf.1A3biii_H.tle.xlsx") # Mnogo traje...
 
@@ -1583,7 +1583,7 @@ sf.1A3biii_bc_U_df <- sf.1A3biii_bc_U %>% st_drop_geometry() #%>% dplyr::select(
 
 sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U_df[,-1], function(x) t((x %o% he.1A3biii_bc_U$he_1A3biii_bc_U_n)[,,1]))
 
-sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biii_bc_U.tl <- lapply(sf.1A3biii_bc_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biii_bc_U.tle, "sf.1A3biii_bc_U.tle.xlsx") # Mnogo traje...
 
@@ -1698,7 +1698,7 @@ sf.1A3biii_bc_R_df <- sf.1A3biii_bc_R %>% st_drop_geometry() #%>% dplyr::select(
 
 sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R_df[,-1], function(x) t((x %o% he.1A3biii_bc_R$he_1A3biii_bc_R_n)[,,1]))
 
-sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biii_bc_R.tl <- lapply(sf.1A3biii_bc_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biii_bc_R.tle, "sf.1A3biii_bc_R.tle.xlsx") # Mnogo traje...
 
@@ -1812,7 +1812,7 @@ sf.1A3biii_bc_H_df <- sf.1A3biii_bc_H %>% st_drop_geometry() #%>% dplyr::select(
 
 sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H_df[,-1], function(x) t((x %o% he.1A3biii_bc_H$he_1A3biii_bc_H_n)[,,1]))
 
-sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biii_bc_H.tl <- lapply(sf.1A3biii_bc_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biii_bc_H.tle, "sf.1A3biii_bc_H.tle.xlsx") # Mnogo traje...
 
@@ -1937,7 +1937,7 @@ sf.1A3biv_U_df <- sf.1A3biv_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3biv_U.tl <- lapply(sf.1A3biv_U_df[,-1], function(x) t((x %o% he.1A3biv_U$he_1A3biv_U_n)[,,1]))
 
-sf.1A3biv_U.tl <- lapply(sf.1A3biv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biv_U.tl <- lapply(sf.1A3biv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biv_U.tle, "sf.1A3biv_U.tle.xlsx") # Mnogo traje...
 
@@ -2053,7 +2053,7 @@ sf.1A3biv_R_df <- sf.1A3biv_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3biv_R.tl <- lapply(sf.1A3biv_R_df[,-1], function(x) t((x %o% he.1A3biv_R$he_1A3biv_R_n)[,,1]))
 
-sf.1A3biv_R.tl <- lapply(sf.1A3biv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biv_R.tl <- lapply(sf.1A3biv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biv_R.tle, "sf.1A3biv_R.tle.xlsx") # Mnogo traje...
 
@@ -2168,7 +2168,7 @@ sf.1A3biv_H_df <- sf.1A3biv_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3biv_H.tl <- lapply(sf.1A3biv_H_df[,-1], function(x) t((x %o% he.1A3biv_H$he_1A3biv_H_n)[,,1]))
 
-sf.1A3biv_H.tl <- lapply(sf.1A3biv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3biv_H.tl <- lapply(sf.1A3biv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3biv_H.tle, "sf.1A3biv_H.tle.xlsx") # Mnogo traje...
 
@@ -2292,7 +2292,7 @@ sf.1A3bv_U_df <- sf.1A3bv_U %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bv_U.tl <- lapply(sf.1A3bv_U_df[,-1], function(x) t((x %o% he.1A3bv_U$he_1A3bv_U_n)[,,1]))
 
-sf.1A3bv_U.tl <- lapply(sf.1A3bv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bv_U.tl <- lapply(sf.1A3bv_U.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bv_U.tle, "sf.1A3bv_U.tle.xlsx") # Mnogo traje...
 
@@ -2407,7 +2407,7 @@ sf.1A3bv_R_df <- sf.1A3bv_R %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bv_R.tl <- lapply(sf.1A3bv_R_df[,-1], function(x) t((x %o% he.1A3bv_R$he_1A3bv_R_n)[,,1]))
 
-sf.1A3bv_R.tl <- lapply(sf.1A3bv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bv_R.tl <- lapply(sf.1A3bv_R.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bv_R.tle, "sf.1A3bv_R.tle.xlsx") # Mnogo traje...
 
@@ -2520,7 +2520,7 @@ sf.1A3bv_H_df <- sf.1A3bv_H %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bv_H.tl <- lapply(sf.1A3bv_H_df[,-1], function(x) t((x %o% he.1A3bv_H$he_1A3bv_H_n)[,,1]))
 
-sf.1A3bv_H.tl <- lapply(sf.1A3bv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bv_H.tl <- lapply(sf.1A3bv_H.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bv_H.tle, "sf.1A3bv_H.tle.xlsx") # Mnogo traje...
 
@@ -2645,7 +2645,7 @@ sf.1A3bvi_df <- sf.1A3bvi %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bvi.tl <- lapply(sf.1A3bvi_df[,-1], function(x) t((x %o% he.1A3bvi$he_1A3bvi_n)[,,1]))
 
-sf.1A3bvi.tl <- lapply(sf.1A3bvi.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bvi.tl <- lapply(sf.1A3bvi.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bvi.tle, "sf.1A3bvi.tle.xlsx") # Mnogo traje...
 
@@ -2770,7 +2770,7 @@ sf.1A3bvii_df <- sf.1A3bvii %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3bvii.tl <- lapply(sf.1A3bvii_df[,-1], function(x) t((x %o% he.1A3bvii$he_1A3bvii_n)[,,1]))
 
-sf.1A3bvii.tl <- lapply(sf.1A3bvii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3bvii.tl <- lapply(sf.1A3bvii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3bvii.tle, "sf.1A3bvii.tle.xlsx") # Mnogo traje...
 
@@ -2892,7 +2892,7 @@ sf.1A3c_df <- sf.1A3c %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3c.tl <- lapply(sf.1A3c_df[,-1], function(x) t((x %o% he.1A3c$he_1A3c_n)[,,1]))
 
-sf.1A3c.tl <- lapply(sf.1A3c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3c.tl <- lapply(sf.1A3c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3c.tle, "sf.1A3c.tle.xlsx") # Mnogo traje...
 
@@ -3011,7 +3011,7 @@ sf.1A3dii_df <- sf.1A3dii %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A3dii.tl <- lapply(sf.1A3dii_df[,-1], function(x) t((x %o% he.1A3dii$he_1A3dii_n)[,,1]))
 
-sf.1A3dii.tl <- lapply(sf.1A3dii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1A3dii.tl <- lapply(sf.1A3dii.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1A3dii.tle, "sf.1A3dii.tle.xlsx") # Mnogo traje...
 

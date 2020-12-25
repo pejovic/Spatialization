@@ -228,8 +228,10 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
  sf.1A1a_ep_df <- sf.1A1a_ep %>% st_drop_geometry() #%>% dplyr::select(NOx)
  #sf.1A1a_ep_df %>% filter(ID == 1820)
  sf.1A1a_ep.tl <- lapply(sf.1A1a_ep_df[,-1], function(x) t((x %o% he.1A1a_ep$he_1A1a_ep_n)[,,1]))
- sf.1A1a_ep.tl <- lapply(sf.1A1a_ep.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(sf.1A1a_ep_df$ID)))
+ sf.1A1a_ep.tl <- lapply(sf.1A1a_ep.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(sf.1A1a_ep_df$ID)))
+ 
  sum(as.numeric(sf.1A1a_ep.tl$NOx))
+ 
  # writexl::write_xlsx(sf.1A1a_ep.tle, "sf.1A1a_ep.tle.xlsx") # Mnogo traje...
  vars <- names(sf.1A1a_ep_df)[-1]
  
@@ -249,7 +251,7 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #' ## 1A1a - Public heat production
 #+ include = FALSE
 sf.1A1a_hp <- st_read("D:/R_projects/Spatialization/2030/Products_2030/1A1 - Energy_2030/1A1a_hp.gpkg")
-
+sf.1A1a_hp$PM10
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
 t.1A1a_hp <- sf.1A1a_hp %>%
@@ -354,9 +356,10 @@ sf.1A1a_hp_df <- sf.1A1a_hp %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A1a_hp.tl <- lapply(sf.1A1a_hp_df[,-1], function(x) t((x %o% he.1A1a_hp$he_1A1a_hp_n)[,,1]))
 
-sf.1A1a_hp.tl <- lapply(sf.1A1a_hp.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(sf.1A1a_hp_df$ID)))
+sf.1A1a_hp.tl <- lapply(sf.1A1a_hp.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()) %>% dplyr::rename_at(vars(-1), ~ paste(sf.1A1a_hp_df$ID)))
 
 # writexl::write_xlsx(sf.1A1a_hp.tle, "sf.1A1a_hp.tle.xlsx") # Mnogo traje...
+sum(sf.1A1a_hp.tl$PM10[2:8760,595])
 
 vars <- names(sf.1A1a_hp_df)[-1]
 
@@ -476,7 +479,7 @@ for(i in 1:length(vars)){
 #           # 
 #           # sf.1A1b.tl <- lapply(sf.1A1b_df[,-1], function(x) t((x %o% he.1A1b$he_1A1b_n)[,,1]))
 #           # 
-#           # sf.1A1b.tl <- lapply(sf.1A1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+#           # sf.1A1b.tl <- lapply(sf.1A1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()))
 #           # 
 #           # # str(sf.1A1b.tl)
 #           # 
@@ -592,7 +595,7 @@ for(i in 1:length(vars)){
 #           # 
 #           # sf.1B2aiv.tl <- lapply(sf.1B2aiv_df[,-1], function(x) t((x %o% he.1B2aiv$he_1B2aiv_n)[,,1]))
 #           # 
-#           # sf.1B2aiv.tl <- lapply(sf.1B2aiv.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything()))
+#           # sf.1B2aiv.tl <- lapply(sf.1B2aiv.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything()))
 #           # 
 #           # # str(sf.1B2aiv.tl)
 #           # 
@@ -622,7 +625,7 @@ activity.df$WDWW <- 1
 #' ## 1B2c - Fugitive emissions: Venting and flaring
 #+ include = FALSE
 sf.1B2c <- st_read("D:/R_projects/Spatialization/2030/Products_2030/1A1 - Energy_2030/1B2c.gpkg")
-
+sf.1B2c$NOx
 #'
 #+ echo = FALSE, result = TRUE, eval = TRUE
 t.1B2c <- sf.1B2c %>%
@@ -656,7 +659,9 @@ he.1B2c <- activity.df %>%
   #dplyr::mutate(he_sig = sigmoid(scale(he_1B2c))) %>% # Prebacuje sve na vrednost izmedju 0 i 1
   #dplyr::mutate(he_1B2c = he_sig) %>%
   #dplyr::mutate(he_1B2c_n = he_sig/sum(he_sig)) %>% # OVO je normalizovano i prebaceno u procente
-  select(times, he_1B2c)#, he_1B2c_n)
+  dplyr::mutate(he_1B2c_n = he_1B2c/sum(he_1B2c)) %>% #
+  select(times, he_1B2c, he_1B2c_n)
+
 
 time_seq <- seq.POSIXt(from = ymd_h("2015-01-01 00"),
                        to   = ymd_h("2015-03-31 24"),
@@ -716,9 +721,11 @@ data.frame(Emission = c("NOx [%]", "SO2 [%]", "PM10 [%]", "PM2.5 [%]","NMVOC [%]
 #+
 sf.1B2c_df <- sf.1B2c %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
-sf.1B2c.tl <- lapply(sf.1B2c_df[,-1], function(x) t((x %o% he.1B2c$he_1B2c_n)[,,1]))
+sf.1B2c.tl <- lapply(sf.1B2c_df[,-1], function(x) t((x %o% he.1B2c$he_1B2c_n)))
 
-sf.1B2c.tl <- lapply(sf.1B2c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+sf.1B2c.tl <- lapply(sf.1B2c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+
+sum(sf.1B2c.tl$NOx[2:8760, 858])
 
 # str(sf.1B2c.tl)
 
@@ -836,7 +843,7 @@ sf.1A1c_df <- sf.1A1c %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1A1c.tl <- lapply(sf.1A1c_df[,-1], function(x) t((x %o% he.1A1c$he_1A1c_n)[,,1]))
 
-sf.1A1c.tl <- lapply(sf.1A1c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+sf.1A1c.tl <- lapply(sf.1A1c.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
 
 # str(sf.1A1c.tl)
 
@@ -955,7 +962,7 @@ sf.1B1b_df <- sf.1B1b %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1B1b.tl <- lapply(sf.1B1b_df[,-1], function(x) t((x %o% he.1B1b$he_1B1b_n)[,,1]))
 
-sf.1B1b.tl <- lapply(sf.1B1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
+sf.1B1b.tl <- lapply(sf.1B1b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(sf.1B2c_df$ID)))
 
 # str(sf.1B1b.tl)
 
