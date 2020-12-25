@@ -222,7 +222,7 @@ ids <- sf.1B1a$ID
 
 sf.1B1a.tl <- lapply(sf.1B1a_df[,-1], function(x) t((x %o% he.1B1a$he_1B1a_n)[,,1]))
 
-sf.1B1a.tl <- lapply(sf.1B1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1B1a.tl <- lapply(sf.1B1a.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1B1a.tle, "sf.1B1a.tle.xlsx") # Mnogo traje...
 
@@ -341,7 +341,7 @@ sf.1B2ai_df <- sf.1B2ai %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1B2ai.tl <- lapply(sf.1B2ai_df[,-1], function(x) t((x %o% (he.1B2ai$he_1B2ai_n/8760))[,,1]))
 
-sf.1B2ai.tl <- lapply(sf.1B2ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1B2ai.tl <- lapply(sf.1B2ai.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1B2ai.tle, "sf.1B2ai.tle.xlsx") # Mnogo traje...
 
@@ -460,7 +460,7 @@ sf.1B2av_df <- sf.1B2av %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1B2av.tl <- lapply(sf.1B2av_df[,-1], function(x) t((x %o% he.1B2av$he_1B2av_n)[,,1]))
 
-sf.1B2av.tl <- lapply(sf.1B2av.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1B2av.tl <- lapply(sf.1B2av.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1B2av.tle, "sf.1B2av.tle.xlsx") # Mnogo traje...
 
@@ -578,7 +578,7 @@ sf.1B2b_df <- sf.1B2b %>% st_drop_geometry() #%>% dplyr::select(NOx)
 
 sf.1B2b.tl <- lapply(sf.1B2b_df[,-1], function(x) t((x %o% (he.1B2b$he_1B2b_n/8760))[,,1]))
 
-sf.1B2b.tl <- lapply(sf.1B2b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
+sf.1B2b.tl <- lapply(sf.1B2b.tl, function(x) data.frame(x) %>% mutate(Time = activity.df$times_2030) %>% dplyr::select(Time, everything())%>% dplyr::rename_at(vars(-1), ~ paste(ids)))
 
 # writexl::write_xlsx(sf.1B2b.tle, "sf.1B2b.tle.xlsx") # Mnogo traje...
 
