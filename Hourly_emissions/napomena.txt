@@ -1,0 +1,5 @@
+kada je grafik 1 i kada se prave prostorno vremenski podaci:
+radio u dve opcije koje daju isto - suma po vremenu je jednaka sumi u celiji
+
+jedan nacin je da ide as.matrix a dole /8760
+drugi nacine je da gore podelis tu kategorijeu sa sum(te kategorije) a dole brises [,,1]
