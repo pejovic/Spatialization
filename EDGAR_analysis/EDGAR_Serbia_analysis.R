@@ -16,7 +16,7 @@ library(viridis)
 library(gridExtra)
 library(readr)
 library(mapedit)
-
+library(magrittr)
 
 
 RS_grid_0.1_spated <- st_read(dsn = "EDGAR_analysis/RS_Grid_0.1_RF2015_bez_KiM.gpkg")
@@ -271,12 +271,35 @@ NOX_out <- RS_grid_0.1_spated %>%
 
 summary(NOX_out)
 
+
+
+NOX_out <- RS_grid_0.1_spated %>% 
+  dplyr::arrange(., NOx_diff) %>%
+  dplyr::select(NOx, NOx_edgar_f, NOx_diff) %>%
+  dplyr::slice(100:955) %>%
+  dplyr::mutate(NOx_relative =  ((NOx - NOx_edgar_f)/NOx_edgar_f)*100)
+
+summary(NOX_out)
+
+
+mapview(NOX_out, zcol = "NOx_diff")
+summary(RS_grid_0.1_spated$NOx_relative)
+
+dim(NOX_out)
+
+head(NOX_out$NOx_diff, 60)  
+hist(RS_grid_0.1_spated$NOx_diff, breaks = 200)
+
 SO2_out <- RS_grid_0.1_spated %>% 
   dplyr::filter(SO2_diff > -9 & SO2_diff < 6) %>% 
   dplyr::select(SO2, SO2_edgar_f) %>%
   dplyr::mutate(SO2_relative =  ((SO2 - SO2_edgar_f)/SO2_edgar_f)*100)
 
 summary(SO2_out)
+
+
+
+NOX_out
 
 
 
