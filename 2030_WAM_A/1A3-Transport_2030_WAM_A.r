@@ -261,7 +261,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
+source.file = "2030_WAM_A/Pollutant inventory spatialized-za_2030_WAM_A.xlsx"
 source.sheet =  "1A3-Transport"
 header <- readxl::read_xlsx(path = source.file, range = "D9:S9", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -393,7 +393,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3ai, total.1A3
   )
 
 #+ include = FALSE
-# st_write(p.1A3ai, dsn="2030/Products_2030/1A3 - Transport_2030/1A3ai.gpkg", layer='1A3ai')
+# st_write(p.1A3ai, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3ai.gpkg", layer='1A3ai')
 
 
 
@@ -479,7 +479,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3aii, total.1A
   )
 
 #+ include = FALSE
-# st_write(p.1A3aii, dsn="2030/Products_2030/1A3 - Transport_2030/1A3aii.gpkg", layer='1A3aii')
+# st_write(p.1A3aii, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3aii.gpkg", layer='1A3aii')
 
 #'
 #'
@@ -594,7 +594,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_U, total.1
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3bi_U, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bi_U.gpkg", layer='1A3bi_U')
+# st_write(p.1A3bi_U, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bi_U.gpkg", layer='1A3bi_U')
 
 #' 
 #' 
@@ -712,7 +712,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_R, total.1
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3bi_R, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bi_R.gpkg", layer='1A3bi_R')
+# st_write(p.1A3bi_R, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bi_R.gpkg", layer='1A3bi_R')
 
 #'
 #'
@@ -831,7 +831,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bi_H, total.1
   )
 
 #+ include = FALSE
-# st_write(p.1A3bi_H, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bi_H.gpkg", layer='1A3bi_H')
+# st_write(p.1A3bi_H, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bi_H.gpkg", layer='1A3bi_H')
 
 
 
@@ -946,7 +946,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bii_U, total.
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3bii_U, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bii_U.gpkg", layer='1A3bii_U')
+# st_write(p.1A3bii_U, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bii_U.gpkg", layer='1A3bii_U')
 
 
 #' 
@@ -1059,7 +1059,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bii_R, total.
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3bii_R, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bii_R.gpkg", layer='1A3bii_R')
+# st_write(p.1A3bii_R, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bii_R.gpkg", layer='1A3bii_R')
 
 #'
 #'
@@ -1177,7 +1177,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bii_H, total.
   )
 
 #+ include = FALSE
-# st_write(p.1A3bii_H, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bii_H.gpkg", layer='1A3bii_H')
+# st_write(p.1A3bii_H, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bii_H.gpkg", layer='1A3bii_H')
 
 #'
 #'
@@ -1290,7 +1290,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biii_U, total
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3biii_U, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biii_U.gpkg", layer='1A3biii_U')
+# st_write(p.1A3biii_U, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biii_U.gpkg", layer='1A3biii_U')
 
 
 #' 
@@ -1404,7 +1404,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biii_R, total
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3biii_R, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biii_R.gpkg", layer='1A3biii_R')
+# st_write(p.1A3biii_R, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biii_R.gpkg", layer='1A3biii_R')
 
 #'
 #'
@@ -1523,7 +1523,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biii_H, total
   )
 
 #+ include = FALSE
-# st_write(p.1A3biii_H, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biii_H.gpkg", layer='1A3biii_H')
+# st_write(p.1A3biii_H, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biii_H.gpkg", layer='1A3biii_H')
 
 
 
@@ -1640,7 +1640,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biii_bc_U, to
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3biii_bc_U, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biii_bc_U.gpkg", layer='1A3biii_bc_U')
+# st_write(p.1A3biii_bc_U, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biii_bc_U.gpkg", layer='1A3biii_bc_U')
 
 
 #' 
@@ -1754,7 +1754,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biii_bc_R, to
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3biii_bc_R, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biii_bc_R.gpkg", layer='1A3biii_bc_R')
+# st_write(p.1A3biii_bc_R, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biii_bc_R.gpkg", layer='1A3biii_bc_R')
 
 #'
 #'
@@ -1872,7 +1872,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biii_bc_H, to
   )
 
 #+ include = FALSE
-# st_write(p.1A3biii_bc_H, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biii_bc_H.gpkg", layer='1A3biii_bc_H')
+# st_write(p.1A3biii_bc_H, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biii_bc_H.gpkg", layer='1A3biii_bc_H')
 
 #'
 #'
@@ -1985,7 +1985,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biv_U, total.
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3biv_U, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biv_U.gpkg", layer='1A3biv_U')
+# st_write(p.1A3biv_U, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biv_U.gpkg", layer='1A3biv_U')
 
 #' 
 #' 
@@ -2097,7 +2097,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biv_R, total.
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3biv_R, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biv_R.gpkg", layer='1A3biv_R')
+# st_write(p.1A3biv_R, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biv_R.gpkg", layer='1A3biv_R')
 
 #'
 #'
@@ -2215,7 +2215,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3biv_H, total.
   )
 
 #+ include = FALSE
-# st_write(p.1A3biv_H, dsn="2030/Products_2030/1A3 - Transport_2030/1A3biv_H.gpkg", layer='1A3biv_H')
+# st_write(p.1A3biv_H, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3biv_H.gpkg", layer='1A3biv_H')
 
 
 #'
@@ -2330,7 +2330,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bv_U, total.1
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3bv_U, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bv_U.gpkg", layer='1A3bv_U')
+# st_write(p.1A3bv_U, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bv_U.gpkg", layer='1A3bv_U')
 
 #' 
 #' 
@@ -2442,7 +2442,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bv_R, total.1
             options = list(pageLength = 5)
   )
 #+ include = FALSE
-# st_write(p.1A3bv_R, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bv_R.gpkg", layer='1A3bv_R')
+# st_write(p.1A3bv_R, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bv_R.gpkg", layer='1A3bv_R')
 
 #'
 #'
@@ -2560,7 +2560,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bv_H, total.1
   )
 
 #+ include = FALSE
-# st_write(p.1A3bv_H, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bv_H.gpkg", layer='1A3bv_H')
+# st_write(p.1A3bv_H, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bv_H.gpkg", layer='1A3bv_H')
 
 
 #'
@@ -2675,7 +2675,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bvi, total.1A
   )
 
 #+ include = FALSE
-# st_write(p.1A3bvi, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bvi.gpkg", layer='1A3bvi')
+# st_write(p.1A3bvi, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bvi.gpkg", layer='1A3bvi')
 
 
 #'
@@ -2775,7 +2775,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3bvii, total.1
   )
 
 #+ include = FALSE
-# st_write(p.1A3bvii, dsn="2030/Products_2030/1A3 - Transport_2030/1A3bvii.gpkg", layer='1A3bvii')
+# st_write(p.1A3bvii, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3bvii.gpkg", layer='1A3bvii')
 
 
 #'
@@ -2892,7 +2892,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3c, total.1A3c
   )
 
 #+ include = FALSE
-# st_write(p.1A3c, dsn="2030/Products_2030/1A3 - Transport_2030/1A3c.gpkg", layer='1A3c')
+# st_write(p.1A3c, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3c.gpkg", layer='1A3c')
 
 #'
 #'
@@ -3005,7 +3005,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A3dii, total.1A
   )
 
 #+ include = FALSE
-# st_write(p.1A3dii, dsn="2030/Products_2030/1A3 - Transport_2030/1A3dii.gpkg", layer='1A3dii')
+# st_write(p.1A3dii, dsn="2030_WAM_A/Products_2030_WAM_A/1A3 - Transport_2030_WAM_A/1A3dii.gpkg", layer='1A3dii')
 
 
 

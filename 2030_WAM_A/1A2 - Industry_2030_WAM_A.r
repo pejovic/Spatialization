@@ -182,7 +182,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
+source.file = "2030_WAM_A/Pollutant inventory spatialized-za_2030_WAM_A.xlsx"
 source.sheet =  "1A2-2-Industry"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -275,7 +275,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2a, total.1A2a
 
 #+ include = FALSE
 #p.1A2a %<>% sf::st_transform(4326)
-# st_write(p.1A2a, dsn="2030/Products_2030/1A2 - Industry_2030/1A2a.gpkg", layer='1A2a')
+# st_write(p.1A2a, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2a.gpkg", layer='1A2a')
 
 #'
 #'
@@ -358,7 +358,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2b, total.1A2b
 
 #+ include = FALSE
 # p.1A2b %<>% sf::st_transform(4326)
-# st_write(p.1A2b, dsn="2030/Products_2030/1A2 - Industry_2030/1A2b.gpkg", layer='1A2b')
+# st_write(p.1A2b, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2b.gpkg", layer='1A2b')
 
 #'
 #'
@@ -440,7 +440,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2c, total.1A2c
 
 #+ include = FALSE
 # p.1A2c %<>% sf::st_transform(4326)
-#  st_write(p.1A2c, dsn="2030/Products_2030/1A2 - Industry_2030/1A2c.gpkg", layer='1A2c')
+#  st_write(p.1A2c, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2c.gpkg", layer='1A2c')
 
 #'
 #'
@@ -529,7 +529,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2d, total.1A2d
 
 #+ include = FALSE
 # p.1A2d %<>% sf::st_transform(4326)
-# st_write(p.1A2d, dsn="2030/Products_2030/1A2 - Industry_2030/1A2d.gpkg", layer='1A2d')
+# st_write(p.1A2d, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2d.gpkg", layer='1A2d')
 
 #'
 #'
@@ -616,7 +616,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e, total.1A2e
 
 #+ include = FALSE
 # p.1A2e %<>% sf::st_transform(4326)
-# st_write(p.1A2e, dsn="2030/Products_2030/1A2 - Industry_2030/1A2e.gpkg", layer='1A2e')
+# st_write(p.1A2e, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2e.gpkg", layer='1A2e')
 
 
 
@@ -724,7 +724,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.bread, tota
 
 #+ include = FALSE
 # p.1A2e.bread %<>% sf::st_transform(4326)
-# st_write(p.1A2e.bread, dsn="2030/Products_2030/1A2 - Industry_2030/1A2e.bread.gpkg", layer='1A2e.bread')
+# st_write(p.1A2e.bread, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2e.bread.gpkg", layer='1A2e.bread')
 
 
 
@@ -879,7 +879,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2e.wine, total
   )
 
 #+ include = FALSE
-# st_write(p.1A2e.wine, dsn="2030/Products_2030/1A2 - Industry_2030/1A2e.wine.gpkg", layer='1A2e.wine')
+# st_write(p.1A2e.wine, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2e.wine.gpkg", layer='1A2e.wine')
 
 # # 1
 # library(raster)
@@ -1046,7 +1046,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2f, total.1A2f
   )
 
 #+ include = FALSE
-# st_write(p.1A2f, dsn="2030/Products_2030/1A2 - Industry_2030/1A2f.gpkg", layer='1A2f')
+# st_write(p.1A2f, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2f.gpkg", layer='1A2f')
 
 
 #'
@@ -1063,7 +1063,7 @@ source.1A2gvi$sources$points <- readxl::read_xlsx(path = source.file, range = "D
 source.1A2gvi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D251:I251", sheet = source.sheet, col_names = vars)
 source.1A2gvi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D256:I256", sheet = source.sheet, col_names = vars)
 
-sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = FALSE) #%>%
+sf.1A2gvi <- corsum2sf(source.1A2gvi, distribute = TRUE) #%>%
   #st_transform(crs = "+init=epsg:32634")
 
 #'
@@ -1107,8 +1107,9 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A2gvi, total.1A2gv
 #'
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
+
 p.1A2gvi <- sf.grid.5km %>%
-  st_join(sf.1A2gvi) %>%
+  st_join(sf.1A2gvi, join = st_contains) %>%
   group_by(ID) %>%
   summarize(NOx = sum(NOx, na.rm = TRUE),
             SO2 = sum(SO2, na.rm = TRUE),
@@ -1135,7 +1136,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2gvi, total.1A
   )
 
 #+ include = FALSE
-# st_write(p.1A2gvi, dsn="2030/Products_2030/1A2 - Industry_2030/1A2g-Auto-production.gpkg", layer='1A2g-Auto-production')
+# st_write(p.1A2gvi, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2g-Auto-production.gpkg", layer='1A2g-Auto-production')
 
 
 
@@ -1330,7 +1331,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2g, total.1A2g
   )
 
 #+ include = FALSE
-# st_write(p.1A2g, dsn="2030/Products_2030/1A2 - Industry_2030/1A2g.gpkg", layer='1A2g')
+# st_write(p.1A2g, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2g.gpkg", layer='1A2g')
 
 
 #'
@@ -1454,7 +1455,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A2gvii, total.1
   )
 
 #+ include = FALSE
-# st_write(p.1A2gvii, dsn="2030/Products_2030/1A2 - Industry_2030/1A2gvii.gpkg", layer='1A2gvii')
+# st_write(p.1A2gvii, dsn="2030_WAM_A/Products_2030_WAM_A/1A2 - Industry_2030_WAM_A/1A2gvii.gpkg", layer='1A2gvii')
 
 #'
 #'

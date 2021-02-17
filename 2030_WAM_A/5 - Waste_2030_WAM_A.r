@@ -219,7 +219,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
+source.file = "2030_WAM_A/Pollutant inventory spatialized-za_2030_WAM_A.xlsx"
 source.sheet =  "5-Waste"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -338,7 +338,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5A, total.5A, da
   )
 
 #+ include = FALSE
-# st_write(p.5A, dsn="2030/Products_2030/5 - Waste_2030/5A.gpkg", layer='5A')
+# st_write(p.5A, dsn="2030_WAM_A/Products_2030_WAM_A/5 - Waste_2030_WAM_A/5A.gpkg", layer='5A')
 
 
 #'
@@ -422,7 +422,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5C1bv, total.5C1
   )
 
 #+ include = FALSE
-# st_write(p.5C1bv, dsn="2030/Products_2030/5 - Waste_2030/5C1bv.gpkg", layer='5C1bv')
+# st_write(p.5C1bv, dsn="2030_WAM_A/Products_2030_WAM_A/5 - Waste_2030_WAM_A/5C1bv.gpkg", layer='5C1bv')
 
 
 
@@ -565,7 +565,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5D1, total.5D1, 
   )
 
 #+ include = FALSE
-# st_write(p.5D1, dsn="2030/Products_2030/5 - Waste_2030/5D1.gpkg", layer='5D1')
+# st_write(p.5D1, dsn="2030_WAM_A/Products_2030_WAM_A/5 - Waste_2030_WAM_A/5D1.gpkg", layer='5D1')
 
 #'
 #'
@@ -731,5 +731,5 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5D2, total.5D2, 
   )
 
 #+ include = FALSE
-# st_write(p.5D2, dsn="2030/Products_2030/5 - Waste_2030/5D2.gpkg", layer='5D2')
+# st_write(p.5D2, dsn="2030_WAM_A/Products_2030_WAM_A/5 - Waste_2030_WAM_A/5D2.gpkg", layer='5D2')
 

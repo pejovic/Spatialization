@@ -187,7 +187,7 @@ spatialised.mapview <- function(sf.sources, layer.name.1 = "", sf.spatialised, l
 #'
 #'
 #+ include = FALSE
-source.file = "2030/Pollutant inventory spatialized-za_2030.xlsx"
+source.file = "2030_WAM_A/Pollutant inventory spatialized-za_2030_WAM_A.xlsx"
 source.sheet =  "1A4-Residential-Tertiary"
 header <- readxl::read_xlsx(path = source.file, range = "D8:S8", sheet = source.sheet) %>% names()
 vars <- header[1:6]
@@ -364,7 +364,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4ai, total.1A4
   )
 
 #+ include = FALSE
-# st_write(p.1A4ai, dsn="2030/Products_2030/1A4 - Residential-Tertiary_2030/1A4ai.gpkg", layer='1A4ai')
+# st_write(p.1A4ai, dsn="2030_WAM_A/Products_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A/1A4ai.gpkg", layer='1A4ai')
 
 #'
 #'
@@ -516,7 +516,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4bi, total.1A4
   )
 
 #+ include = FALSE
- st_write(p.1A4bi, dsn="2030/Products_2030/1A4 - Residential-Tertiary_2030/1A4bi.gpkg", layer='1A4bi')
+ st_write(p.1A4bi, dsn="2030_WAM_A/Products_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A/1A4bi.gpkg", layer='1A4bi')
 
 #'
 #'
@@ -633,7 +633,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4ci, total.1A4
   )
 
 #+ include = FALSE
-# st_write(p.1A4ci, dsn="2030/Products_2030/1A4 - Residential-Tertiary_2030/1A4ci.gpkg", layer='1A4ci')
+# st_write(p.1A4ci, dsn="2030_WAM_A/Products_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A/1A4ci.gpkg", layer='1A4ci')
 
 #'
 #'
@@ -779,6 +779,6 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4cii, total.1A
   )
 
 #+ include = FALSE
-# st_write(p.1A4cii, dsn="2030/Products_2030/1A4 - Residential-Tertiary_2030/1A4cii.gpkg", layer='1A4cii')
+# st_write(p.1A4cii, dsn="2030_WAM_A/Products_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A/1A4cii.gpkg", layer='1A4cii')
 
 
