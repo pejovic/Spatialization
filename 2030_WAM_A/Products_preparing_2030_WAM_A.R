@@ -138,8 +138,8 @@ sf_data
 #mapview(sf_data, zcol = "NMVOC")
 
 
-st_write(sf_data, dsn="2030/Products_2030/Sum_up_by_cell_by_pollutant_2030.gpkg", layer='Sum_up_by_cell_by_pollutant_2030')
-writexl::write_xlsx(sf_data %>% st_drop_geometry(), "2030/Products_2030/Sum_up_by_cell_by_pollutant_2030.xlsx")
+st_write(sf_data, dsn="2030_WAM_A/Products_2030_WAM_A/Sum_up_by_cell_by_pollutant_2030_WAM_A.gpkg", layer='Sum_up_by_cell_by_pollutant_2030_WAM_A')
+writexl::write_xlsx(sf_data %>% st_drop_geometry(), "2030_WAM_A/Products_2030_WAM_A/Sum_up_by_cell_by_pollutant_2030_WAM_A.xlsx")
 
 
 
@@ -148,11 +148,11 @@ writexl::write_xlsx(sf_data %>% st_drop_geometry(), "2030/Products_2030/Sum_up_b
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 # Temporal profiles all in one
-data.tprofiles <- list.files('2030/Hourly_emissions_2030/Products_2030/')
+data.tprofiles <- list.files('2030_WAM_A/Hourly_emissions_2030_WAM_A/Products_2030_WAM_A/')
 
 data.temp.list <- list()                                                   
 for(i in 1:length(data.tprofiles)){                                             
-  data.temp.list[[i]] <- readxl::read_xlsx(path = paste("2030/Hourly_emissions_2030/Products_2030/",data.tprofiles[i], sep = ""))
+  data.temp.list[[i]] <- readxl::read_xlsx(path = paste("2030_WAM_A/Hourly_emissions_2030_WAM_A/Products_2030_WAM_A/",data.tprofiles[i], sep = ""))
 }
 
 
@@ -177,7 +177,7 @@ temporal_Profiles <- data.temp.list[[1]]$. %>%
   as_data_frame()
 
 
-writexl::write_xlsx(temporal_Profiles, "2030/Hourly_emissions_2030/TemporalProfiles_by_pollutant_and_sub-categories.xlsx")
+writexl::write_xlsx(temporal_Profiles, "2030_WAM_A/Hourly_emissions_2030_WAM_A/TemporalProfiles_by_pollutant_and_sub-categories_2030_WAM_A.xlsx")
 
 
 

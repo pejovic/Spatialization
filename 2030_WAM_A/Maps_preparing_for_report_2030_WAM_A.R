@@ -53,7 +53,7 @@ sf_opstine <- st_as_sf(opstine)
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_energy <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/1A1 - Energy_2030.gpkg")
+sf_data_energy <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/1A1 - Energy_2030_WAM_A.gpkg")
 
 classes.NOx <- classIntervals(sf_data_energy$NOx, n = 12, style = "fisher")
 classes.SO2 <- classIntervals(sf_data_energy$SO2, n = 12, style = "fisher")
@@ -87,9 +87,9 @@ a1<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 1A1 - Energy",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -109,9 +109,9 @@ b1<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 1A1 - Energy",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -130,9 +130,9 @@ c1<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 1A1 - Energy",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -150,9 +150,9 @@ d1<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 1A1 - Energy",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -171,9 +171,9 @@ e1<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 1A1 - Energy",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -191,9 +191,9 @@ f1<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 1A1 - Energy",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -210,7 +210,7 @@ energy_map <- grid.arrange(a1, b1, c1, d1, e1, f1, ncol = 2, nrow = 3)
 
 
 ggsave(plot = f1, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -219,7 +219,7 @@ ggsave(plot = f1,
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_industry <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/1A2 - Industry_2030.gpkg")
+sf_data_industry <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/1A2 - Industry_2030_WAM_A.gpkg")
 
 classes.NOx <- classIntervals(sf_data_industry$NOx, n = 12, style = "fisher")
 classes.SO2 <- classIntervals(sf_data_industry$SO2, n = 12, style = "fisher")
@@ -251,9 +251,9 @@ a2<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 1A2 - Industry",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -272,9 +272,9 @@ b2<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 1A2 - Industry",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -292,9 +292,9 @@ c2<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 1A2 - Industry",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -312,9 +312,9 @@ d2<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 1A2 - Industry",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -332,9 +332,9 @@ e2<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 1A2 - Industry",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -352,9 +352,9 @@ f2<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 1A2 - Industry",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -369,7 +369,7 @@ f2
 industry_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 ggsave(plot = a2, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -377,35 +377,35 @@ ggsave(plot = a2,
        dpi = 600)
 
 ggsave(plot = b2, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c2, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d2, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e2, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f2, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -413,7 +413,7 @@ ggsave(plot = f2,
        dpi = 600)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_transport <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/1A3 - Transport_2030.gpkg")
+sf_data_transport <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/1A3 - Transport_2030_WAM_A.gpkg")
 
 classes.NOx <- classIntervals(sf_data_transport$NOx, n = 12, style = "fisher")
 classes.SO2 <- classIntervals(sf_data_transport$SO2, n = 12, style = "fisher")
@@ -445,9 +445,9 @@ a3<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 1A3 - Transport",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -465,9 +465,9 @@ b3<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 1A3 - Transport",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -485,9 +485,9 @@ c3<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 1A3 - Transport",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -505,9 +505,9 @@ d3<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 1A3 - Transport",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -525,9 +525,9 @@ e3<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 1A3 - Transport",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -545,9 +545,9 @@ f3<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 1A3 - Transport",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -564,7 +564,7 @@ transport_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 ggsave(plot = a3, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -572,42 +572,42 @@ ggsave(plot = a3,
        dpi = 600)
 
 ggsave(plot = b3, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c3, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d3, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e3, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f3, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_residential <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/1A4 - Residential-Tertiary_2030.gpkg")
+sf_data_residential <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A.gpkg")
 
 classes.NOx <- classIntervals(sf_data_residential$NOx, n = 12, style = "fisher")
 classes.SO2 <- classIntervals(sf_data_residential$SO2, n = 12, style = "fisher")
@@ -639,9 +639,9 @@ a4<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -659,9 +659,9 @@ b4<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -679,9 +679,9 @@ c4<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -699,9 +699,9 @@ d4<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -719,9 +719,9 @@ e4<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -739,9 +739,9 @@ f4<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 1A4 - Residential-Tertiary",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -758,7 +758,7 @@ residential_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 ggsave(plot = a4, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -766,35 +766,35 @@ ggsave(plot = a4,
        dpi = 600)
 
 ggsave(plot = b4, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c4, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d4, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e4, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f4, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -802,7 +802,7 @@ ggsave(plot = f4,
        dpi = 600)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_fugitive <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/1B - Fugitive emissions_2030.gpkg")
+sf_data_fugitive <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/1B - Fugitive emissions_2030_WAM_A.gpkg")
 
 summary(sf_data_fugitive)
 
@@ -844,9 +844,9 @@ a5<-ggplot() +
   scale_fill_manual(values = pal2,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -864,9 +864,9 @@ b5<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -884,9 +884,9 @@ c5<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -904,9 +904,9 @@ d5<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -924,9 +924,9 @@ e5<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -944,9 +944,9 @@ f5<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 1B - Fugitive emissions",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -963,7 +963,7 @@ fugitive_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 ggsave(plot = a5, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -971,35 +971,35 @@ ggsave(plot = a5,
        dpi = 600)
 
 ggsave(plot = b5, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c5, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d5, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e5, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f5, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1011,7 +1011,7 @@ ggsave(plot = f5,
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_other <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/2 - Other processes_2030.gpkg")
+sf_data_other <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/2 - Other processes_2030_WAM_A.gpkg")
 
 summary(sf_data_other)
 
@@ -1047,9 +1047,9 @@ a6<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 2 - Other processes",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1067,9 +1067,9 @@ b6<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 2 - Other processes",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1087,9 +1087,9 @@ c6<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 2 - Other processes",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1107,9 +1107,9 @@ d6<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 2 - Other processes",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1127,9 +1127,9 @@ e6<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 2 - Other processes",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1147,9 +1147,9 @@ f6<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 2 - Other processes",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1167,7 +1167,7 @@ other_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 ggsave(plot = a6, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1175,35 +1175,35 @@ ggsave(plot = a6,
        dpi = 600)
 
 ggsave(plot = b6, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c6, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d6, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e6, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f6, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_2 - Other processes_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1225,7 +1225,7 @@ ggsave(plot = f6,
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_agriculture <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/3 - Agriculture_2030.gpkg")
+sf_data_agriculture <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/3 - Agriculture_2030_WAM_A.gpkg")
 
 summary(sf_data_agriculture)
 
@@ -1258,9 +1258,9 @@ a7<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 3 - Agriculture",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1278,9 +1278,9 @@ b7<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 3 - Agriculture",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1298,9 +1298,9 @@ c7<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 3 - Agriculture",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1318,9 +1318,9 @@ d7<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 3 - Agriculture",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1338,9 +1338,9 @@ e7<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 3 - Agriculture",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1358,9 +1358,9 @@ f7<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 3 - Agriculture",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1379,7 +1379,7 @@ agriculture_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 ggsave(plot = a7, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1387,35 +1387,35 @@ ggsave(plot = a7,
        dpi = 600)
 
 ggsave(plot = b7, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c7, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d7, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e7, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f7, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1428,7 +1428,7 @@ ggsave(plot = f7,
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-sf_data_waste <- st_read(dsn = "2030/Products_2030/Sum-up_By_category_2030/5 - Waste_2030.gpkg")
+sf_data_waste <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/5 - Waste_2030_WAM_A.gpkg")
 
 summary(sf_data_waste)
 
@@ -1463,9 +1463,9 @@ a8<-ggplot() +
   scale_fill_manual(values = pal2,
                     name = "NOx [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "GNFR sector: 5 - Waste",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1483,9 +1483,9 @@ b8<-ggplot() +
   scale_fill_manual(values = pal2,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "GNFR sector: 5 - Waste",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1503,9 +1503,9 @@ c8<-ggplot() +
   scale_fill_manual(values = pal2,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "GNFR sector: 5 - Waste",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1523,9 +1523,9 @@ d8<-ggplot() +
   scale_fill_manual(values = pal2,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "GNFR sector: 5 - Waste",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1543,9 +1543,9 @@ e8<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "GNFR sector: 5 - Waste",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1563,9 +1563,9 @@ f8<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "GNFR sector: 5 - Waste",
-       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2020)")+
+       caption = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia\n UBFCE (2021)")+
   theme(line = element_blank(),
         #axis.text = element_blank(),
         legend.position = "bottom", ###################### legend
@@ -1583,7 +1583,7 @@ waste_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 ggsave(plot = a8, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1591,35 +1591,35 @@ ggsave(plot = a8,
        dpi = 600)
 
 ggsave(plot = b8, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = c8, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = d8, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = e8, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 ggsave(plot = f8, 
-       filename = "2030/Maps_2030/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_5 - Waste_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 

@@ -1,5 +1,5 @@
 #' ---
-#' title: "Pollutant inventory spatialization (2030)"
+#' title: "Pollutant inventory spatialization (2030_WAM_A)"
 #' author:
 #'    - "Milan Kilibarda"
 #'    - "Dragutin Protic"
@@ -63,7 +63,7 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 
 
 
-sf_data <- st_read(dsn = "2030/Products_2030/Sum_up_by_cell_by_pollutant_2030.gpkg")
+sf_data <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum_up_by_cell_by_pollutant_2030_WAM_A.gpkg")
 
 
 
@@ -108,9 +108,9 @@ a<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -125,7 +125,7 @@ a<-ggplot() +
 
 a
 ggsave(plot = a, 
-       filename = "2030/Maps_2030/Serbia_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Serbia_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -140,9 +140,9 @@ b<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -157,7 +157,7 @@ b<-ggplot() +
 
 b
 ggsave(plot = b, 
-       filename = "2030/Maps_2030/Serbia_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Serbia_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -170,9 +170,9 @@ PM10<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -187,7 +187,7 @@ PM10<-ggplot() +
 
 PM10
 ggsave(plot = PM10, 
-       filename = "2030/Maps_2030/Serbia_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Serbia_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -200,9 +200,9 @@ d<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -217,7 +217,7 @@ d<-ggplot() +
 
 d
 ggsave(plot = d, 
-       filename = "2030/Maps_2030/Serbia_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Serbia_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -232,9 +232,9 @@ e<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -249,7 +249,7 @@ e<-ggplot() +
 
 e
 ggsave(plot = e, 
-       filename = "2030/Maps_2030/Serbia_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Serbia_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -262,9 +262,9 @@ f<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Teritory of the Republic of Serbia",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -279,7 +279,7 @@ f<-ggplot() +
 
 f
 ggsave(plot = f, 
-       filename = "2030/Maps_2030/Serbia_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Serbia_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -327,7 +327,7 @@ mapview(sf_data, zcol = "percent_class_NOx", col.regions = pal1, query.type = c(
 
 # Belgrade
 
-sf_data <- st_read(dsn = "2030/Products_2030/Sum_up_by_cell_by_pollutant_2030.gpkg")
+sf_data <- st_read(dsn = "2030_WAM_A/Products_2030_WAM_A/Sum_up_by_cell_by_pollutant_2030_WAM_A.gpkg")
 
 opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
                    use_iconv=TRUE,  
@@ -366,9 +366,9 @@ a.bg<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Belgrade",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -383,7 +383,7 @@ a.bg<-ggplot() +
 
 a.bg
 ggsave(plot = a.bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -398,9 +398,9 @@ b.bg<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Belgrade",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -415,7 +415,7 @@ b.bg<-ggplot() +
 
 b.bg
 ggsave(plot = b.bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -428,9 +428,9 @@ c.bg<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Belgrade",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -445,7 +445,7 @@ c.bg<-ggplot() +
 
 c.bg
 ggsave(plot = c.bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -458,9 +458,9 @@ d.bg<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Belgrade",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -475,7 +475,7 @@ d.bg<-ggplot() +
 
 d.bg
 ggsave(plot = d.bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -490,9 +490,9 @@ e.bg<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Belgrade",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -507,7 +507,7 @@ e.bg<-ggplot() +
 
 e.bg
 ggsave(plot = e.bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -520,9 +520,9 @@ f.bg<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Belgrade",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -537,7 +537,7 @@ f.bg<-ggplot() +
 
 f.bg
 ggsave(plot = f.bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -548,7 +548,7 @@ bg <- grid.arrange(a.bg, b.bg, c.bg, d.bg, e.bg, f.bg, ncol = 2)
 
 
 ggsave(plot = bg, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Belgrade.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Belgrade.jpg", 
        width = 40, 
        height = 40, 
        units = "cm", 
@@ -589,9 +589,9 @@ a.bo<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Bor",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -606,7 +606,7 @@ a.bo<-ggplot() +
 
 a.bo
 ggsave(plot = a.bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -621,9 +621,9 @@ b.bo<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Bor",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -638,7 +638,7 @@ b.bo<-ggplot() +
 
 b.bo
 ggsave(plot = b.bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -651,9 +651,9 @@ c.bo<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Bor",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -668,7 +668,7 @@ c.bo<-ggplot() +
 
 c.bo
 ggsave(plot = c.bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -681,9 +681,9 @@ d.bo<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Bor",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -698,7 +698,7 @@ d.bo<-ggplot() +
 
 d.bo
 ggsave(plot = d.bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -713,9 +713,9 @@ e.bo<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Bor",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -730,7 +730,7 @@ e.bo<-ggplot() +
 
 e.bo
 ggsave(plot = e.bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -743,9 +743,9 @@ f.bo<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Bor",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -760,7 +760,7 @@ f.bo<-ggplot() +
 
 f.bo
 ggsave(plot = f.bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -770,7 +770,7 @@ bo <- grid.arrange(a.bo, b.bo, c.bo, d.bo, e.bo, f.bo, ncol = 2)
 
 
 ggsave(plot = bo, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Bor_2030.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Bor_2030_WAM_A.jpg", 
        width = 40, 
        height = 40, 
        units = "cm", 
@@ -812,9 +812,9 @@ a.ns<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Novi Sad",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -829,7 +829,7 @@ a.ns<-ggplot() +
 
 a.ns
 ggsave(plot = a.ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -844,9 +844,9 @@ b.ns<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Novi Sad",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -861,7 +861,7 @@ b.ns<-ggplot() +
 
 b.ns
 ggsave(plot = b.ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -874,9 +874,9 @@ c.ns<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Novi Sad",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -891,7 +891,7 @@ c.ns<-ggplot() +
 
 c.ns
 ggsave(plot = c.ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -904,9 +904,9 @@ d.ns<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Novi Sad",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -921,7 +921,7 @@ d.ns<-ggplot() +
 
 d.ns
 ggsave(plot = d.ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -936,9 +936,9 @@ e.ns<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Novi Sad",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -953,7 +953,7 @@ e.ns<-ggplot() +
 
 e.ns
 ggsave(plot = e.ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -966,9 +966,9 @@ f.ns<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Novi Sad",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -983,7 +983,7 @@ f.ns<-ggplot() +
 
 f.ns
 ggsave(plot = f.ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Novi Sad_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -992,7 +992,7 @@ ggsave(plot = f.ns,
 ns <- grid.arrange(a.ns, b.ns, c.ns, d.ns, e.ns, f.ns, ncol = 2)
 
 ggsave(plot = ns, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/NoviSad_2030.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/NoviSad_2030_WAM_A.jpg", 
        width = 40, 
        height = 40, 
        units = "cm", 
@@ -1034,9 +1034,9 @@ a.pa<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Pančevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1051,7 +1051,7 @@ a.pa<-ggplot() +
 
 a.pa
 ggsave(plot = a.pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1066,9 +1066,9 @@ b.pa<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Pančevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1083,7 +1083,7 @@ b.pa<-ggplot() +
 
 b.pa
 ggsave(plot = b.pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1096,9 +1096,9 @@ c.pa<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Pančevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1113,7 +1113,7 @@ c.pa<-ggplot() +
 
 c.pa
 ggsave(plot = c.pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1126,9 +1126,9 @@ d.pa<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Pančevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1143,7 +1143,7 @@ d.pa<-ggplot() +
 
 d.pa
 ggsave(plot = d.pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1158,9 +1158,9 @@ e.pa<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Pančevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1175,7 +1175,7 @@ e.pa<-ggplot() +
 
 e.pa
 ggsave(plot = e.pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1188,9 +1188,9 @@ f.pa<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Pančevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1205,7 +1205,7 @@ f.pa<-ggplot() +
 
 f.pa
 ggsave(plot = f.pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1214,7 +1214,7 @@ ggsave(plot = f.pa,
 pa <- grid.arrange(a.pa, b.pa, c.pa, d.pa, e.pa, f.pa, ncol = 2)
 
 ggsave(plot = pa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Pancevo_2030.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Pancevo_2030_WAM_A.jpg", 
        width = 40, 
        height = 40, 
        units = "cm", 
@@ -1256,9 +1256,9 @@ a.sd<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Smederevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1273,7 +1273,7 @@ a.sd<-ggplot() +
 
 a.sd
 ggsave(plot = a.sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1288,9 +1288,9 @@ b.sd<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Smederevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1305,7 +1305,7 @@ b.sd<-ggplot() +
 
 b.sd
 ggsave(plot = b.sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1318,9 +1318,9 @@ c.sd<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Smederevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1335,7 +1335,7 @@ c.sd<-ggplot() +
 
 c.sd
 ggsave(plot = c.sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1348,9 +1348,9 @@ d.sd<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Smederevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1365,7 +1365,7 @@ d.sd<-ggplot() +
 
 d.sd
 ggsave(plot = d.sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1380,9 +1380,9 @@ e.sd<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Smederevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1397,7 +1397,7 @@ e.sd<-ggplot() +
 
 e.sd
 ggsave(plot = e.sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1410,9 +1410,9 @@ f.sd<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Smederevo",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1427,7 +1427,7 @@ f.sd<-ggplot() +
 
 f.sd
 ggsave(plot = f.sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1436,7 +1436,7 @@ ggsave(plot = f.sd,
 sd <- grid.arrange(a.sd, b.sd, c.sd, d.sd, e.sd, f.sd, ncol = 2)
 
 ggsave(plot = sd, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Smederevo_2030.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Smederevo_2030_WAM_A.jpg", 
        width = 40, 
        height = 40, 
        units = "cm", 
@@ -1477,9 +1477,9 @@ a.uz<-ggplot() +
                     name = "NOx [t]") +
   
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NOx",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NOx",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Užice",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1494,7 +1494,7 @@ a.uz<-ggplot() +
 
 a.uz
 ggsave(plot = a.uz, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030_NOx.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1509,9 +1509,9 @@ b.uz<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "SO2 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - SO2",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - SO2",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Užice",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1526,7 +1526,7 @@ b.uz<-ggplot() +
 
 b.uz
 ggsave(plot = b.uz, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030_SO2.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A_SO2.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1539,9 +1539,9 @@ c.uz<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM10 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM10",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM10",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Užice",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1556,7 +1556,7 @@ c.uz<-ggplot() +
 
 c.uz
 ggsave(plot = c.uz, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030_PM10.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A_PM10.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1569,9 +1569,9 @@ d.uz<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "PM2.5 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - PM2.5",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Užice",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1586,7 +1586,7 @@ d.uz<-ggplot() +
 
 d.uz
 ggsave(plot = d.uz, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030_PM2.5.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A_PM2.5.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1601,9 +1601,9 @@ e.uz<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NMVOC [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NMVOC",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Užice",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1618,7 +1618,7 @@ e.uz<-ggplot() +
 
 e.uz
 ggsave(plot = e.uz, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030_NMVOC.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A_NMVOC.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1631,9 +1631,9 @@ f.uz<-ggplot() +
   scale_fill_manual(values = pal1,
                     name = "NH3 [t]") +
   labs(x = NULL, y = NULL,
-       title = "Pollutant inventory spatialization (2030) - NH3",
+       title = "Pollutant inventory spatialization (2030_WAM_A) - NH3",
        subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Užice",
-       caption = "UBFCE (2020)") +
+       caption = "UBFCE (2021)") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
         axis.title = element_blank(),
@@ -1648,7 +1648,7 @@ f.uz<-ggplot() +
 
 f.uz
 ggsave(plot = f.uz, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030_NH3.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A_NH3.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
@@ -1656,7 +1656,7 @@ ggsave(plot = f.uz,
        dpi=600)
 aaa <- grid.arrange(a.uz, b.uz, c.uz, d.uz, e.uz, f.uz, ncol = 2)
 ggsave(plot = aaa, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Uzice_2030.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/Uzice_2030_WAM_A.jpg", 
        width = 40, 
        height = 40, 
        units = "cm", 
@@ -1677,7 +1677,7 @@ map_cities <- ggplot() +
   labs(x = NULL, y = NULL,
        title = "Municipalities with specific air quality plans",
        subtitle = "Territory of the Republic of Serbia",
-       caption = "UBFCE (2020)",
+       caption = "UBFCE (2021)",
        fill = "Cities") +
   theme(line = element_blank(),
         #axis.text = element_blank(),
@@ -1695,7 +1695,7 @@ map_cities <- ggplot() +
 map_cities
 
 ggsave(plot = map_cities, 
-       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/cities.jpg", 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_cities_with_specific_air_quality_plans/cities.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
