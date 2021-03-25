@@ -66,11 +66,13 @@ mycolors=c("#f32440","#2185ef","#d421ef")
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Read all data files
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::
-data.spat <- list.files('C:/Users/pbursac/Desktop/data/')
+# data.spat <- list.files('C:/Users/pbursac/Desktop/data/')
+data.spat <- list.files('C:/Users/Petar/Desktop/data/') # C:/Users/pbursac/Desktop/data/
+
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("C:/Users/pbursac/Desktop/data/",data.spat[i], sep = ""))
+ data.spat.list[[i]] <- st_read(paste("C:/Users/Petar/Desktop/data/",data.spat[i], sep = ""))
 }
 
 sf_data <- data.spat.list[[1]]
@@ -95,9 +97,9 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-mapview(sf_data, zcol = "NMVOC")
-st_write(sf_data, dsn="Products/Sum_up_by_cell_by_pollutant.gpkg", layer='Sum_up_by_cell_by_pollutant')
-writexl::write_xlsx(sf_data %>% st_drop_geometry(), "Products/Sum_up_by_cell_by_pollutant.xlsx")
+
+st_write(sf_data, dsn="Products/Sum_up_by_cell_by_pollutant_2015.gpkg", layer='Sum_up_by_cell_by_pollutant_2015')
+writexl::write_xlsx(sf_data %>% st_drop_geometry(), "Products/Sum_up_by_cell_by_pollutant_2015.xlsx")
 
 #+ include = FALSE 
 #sf_data <- st_read(dsn = "Products/sf_data.gpkg", layer = "sf_data")
