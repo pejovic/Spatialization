@@ -1701,3 +1701,685 @@ ggsave(plot = map_cities,
        units = "cm", 
        device = "jpeg",
        dpi=600)
+
+
+
+
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Valjevo
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_opstine_uz <- sf_opstine %>% dplyr::filter(NAME_2 == "Valjevo")
+
+sf_data_uz <- sf_data[sf_opstine_uz, ] 
+Sys.setlocale(locale = 'Serbian (Latin)')
+uz_classes.NOx <- classIntervals(sf_data_uz$NOx, n = 12, style = "fisher")
+uz_classes.SO2 <- classIntervals(sf_data_uz$SO2, n = 12, style = "fisher")
+uz_classes.PM10 <- classIntervals(sf_data_uz$PM10, n = 12, style = "fisher")
+uz_classes.PM2.5 <- classIntervals(sf_data_uz$PM2.5, n = 12, style = "fisher")
+uz_classes.NMVOC <- classIntervals(sf_data_uz$NMVOC, n = 12, style = "fisher")
+uz_classes.NH3 <- classIntervals(sf_data_uz$NH3, n = 12, style = "fisher")
+
+sf_data_uz <- sf_data_uz %>%
+  mutate(percent_class_NOx = cut(NOx, uz_classes.NOx$brks, include.lowest = T, dig.lab=7),
+         percent_class_SO2 = cut(SO2, uz_classes.SO2$brks, include.lowest = T, dig.lab=7),
+         percent_class_PM10 = cut(PM10, uz_classes.PM10$brks, include.lowest = T, dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, uz_classes.PM2.5$brks, include.lowest = T, dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, uz_classes.NMVOC$brks, include.lowest = T, dig.lab=7),
+         percent_class_NH3 = cut(NH3, uz_classes.NH3$brks, include.lowest = T, dig.lab=7)
+  )
+
+pal1 <- viridisLite::viridis(12, direction = -1)
+
+
+#+ include = FALSE 
+a.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx [t]") +
+  
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NOx",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Valjevo",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+a.uz
+ggsave(plot = a.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030_NOx.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+b.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal1,
+                    name = "SO2 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - SO2",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Valjevo",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+b.uz
+ggsave(plot = b.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+c.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal1,
+                    name = "PM10 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - PM10",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Valjevo",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+c.uz
+ggsave(plot = c.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+d.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal1,
+                    name = "PM2.5 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Valjevo",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+d.uz
+ggsave(plot = d.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+e.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal1,
+                    name = "NMVOC [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Valjevo",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+e.uz
+ggsave(plot = e.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+f.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal1,
+                    name = "NH3 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NH3",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Valjevo",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+f.uz
+ggsave(plot = f.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+aaa <- grid.arrange(a.uz, b.uz, c.uz, d.uz, e.uz, f.uz, ncol = 2)
+ggsave(plot = aaa, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Valjevo_2030.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Kragujevac
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_opstine_uz <- sf_opstine %>% dplyr::filter(NAME_2 == "Kragujevac")
+
+sf_data_uz <- sf_data[sf_opstine_uz, ] 
+Sys.setlocale(locale = 'Serbian (Latin)')
+uz_classes.NOx <- classIntervals(sf_data_uz$NOx, n = 12, style = "fisher")
+uz_classes.SO2 <- classIntervals(sf_data_uz$SO2, n = 12, style = "fisher")
+uz_classes.PM10 <- classIntervals(sf_data_uz$PM10, n = 12, style = "fisher")
+uz_classes.PM2.5 <- classIntervals(sf_data_uz$PM2.5, n = 12, style = "fisher")
+uz_classes.NMVOC <- classIntervals(sf_data_uz$NMVOC, n = 12, style = "fisher")
+uz_classes.NH3 <- classIntervals(sf_data_uz$NH3, n = 12, style = "fisher")
+
+sf_data_uz <- sf_data_uz %>%
+  mutate(percent_class_NOx = cut(NOx, uz_classes.NOx$brks, include.lowest = T, dig.lab=7),
+         percent_class_SO2 = cut(SO2, uz_classes.SO2$brks, include.lowest = T, dig.lab=7),
+         percent_class_PM10 = cut(PM10, uz_classes.PM10$brks, include.lowest = T, dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, uz_classes.PM2.5$brks, include.lowest = T, dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, uz_classes.NMVOC$brks, include.lowest = T, dig.lab=7),
+         percent_class_NH3 = cut(NH3, uz_classes.NH3$brks, include.lowest = T, dig.lab=7)
+  )
+
+pal1 <- viridisLite::viridis(12, direction = -1)
+
+
+#+ include = FALSE 
+a.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx [t]") +
+  
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NOx",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Kragujevac",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+a.uz
+ggsave(plot = a.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030_NOx.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+b.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal1,
+                    name = "SO2 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - SO2",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Kragujevac",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+b.uz
+ggsave(plot = b.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+c.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal1,
+                    name = "PM10 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - PM10",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Kragujevac",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+c.uz
+ggsave(plot = c.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+d.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal1,
+                    name = "PM2.5 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Kragujevac",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+d.uz
+ggsave(plot = d.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+e.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal1,
+                    name = "NMVOC [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Kragujevac",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+e.uz
+ggsave(plot = e.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+f.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal1,
+                    name = "NH3 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NH3",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Kragujevac",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+f.uz
+ggsave(plot = f.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+aaa <- grid.arrange(a.uz, b.uz, c.uz, d.uz, e.uz, f.uz, ncol = 2)
+ggsave(plot = aaa, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Kragujevac_2030.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Nis
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sf_opstine_uz <- sf_opstine %>% dplyr::filter(NAME_2 == "Niš")
+
+sf_data_uz <- sf_data[sf_opstine_uz, ] 
+Sys.setlocale(locale = 'Serbian (Latin)')
+uz_classes.NOx <- classIntervals(sf_data_uz$NOx, n = 12, style = "fisher")
+uz_classes.SO2 <- classIntervals(sf_data_uz$SO2, n = 12, style = "fisher")
+uz_classes.PM10 <- classIntervals(sf_data_uz$PM10, n = 12, style = "fisher")
+uz_classes.PM2.5 <- classIntervals(sf_data_uz$PM2.5, n = 12, style = "fisher")
+uz_classes.NMVOC <- classIntervals(sf_data_uz$NMVOC, n = 12, style = "fisher")
+uz_classes.NH3 <- classIntervals(sf_data_uz$NH3, n = 12, style = "fisher")
+
+sf_data_uz <- sf_data_uz %>%
+  mutate(percent_class_NOx = cut(NOx, uz_classes.NOx$brks, include.lowest = T, dig.lab=7),
+         percent_class_SO2 = cut(SO2, uz_classes.SO2$brks, include.lowest = T, dig.lab=7),
+         percent_class_PM10 = cut(PM10, uz_classes.PM10$brks, include.lowest = T, dig.lab=7),
+         percent_class_PM2.5 = cut(PM2.5, uz_classes.PM2.5$brks, include.lowest = T, dig.lab=7),
+         percent_class_NMVOC = cut(NMVOC, uz_classes.NMVOC$brks, include.lowest = T, dig.lab=7),
+         percent_class_NH3 = cut(NH3, uz_classes.NH3$brks, include.lowest = T, dig.lab=7)
+  )
+
+pal1 <- viridisLite::viridis(12, direction = -1)
+
+
+#+ include = FALSE 
+a.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NOx)) +
+  scale_fill_manual(values = pal1,
+                    name = "NOx [t]") +
+  
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NOx",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Nis",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+a.uz
+ggsave(plot = a.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030_NOx.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+b.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_SO2)) +
+  scale_fill_manual(values = pal1,
+                    name = "SO2 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - SO2",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Nis",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+b.uz
+ggsave(plot = b.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+c.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_PM10)) +
+  scale_fill_manual(values = pal1,
+                    name = "PM10 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - PM10",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Nis",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+c.uz
+ggsave(plot = c.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+d.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_PM2.5)) +
+  scale_fill_manual(values = pal1,
+                    name = "PM2.5 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - PM2.5",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Nis",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+d.uz
+ggsave(plot = d.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+e.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NMVOC)) +
+  scale_fill_manual(values = pal1,
+                    name = "NMVOC [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NMVOC",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Nis",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+e.uz
+ggsave(plot = e.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+f.uz<-ggplot() +
+  geom_sf(data = sf_data_uz,
+          aes(fill = percent_class_NH3)) +
+  scale_fill_manual(values = pal1,
+                    name = "NH3 [t]") +
+  labs(x = NULL, y = NULL,
+       title = "Pollutant inventory spatialization (2030) - NH3",
+       subtitle = "Spatial resolution 0.05°x0.05°, Territory of the City of Nis",
+       caption = "UBFCE (2021)") +
+  theme(line = element_blank(),
+        #axis.text = element_blank(),
+        axis.title = element_blank(),
+        #legend.position = "None", ###################### legend
+        panel.background = element_blank()) +
+  geom_sf(data = sf_opstine_uz, fill = NA, colour = "black", lwd = 0.6)+
+  coord_sf(datum = sf::st_crs(4326))+
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                         style = north_arrow_fancy_orienteering)
+
+f.uz
+ggsave(plot = f.uz, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+aaa <- grid.arrange(a.uz, b.uz, c.uz, d.uz, e.uz, f.uz, ncol = 2)
+ggsave(plot = aaa, 
+       filename = "2030/Maps_2030/Maps_cities_with_specific_air_quality_plans/Nis_2030.jpg", 
+       width = 40, 
+       height = 40, 
+       units = "cm", 
+       device = "jpeg",
+       dpi=600)
+
+
+
+
+
+
+
+
+
+
+
+

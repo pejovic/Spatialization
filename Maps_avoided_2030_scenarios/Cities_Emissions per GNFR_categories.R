@@ -31,6 +31,12 @@ sf_opstine_sd <- sf_opstine %>% dplyr::filter(NAME_2 == "Smederevo")
 sf_opstine_uz <- sf_opstine %>% dplyr::filter(NAME_2 == "Užice")
 
 
+sf_opstine_va <- sf_opstine %>% dplyr::filter(NAME_2 == "Valjevo")
+sf_opstine_kg <- sf_opstine %>% dplyr::filter(NAME_2 == "Kragujevac")
+sf_opstine_ni <- sf_opstine %>% dplyr::filter(NAME_2 == "Niš")
+
+#mapview(sf_opstine_va) + mapview(sf_opstine_kg) + mapview(sf_opstine_ni)
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Sum-up by GNFR category per cities
@@ -175,6 +181,85 @@ for(i in 1:length(data.spat)){
 
 
 
+# Valjevo
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/Products/Sum-up_By_category/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/Sum-up_By_category/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_va, ]
+}
+
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_2015_Valjevo",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+# Kragujevac
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/Products/Sum-up_By_category/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/Sum-up_By_category/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_kg, ]
+}
+
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_2015_Kragujevac",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+# Nis
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/Products/Sum-up_By_category/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/Sum-up_By_category/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_ni, ]
+}
+
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_2015_Nis",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+
+
+
+
 
 
 
@@ -303,6 +388,90 @@ for(i in 1:length(data.spat)){
   fwrite(dataa, file = paste(data.spat[i],"_WEM_Uzice",".csv", sep = ""), sep = ",")
 }
 ###################################################
+
+
+
+
+# Valjevo
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030/Products_2030/Sum-up_By_category_2030/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030/Products_2030/Sum-up_By_category_2030/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_va, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_WEM_Valjevo",".csv", sep = ""), sep = ",")
+}
+###################################################
+
+# Kragujevac
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030/Products_2030/Sum-up_By_category_2030/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030/Products_2030/Sum-up_By_category_2030/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_kg, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_WEM_Kragujevac",".csv", sep = ""), sep = ",")
+}
+###################################################
+
+#  Nis
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030/Products_2030/Sum-up_By_category_2030/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030/Products_2030/Sum-up_By_category_2030/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_ni, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_WEM_Nis",".csv", sep = ""), sep = ",")
+}
+###################################################
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #######################################################################################
@@ -435,6 +604,90 @@ for(i in 1:length(data.spat)){
 }
 
 ###################################################
+
+
+
+
+
+# Valjevo
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_va, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_Valjevo",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+
+
+# Kragujevac
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_kg, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_Kragujevac",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+
+
+# Nis
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_ni, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_Nis",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+
+
+
 
 
 #######################################################################################
@@ -576,4 +829,83 @@ for(i in 1:length(data.spat)){
 
 
 
+
+
+
+
+
+
+# Valjevo
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_va, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_Valjevo",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+
+# Kragujevac
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_kg, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_Kragujevac",".csv", sep = ""), sep = ",")
+}
+
+###################################################
+
+
+# Nis
+###################################################
+
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/')
+
+data.spat.list <- list()                                                   
+for(i in 1:length(data.spat)){                                             
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/",data.spat[i], sep = ""))
+}
+
+
+data.spat %<>% str_remove(., ".gpkg")
+
+for(i in 1:length(data.spat)){
+  data.spat.list[[i]] <- data.spat.list[[i]][sf_opstine_ni, ]
+}
+
+for(i in 1:length(data.spat)){                                             
+  dataa <- data.spat.list[[i]] %>% st_drop_geometry()
+  fwrite(dataa, file = paste(data.spat[i],"_Nis",".csv", sep = ""), sep = ",")
+}
+
+###################################################
 
