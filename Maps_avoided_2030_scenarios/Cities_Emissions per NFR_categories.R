@@ -471,30 +471,61 @@ for(i in 1:length(data.spat)){
 
 # pokrenuta skripta za generisanje podataka 1A4-Residential... .R
 
+# district heating system - DHS
+# own  heating system -  OHS
 
+mapview(sf_opstine, zcol = "Br_domacinstva_SDG")
+names(sf_opstine)
 
+sf_municipalities <- sf_opstine %>% dplyr::select(NAME_2, SDG, Br_domacinstva, Br_domacinstva_SDG) %>%
+  dplyr::rename(NAME = NAME_2, No_houeses_DHS = SDG, No_houses = Br_domacinstva, No_houses_OHS = Br_domacinstva_SDG)
 
+mapview(sf_municipalities, zcol = "No_houses_OHS")
 
-
-
+sf_municipalities %<>% st_transform(4326)
+st_write(sf_municipalities,  dsn = "E:/Deliverables_25042021/Data_used_for_spatialisation_1A4bi/NOVO/1A4bi_proxy_data_Municipalities.gpkg")
 
 mapview(sf.1A4bi, zcol = "Br_domacinstva") 
 
+# 1       114.5628 [1]
+# 2       254.9083 [1]
+# 3       112.2872 [1]
+# 4       274.5678 [1]
+# 5       566.8860 [1]
+# 6       566.5721 [1]
+# 7       303.1007 [1]
+# 8       115.6506 [1]
 
+sf_municipalities %<>% st_transform(4326)
+sf_municipalities %<>% mutate(Area_mun = st_area(.))
+
+sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
+sf_clc18_urb %<>% st_transform(4326)
+
+mapview(sf_clc18_urb) + mapview(sf_municipalities)
+
+st_intersection(sf_clc18_urb, sf_municipalities)
+
+sf_municipalities.int <- st_intersection(sf_municipalities, sf.grid.5km)
+
+sf_municipalities.int %<>% mutate(Area_int = st_area(.)) %>%
+  mutate(No_houses_OHS_int = (No_houses_OHS/Area_mun)* Area_int)
+
+sum(sf_municipalities.int$Area_int[sf_municipalities.int$NAME == "Sombor"])
 
 
 p.1A4bi <- sf.grid.5km %>%
-  st_join(sf.1A4bi, join = st_contains) %>% 
+  st_join(sf_municipalities.int, join = st_contains) %>% 
   group_by(ID.x) %>%
-  summarize(No_houses = sum(Br_domacinstva, na.rm = TRUE)) %>% 
+  summarize(No_houses_OHS = sum(No_houses_OHS_int, na.rm = TRUE)) %>% 
   mutate(ID = as.numeric(ID.x)) %>%
-  dplyr::select(ID, No_houses)
-
-p.1A4bi
+  dplyr::select(ID, No_houses_OHS)
+library(units)
+p.1A4bi %<>% drop_units()
 
 grid_SRB <- p.1A4bi
 
-mapview(grid_SRB, zcol = "No_houses")
+mapview(grid_SRB, zcol = "No_houses_OHS")
 
 st_write(grid_SRB, dsn = "E:/Deliverables_26042021/Data_used_for_spatialisation_1A4bi/1A4bi_proxy_data_Serbia.gpkg")
 writexl::write_xlsx(grid_SRB %>% st_drop_geometry(), "E:/Deliverables_26042021/Data_used_for_spatialisation_1A4bi/1A4bi_proxy_data_Serbia.xlsx")
