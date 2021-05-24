@@ -37,6 +37,7 @@ library(rgdal)
 library(SerbianCyrLat)
 library(stringr)
 library(s2)
+library(magrittr)
 #' 
 #' 
 #+ include = FALSE
@@ -380,6 +381,9 @@ source.1A4bi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D
 
 
 #+ include = FALSE
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+
 sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
   st_transform(crs = "+init=epsg:32634")
 
@@ -420,11 +424,11 @@ sf_opstine %<>%
 
 sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
 
-sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva, NAME_2)
+sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva_SDG, NAME_2)
 sf_clc18_urb[,vars] <- NA
 sf_clc18_urb %<>% sf::st_transform(4326)
 sf_clc18_urb.int <- st_intersection(sf_clc18_urb, sf.grid.5km) %>% 
-  filter(!is.na(Br_domacinstva))
+  filter(!is.na(Br_domacinstva_SDG))
 
 source.1A4bi$sources$polygon <- sf_clc18_urb.int
 
@@ -476,15 +480,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4bi, total.1A4bi,
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.1A4bi$Br_domacinstva)
+sum_s <- sum(sf.1A4bi$Br_domacinstva_SDG)
 diff.1A4bi <- data.frame(total.1A4bi - sum.1A4bi)
 sf.1A4bi <- sf.1A4bi %>%
-  mutate(NOx = ((diff.1A4bi$NOx/sum_s)*Br_domacinstva),
-         SO2 = ((diff.1A4bi$SO2/sum_s)*Br_domacinstva),
-         PM10 = ((diff.1A4bi$PM10/sum_s)*Br_domacinstva),
-         PM2.5 = ((diff.1A4bi$PM2.5/sum_s)*Br_domacinstva),
-         NMVOC = ((diff.1A4bi$NMVOC/sum_s)*Br_domacinstva),
-         NH3 = ((diff.1A4bi$NH3/sum_s)*Br_domacinstva))
+  mutate(NOx = ((diff.1A4bi$NOx/sum_s)*Br_domacinstva_SDG),
+         SO2 = ((diff.1A4bi$SO2/sum_s)*Br_domacinstva_SDG),
+         PM10 = ((diff.1A4bi$PM10/sum_s)*Br_domacinstva_SDG),
+         PM2.5 = ((diff.1A4bi$PM2.5/sum_s)*Br_domacinstva_SDG),
+         NMVOC = ((diff.1A4bi$NMVOC/sum_s)*Br_domacinstva_SDG),
+         NH3 = ((diff.1A4bi$NH3/sum_s)*Br_domacinstva_SDG))
 sf.1A4bi %<>% dplyr::select(vars)
 #'
 #'
