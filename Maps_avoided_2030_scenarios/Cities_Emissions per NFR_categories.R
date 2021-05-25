@@ -502,7 +502,9 @@ sf_municipalities %<>% mutate(Area_mun = st_area(.))
 sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
 sf_clc18_urb %<>% st_transform(4326)
 
-mapview(sf_clc18_urb) + mapview(sf_municipalities)
+sf_clc18_urb %<>% select(geometry)
+mapview(sf_municipalities, zcol = "No_houses_OHS") + mapview(sf_clc18_urb) 
+
 
 st_intersection(sf_clc18_urb, sf_municipalities)
 
