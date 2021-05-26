@@ -379,12 +379,72 @@ source.1A4bi$total$spatialize <- readxl::read_xlsx(path = source.file, range = "
 source.1A4bi$total$inventory <- readxl::read_xlsx(path = source.file, range = "D37:I37", sheet = source.sheet, col_names = vars)
 
 
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+#STARO
+
+# sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
+#   st_transform(crs = "+init=epsg:32634")
+# 
+# Sys.setlocale(locale = 'Serbian (Latin)')
+# sf_opstine <- st_as_sf(opstine)
+# 
+# toplane <- readxl::read_xls(path = "Data/toplane/Toplane_2015.xls") %>%
+#   mutate(GRAD = str_to_title(GRAD))
+# 
+# sf_opstine$SDG <- toplane$`Broj domacinstava prikljucenih na SDG`[match(sf_opstine$NAME_2, toplane$GRAD)] 
+# 
+# #+ include = FALSE
+# domacinstva <- readxl::read_xls(path = "Data/Domacinstva_2015.xls", sheet = "Stanovnistvo8")
+# lcl(loc = "C")
+# domacinstva <- cyr_lat(domacinstva)
+# names(domacinstva) <- cyr_lat(names(domacinstva)) 
+# domacinstva <- domacinstva %>%
+#   mutate_all(~replace_na(., 0))
+# domacinstva$Opština[domacinstva$Opština == "Indjija"] <- "Inđija"
+# domacinstva$Opština[domacinstva$Opština == "LJubovija"] <- "Ljubovija"
+# domacinstva$Opština[domacinstva$Opština == "Mali Idjoš"] <- "Mali Iđoš"
+# domacinstva$Opština[domacinstva$Opština == "Savski venac"] <- "Savski Venac"
+# domacinstva$Opština[domacinstva$Opština == "Stari grad"] <- "Stari Grad"
+# domacinstva$Opština[domacinstva$Opština == "Petrovac na Mlavi"] <- "Petrovac"
+# domacinstva$Opština[domacinstva$Opština == "Arandjelovac"] <- "Aranđelovac"
+# domacinstva$Opština[domacinstva$Opština == "LJig"] <- "Ljig"
+# domacinstva$Opština[domacinstva$Opština == "Žitoradja"] <- "Žitorađa"
+# domacinstva$Opština[domacinstva$Opština == "Medvedja"] <- "Medveđa"
+# 
+# sf_opstine$Br_domacinstva <- domacinstva$Ukupno_domaćinstva[match(sf_opstine$NAME_2, domacinstva$Opština)]
+# 
+# sf_opstine %<>% 
+#   st_transform(crs = "+init=epsg:32634") %>% 
+#   mutate_all(~replace(., is.na(.), 0)) %>%
+#   mutate(Br_domacinstva_SDG = Br_domacinstva - SDG)
+# 
+# sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
+# 
+# sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva, NAME_2)
+# sf_clc18_urb[,vars] <- NA
+# sf_clc18_urb %<>% sf::st_transform(4326)
+# sf_clc18_urb.int <- st_intersection(sf_clc18_urb, sf.grid.5km) %>% 
+#   filter(!is.na(Br_domacinstva))
+# 
+# source.1A4bi$sources$polygon <- sf_clc18_urb.int
+# 
+# sf.1A4bi <- corsum2sf_polygon(source.1A4bi, distribute = FALSE) 
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
 #+ include = FALSE
-sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
-  st_transform(crs = "+init=epsg:32634")
+clc_18 <- readOGR("Data/clc/CLC18_RS.shp")
+sf_clc18 <- st_as_sf(clc_18)
+
 
 #+ include = FALSE
 Sys.setlocale(locale = 'Serbian (Latin)')
+opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
+                   use_iconv=TRUE,  
+                   encoding = "UTF-8")
 sf_opstine <- st_as_sf(opstine)
 
 #+ include = FALSE
@@ -413,23 +473,95 @@ domacinstva$Opština[domacinstva$Opština == "Medvedja"] <- "Medveđa"
 
 sf_opstine$Br_domacinstva <- domacinstva$Ukupno_domaćinstva[match(sf_opstine$NAME_2, domacinstva$Opština)]
 
+# Opstine sa svim atributima
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634") %>% 
   mutate_all(~replace(., is.na(.), 0)) %>%
   mutate(Br_domacinstva_SDG = Br_domacinstva - SDG)
 
-sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
+# urbana podrucja iz CORINE
+sf_clc18_urb <- subset(sf_clc18, CODE_18 == "111" | CODE_18 == "112") %>% # CLC urban zones
+  st_transform(crs = "+init=epsg:32634")
 
-sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva, NAME_2)
-sf_clc18_urb[,vars] <- NA
-sf_clc18_urb %<>% sf::st_transform(4326)
-sf_clc18_urb.int <- st_intersection(sf_clc18_urb, sf.grid.5km) %>% 
-  filter(!is.na(Br_domacinstva))
+# presek sa poligonima opstina kako bi se dobili manji poligoni
+sf_clc18_urb_intCLC <- st_intersection(sf_clc18_urb, sf_opstine)
+sf_clc18_urb_intCLC %<>% 
+  dplyr::mutate(Area_pol = sf::st_area(.)) %>% 
+  units::drop_units(.) %>% 
+  dplyr::select(Area_pol) %>%
+  dplyr::mutate(IDpol = row_number())
 
-source.1A4bi$sources$polygon <- sf_clc18_urb.int
+# join atributa tako da manji urban poligoni dobiju odgovorajuce atribute opstine u kojoj se nalaze u celosti
+# mapview(sf_clc18_urb_intCLC) + mapview(sf_opstine)
+sf_clc18_urb_intCLC_cent <- st_centroid(sf_clc18_urb_intCLC)
+sf_clc18_urb_intCLC_1 <-  st_join(sf_clc18_urb_intCLC_cent, 
+                                  sf_opstine, 
+                                  join = st_within) 
 
-sf.1A4bi <- corsum2sf_polygon(source.1A4bi, distribute = FALSE) #%>%
-  #st_transform(crs = "+init=epsg:32634")
+sf_clc18_urb_intCLC$Broj_domacinstva_OHS <- sf_clc18_urb_intCLC_1$Br_domacinstva_SDG[match(sf_clc18_urb_intCLC$IDpol, sf_clc18_urb_intCLC_1$IDpol)]
+sf_clc18_urb_intCLC$Opstina <- sf_clc18_urb_intCLC_1$NAME_2[match(sf_clc18_urb_intCLC$IDpol, sf_clc18_urb_intCLC_1$IDpol)]
+
+aa <- sf_clc18_urb_intCLC  %>% 
+  dplyr::group_by(Opstina) %>%
+  dplyr::summarize(Area_by_opstina = sum(Area_pol)) %>%
+  dplyr::mutate(Area_by_opstina = Area_by_opstina) %>%  
+  dplyr::ungroup()
+
+sf_clc18_urb_intCLC$Area_by_opstina <- aa$Area_by_opstina[match(sf_clc18_urb_intCLC$Opstina, aa$Opstina)]  
+# sf_clc18_urb_intCLC %>% dplyr::filter(IDpol == 778)
+sf_clc18_urb_intCLC$Opstina[sf_clc18_urb_intCLC$IDpol == 778] <- "Mali Zvornik"
+sf_clc18_urb_intCLC$Broj_domacinstva_OHS[sf_clc18_urb_intCLC$IDpol == 778] <- sf_clc18_urb_intCLC$Broj_domacinstva_OHS[sf_clc18_urb_intCLC$IDpol == 777]
+
+#sf_clc18_urb_intCLC %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol))
+sf_clc18_urb_intCLC %<>% 
+  dplyr::mutate(OHS_by_polygon = (Broj_domacinstva_OHS/Area_by_opstina)*Area_pol)
+
+# Kontrola
+# sf_clc18_urb_intCLC %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol), ohssum = sum(OHS_by_polygon))
+# sf_clc18_urb_intCLC  %>% dplyr::filter(is.na(OHS_by_polygon))
+
+sf_clc18_urb_intCLC %<>% 
+  dplyr::select(OHS_by_polygon, Area_pol, IDpol)
+# mapview(sf_clc18_urb_intCLC, zcol = "OHS_by_polygon")
+
+# presek sa poligonima grida
+
+sf_clc18_urb_intCLC_wgs <- sf_clc18_urb_intCLC %>% sf::st_transform(4326)
+
+sf_clc18_urb_intGrid <- st_intersection(sf_clc18_urb_intCLC_wgs, sf.grid.5km)
+
+sf_clc18_urb_intGrid %<>% 
+  dplyr::rename(ID_grid = ID) %>%
+  dplyr::select(OHS_by_polygon, IDpol, ID_grid) 
+
+# Kontrola   
+#sf_clc18_urb_intGrid  %>% 
+#  dplyr::filter(is.na(ID_grid)) 
+
+sf_clc18_urb_intGrid %<>% 
+  dplyr::mutate(Area_by_poly = sf::st_area(.)) %>%
+  units::drop_units(.)
+
+bb <- sf_clc18_urb_intGrid %>% 
+  dplyr::group_by(IDpol) %>%
+  dplyr::summarize(Area_by_grid = sum(Area_by_poly))
+
+sf_clc18_urb_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_clc18_urb_intGrid$IDpol, bb$IDpol)]
+sf_clc18_urb_intGrid %<>% 
+  dplyr::mutate(OHS_by_grid = (OHS_by_polygon/Area_by_grid)*Area_by_poly)
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
+
+
+sf_clc18_urb_intGrid %<>% 
+  dplyr::select(OHS_by_grid)
+
+sf_clc18_urb_intGrid[,vars] <- NA
+
+source.1A4bi$sources$polygon <- sf_clc18_urb_intGrid
+
+
+sf.1A4bi <- corsum2sf_polygon(source.1A4bi, distribute = FALSE) 
 
 
 #'
@@ -476,15 +608,26 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1A4bi, total.1A4bi,
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.1A4bi$Br_domacinstva)
+# sum_s <- sum(sf.1A4bi$Br_domacinstva)
+# diff.1A4bi <- data.frame(total.1A4bi - sum.1A4bi)
+# sf.1A4bi <- sf.1A4bi %>%
+#   mutate(NOx = ((diff.1A4bi$NOx/sum_s)*Br_domacinstva),
+#          SO2 = ((diff.1A4bi$SO2/sum_s)*Br_domacinstva),
+#          PM10 = ((diff.1A4bi$PM10/sum_s)*Br_domacinstva),
+#          PM2.5 = ((diff.1A4bi$PM2.5/sum_s)*Br_domacinstva),
+#          NMVOC = ((diff.1A4bi$NMVOC/sum_s)*Br_domacinstva),
+#          NH3 = ((diff.1A4bi$NH3/sum_s)*Br_domacinstva))
+# sf.1A4bi %<>% dplyr::select(vars)
+
+sum_s <- sum(sf.1A4bi$OHS_by_grid)
 diff.1A4bi <- data.frame(total.1A4bi - sum.1A4bi)
 sf.1A4bi <- sf.1A4bi %>%
-  mutate(NOx = ((diff.1A4bi$NOx/sum_s)*Br_domacinstva),
-         SO2 = ((diff.1A4bi$SO2/sum_s)*Br_domacinstva),
-         PM10 = ((diff.1A4bi$PM10/sum_s)*Br_domacinstva),
-         PM2.5 = ((diff.1A4bi$PM2.5/sum_s)*Br_domacinstva),
-         NMVOC = ((diff.1A4bi$NMVOC/sum_s)*Br_domacinstva),
-         NH3 = ((diff.1A4bi$NH3/sum_s)*Br_domacinstva))
+  mutate(NOx = ((diff.1A4bi$NOx/sum_s)*OHS_by_grid),
+         SO2 = ((diff.1A4bi$SO2/sum_s)*OHS_by_grid),
+         PM10 = ((diff.1A4bi$PM10/sum_s)*OHS_by_grid),
+         PM2.5 = ((diff.1A4bi$PM2.5/sum_s)*OHS_by_grid),
+         NMVOC = ((diff.1A4bi$NMVOC/sum_s)*OHS_by_grid),
+         NH3 = ((diff.1A4bi$NH3/sum_s)*OHS_by_grid))
 sf.1A4bi %<>% dplyr::select(vars)
 #'
 #'
@@ -516,7 +659,8 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1A4bi, total.1A4
   )
 
 #+ include = FALSE
- st_write(p.1A4bi, dsn="2030_WAM_A/Products_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A/1A4bi.gpkg", layer='1A4bi')
+# st_write(p.1A4bi, dsn="2030_WAM_A/Products_2030_WAM_A/1A4 - Residential-Tertiary_2030_WAM_A/1A4bi.gpkg", layer='1A4bi')
+# st_write(p.1A4bi, dsn="Products/NOVO_25052021/1A4 - Residential-Tertiary/1A4bi_2030_WAM_A.gpkg", layer='1A4bi_2030_WAM_A')
 
 #'
 #'

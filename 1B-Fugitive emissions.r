@@ -319,7 +319,7 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B1a, total.1B1a, d
 #+ include = FALSE, echo = FALSE, result = FALSE
 
 sf.1B1a <- sf.1B1a %>%
-  mutate(Area = st_area(.))
+  mutate(Area = st_area(.)) 
 
 sum_Area <- sum(sf.1B1a$Area)
 diff.1B1a <- data.frame(total.1B1a - sum.1B1a)
@@ -581,11 +581,41 @@ stanovnistvo$Opština[stanovnistvo$Opština == "Žitoradja"] <- "Žitorađa"
 stanovnistvo$Opština[stanovnistvo$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Br_stanovnistvo <- stanovnistvo$Stanovništvo[match(sf_opstine$NAME_2, stanovnistvo$Opština)]
 
-sf_opstine[,vars] <- NA
+
 sf_opstine %<>% st_transform(4326)
-sf_opstine.int <- st_intersection(sf_opstine, sf.grid.5km)  
+sf_opstine_intGrid <- st_intersection(sf_opstine, sf.grid.5km)  
 
 
+sf_opstine_intGrid %<>% 
+  dplyr::rename(ID_grid = ID) %>%
+  dplyr::select(Br_stanovnistvo, ID_grid, NAME_2) 
+
+# Kontrola   
+#sf_rur_intGrid  %>% 
+#  dplyr::filter(is.na(ID_grid)) 
+
+sf_opstine_intGrid %<>% 
+  dplyr::mutate(Area_by_poly = sf::st_area(.)) %>%
+  units::drop_units(.)
+
+bb <- sf_opstine_intGrid %>% 
+  dplyr::group_by(NAME_2) %>%
+  dplyr::summarize(Area_by_grid = sum(Area_by_poly))
+
+sf_opstine_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_opstine_intGrid$NAME_2, bb$NAME_2)]
+sf_opstine_intGrid %<>% 
+  dplyr::mutate(stanovnistvo_by_grid = (Br_stanovnistvo/Area_by_grid)*Area_by_poly)
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
+
+
+sf_opstine_intGrid %<>% 
+  dplyr::select(stanovnistvo_by_grid)
+
+sf_opstine_intGrid[,vars] <- NA
+
+
+#sf_opstine[,vars] <- NA
 
 fuel.s <- sf::st_read(dsn = "Version_2_update/Spatialization/Proxy_data_new/Fuel_stations_OSM_32634.gpkg")
 
@@ -600,8 +630,8 @@ sf.1A1a[, vars] <- NA
 
 
 sourcee <- rbind(sf.1B2av, sf.1A1a) # Banatski dvor, rafinerije
-sourcee %<>% st_intersection(., sf_opstine.int) %>%
-    dplyr::select(Br_stanovnistvo)
+sourcee %<>% st_intersection(., sf_opstine_intGrid) %>%
+    dplyr::select(stanovnistvo_by_grid)
 
 sourcee[, vars] <- NA
 source.1B2av$sources$points <- sourcee
@@ -613,9 +643,23 @@ sf.1B2av1 <- sf.1B2av
 
 fuel.s %<>% dplyr::select() %>% dplyr::rename(geometry = geom)
 fuel.s %<>% st_transform(4326)
-fuel.s %<>% st_intersection(., sf_opstine.int) %>%
-  dplyr::select(Br_stanovnistvo)
+sf_opstine_intGrid %<>% dplyr::mutate(ID_opst_grid = row_number())
+
+fuel.s %<>% st_intersection(., sf_opstine_intGrid) #%>%
+  #dplyr::select(stanovnistvo_by_grid)
+fuel.s
+cc <- fuel.s %>% 
+  dplyr::group_by(ID_opst_grid) %>%
+  dplyr::summarize(Count_by = n())
+
+fuel.s$Count_by <- cc$Count_by[match(fuel.s$ID_opst_grid, cc$ID_opst_grid)]
+
+fuel.s %<>% dplyr::mutate(Br_stan_by_grid = stanovnistvo_by_grid/Count_by)
+
 fuel.s[, vars] <- NA
+
+#mapview(fuel.s, zcol = "stanovnistvo_by_grid") + mapview(sf_opstine_intGrid)
+
 
 source.1B2av$sources$points <- fuel.s
 sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE)# %>%
@@ -623,6 +667,7 @@ sf.1B2av <- corsum2sf_point.sf(source.1B2av, distribute = FALSE)# %>%
 
 sf.1B2av2 <- sf.1B2av
 sf.1B2av1 %<>% st_transform(4326)
+sf.1B2av2 %<>% dplyr::select(-stanovnistvo_by_grid) %>% dplyr::rename(stanovnistvo_by_grid = Br_stan_by_grid) %>% dplyr::select(stanovnistvo_by_grid, vars)
 sf.1B2av <- rbind(sf.1B2av1, sf.1B2av2)
 source.1B2av$total$inventory <- readxl::read_xlsx(path = source.file, range = "D41:I41", sheet = source.sheet, col_names = vars)
 
@@ -670,15 +715,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.1B2av, total.1B2av,
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.1B2av$Br_stanovnistvo)
+sum_s <- sum(sf.1B2av$stanovnistvo_by_grid)
 diff.1B2av <- data.frame(total.1B2av - sum.1B2av)
 sf.1B2av <- sf.1B2av %>%
-  mutate(NOx = ((diff.1B2av$NOx/sum_s)*Br_stanovnistvo),
-         SO2 = ((diff.1B2av$SO2/sum_s)*Br_stanovnistvo),
-         PM10 = ((diff.1B2av$PM10/sum_s)*Br_stanovnistvo),
-         PM2.5 = ((diff.1B2av$PM2.5/sum_s)*Br_stanovnistvo),
-         NMVOC = ((diff.1B2av$NMVOC/sum_s)*Br_stanovnistvo),
-         NH3 = ((diff.1B2av$NH3/sum_s)*Br_stanovnistvo))
+  mutate(NOx = ((diff.1B2av$NOx/sum_s)*stanovnistvo_by_grid),
+         SO2 = ((diff.1B2av$SO2/sum_s)*stanovnistvo_by_grid),
+         PM10 = ((diff.1B2av$PM10/sum_s)*stanovnistvo_by_grid),
+         PM2.5 = ((diff.1B2av$PM2.5/sum_s)*stanovnistvo_by_grid),
+         NMVOC = ((diff.1B2av$NMVOC/sum_s)*stanovnistvo_by_grid),
+         NH3 = ((diff.1B2av$NH3/sum_s)*stanovnistvo_by_grid))
 sf.1B2av %<>% dplyr::select(vars)
 #'
 #'
