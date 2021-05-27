@@ -66,7 +66,7 @@ for(i in 2:length(data.spat)){
              NMVOC = sum(NMVOC.x, NMVOC.y),
              NH3 = sum(NH3.x + NH3.y)) %>%
    mutate(ID = ID.x) %>%
-   select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+   dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
  print(paste("NOx:",sum(sf_data$NOx))) 
  print(paste("SO2:",sum(sf_data$SO2)))
  print(paste("PM10:",sum(sf_data$PM10)))
@@ -77,7 +77,7 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-st_write(sf_data, dsn="2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/5 - Waste_2030_WAM_A.gpkg", layer='Waste')
+st_write(sf_data, dsn="2030_WAM_A/Products_2030_WAM_A/Sum-up_By_category_2030_WAM_A/5 - Waste_2030_WAM_A.gpkg", layer='5 - Waste_2030_WAM_A')
 
 
 
@@ -124,7 +124,7 @@ for(i in 2:length(data.spat)){
               NMVOC = sum(NMVOC.x, NMVOC.y),
               NH3 = sum(NH3.x + NH3.y)) %>%
     mutate(ID = ID.x) %>%
-    select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+    dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
   print(paste("NOx:",sum(sf_data$NOx))) 
   print(paste("SO2:",sum(sf_data$SO2)))
   print(paste("PM10:",sum(sf_data$PM10)))

@@ -47,11 +47,11 @@ file.rename(from = old_files, to = new_files)
 # Sum-up by category
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/5 - Waste_2030_WAM_B/')
+data.spat <- list.files('D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/3 - Agriculture_2030_WAM_B/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/5 - Waste_2030_WAM_B/",data.spat[i], sep = ""))
+ data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030_WAM_B/Products_2030_WAM_B/3 - Agriculture_2030_WAM_B/",data.spat[i], sep = ""))
 }
 
 
@@ -77,7 +77,7 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-st_write(sf_data, dsn="2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/5 - Waste_2030_WAM_B.gpkg", layer='Waste_2030_WAM_B')
+st_write(sf_data, dsn="2030_WAM_B/Products_2030_WAM_B/Sum-up_By_category_2030_WAM_B/3 - Agriculture_2030_WAM_B.gpkg", layer='3 - Agriculture_2030_WAM_B')
 
 
 

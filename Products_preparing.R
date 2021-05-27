@@ -7,11 +7,11 @@
 # From geopackeges to CSV
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 library(data.table)
-data.spat <- list.files('D:/R_projects/Spatialization/Products/1A1 - Energy/')
+data.spat <- list.files('D:/R_projects/Spatialization/Products/5 - Waste/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
-  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/1A1 - Energy/",data.spat[i], sep = ""))
+  data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/5 - Waste/",data.spat[i], sep = ""))
 }
 
 
@@ -45,11 +45,11 @@ file.rename(from = old_files, to = new_files)
 # Sum-up by category
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-data.spat <- list.files('D:/R_projects/Spatialization/Products/1A1 - Energy/')
+data.spat <- list.files('D:/R_projects/Spatialization/Products/5 - Waste/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/1A1 - Energy/",data.spat[i], sep = ""))
+ data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/Products/5 - Waste/",data.spat[i], sep = ""))
 }
 
 
@@ -64,7 +64,7 @@ for(i in 2:length(data.spat)){
              NMVOC = sum(NMVOC.x, NMVOC.y),
              NH3 = sum(NH3.x + NH3.y)) %>%
    mutate(ID = ID.x) %>%
-   select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+   dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
  print(paste("NOx:",sum(sf_data$NOx))) 
  print(paste("SO2:",sum(sf_data$SO2)))
  print(paste("PM10:",sum(sf_data$PM10)))
@@ -75,7 +75,7 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-st_write(sf_data, dsn="Products/Sum-up_By_category/1A1 - Energy.gpkg", layer='Energy')
+st_write(sf_data, dsn="Products/Sum-up_By_category/5 - Waste.gpkg", layer='5 - Waste')
 
 #### CSvs
 
@@ -118,7 +118,7 @@ for(i in 2:length(data.spat)){
               NMVOC = sum(NMVOC.x, NMVOC.y),
               NH3 = sum(NH3.x + NH3.y)) %>%
     mutate(ID = ID.x) %>%
-    select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+    dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
   print(paste("NOx:",sum(sf_data$NOx))) 
   print(paste("SO2:",sum(sf_data$SO2)))
   print(paste("PM10:",sum(sf_data$PM10)))

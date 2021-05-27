@@ -27,17 +27,17 @@ for(i in 1:length(data.spat)){
 
 
 ##### Rename files
-old_files <- list.files("D:/R_projects/Spatialization/Products/! CSVs/5 - Waste/")
-old_files <- paste("D:/R_projects/Spatialization/Products/! CSVs/5 - Waste/", old_files, sep = "")
-
-# Create vector of new files
-
-new_files <- old_files %>% str_remove(., ".gpkg")
-new_files
-
-# Rename from old files to new files
-
-file.rename(from = old_files, to = new_files)
+# old_files <- list.files("D:/R_projects/Spatialization/Products/! CSVs/5 - Waste/")
+# old_files <- paste("D:/R_projects/Spatialization/Products/! CSVs/5 - Waste/", old_files, sep = "")
+# 
+# # Create vector of new files
+# 
+# new_files <- old_files %>% str_remove(., ".gpkg")
+# new_files
+# 
+# # Rename from old files to new files
+# 
+# file.rename(from = old_files, to = new_files)
 
 
 
@@ -45,11 +45,11 @@ file.rename(from = old_files, to = new_files)
 # Sum-up by category
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-data.spat <- list.files('D:/R_projects/Spatialization/2030/Products_2030/1A2 - Industry_2030/')
+data.spat <- list.files('D:/R_projects/Spatialization/2030/Products_2030/5 - Waste_2030/')
 
 data.spat.list <- list()                                                   
 for(i in 1:length(data.spat)){                                             
- data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030/Products_2030/1A2 - Industry_2030/",data.spat[i], sep = ""))
+ data.spat.list[[i]] <- st_read(paste("D:/R_projects/Spatialization/2030/Products_2030/5 - Waste_2030/",data.spat[i], sep = ""))
 }
 
 
@@ -64,7 +64,7 @@ for(i in 2:length(data.spat)){
              NMVOC = sum(NMVOC.x, NMVOC.y),
              NH3 = sum(NH3.x + NH3.y)) %>%
    mutate(ID = ID.x) %>%
-   select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+   dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
  print(paste("NOx:",sum(sf_data$NOx))) 
  print(paste("SO2:",sum(sf_data$SO2)))
  print(paste("PM10:",sum(sf_data$PM10)))
@@ -75,7 +75,7 @@ for(i in 2:length(data.spat)){
 
 sf_data
 
-st_write(sf_data, dsn="2030/Products_2030/Sum-up_By_category_2030/1A2 - Industry_2030.gpkg", layer='Industry')
+st_write(sf_data, dsn="2030/Products_2030/Sum-up_By_category_2030/5 - Waste_2030.gpkg", layer='5 - Waste_2030')
 
 
 
@@ -122,7 +122,7 @@ for(i in 2:length(data.spat)){
               NMVOC = sum(NMVOC.x, NMVOC.y),
               NH3 = sum(NH3.x + NH3.y)) %>%
     mutate(ID = ID.x) %>%
-    select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
+    dplyr::select(ID, NOx, SO2, PM10, PM2.5, NMVOC, NH3)
   print(paste("NOx:",sum(sf_data$NOx))) 
   print(paste("SO2:",sum(sf_data$SO2)))
   print(paste("PM10:",sum(sf_data$PM10)))
