@@ -531,6 +531,9 @@ sf_clc18_urb_intCLC_1 <-  st_join(sf_clc18_urb_intCLC_cent,
 
 sf_clc18_urb_intCLC$Broj_domacinstva_OHS <- sf_clc18_urb_intCLC_1$Br_domacinstva_SDG[match(sf_clc18_urb_intCLC$IDpol, sf_clc18_urb_intCLC_1$IDpol)]
 sf_clc18_urb_intCLC$Opstina <- sf_clc18_urb_intCLC_1$NAME_2[match(sf_clc18_urb_intCLC$IDpol, sf_clc18_urb_intCLC_1$IDpol)]
+sf_clc18_urb_intCLC$Opstina[sf_clc18_urb_intCLC$IDpol == 778] <- "Mali Zvornik"
+sf_clc18_urb_intCLC$Broj_domacinstva_OHS[sf_clc18_urb_intCLC$IDpol == 778] <- sf_clc18_urb_intCLC$Broj_domacinstva_OHS[sf_clc18_urb_intCLC$IDpol == 777]
+
 
 aa <- sf_clc18_urb_intCLC  %>% 
   dplyr::group_by(Opstina) %>%
@@ -540,8 +543,6 @@ aa <- sf_clc18_urb_intCLC  %>%
 
 sf_clc18_urb_intCLC$Area_by_opstina <- aa$Area_by_opstina[match(sf_clc18_urb_intCLC$Opstina, aa$Opstina)]  
 # sf_clc18_urb_intCLC %>% dplyr::filter(IDpol == 778)
-sf_clc18_urb_intCLC$Opstina[sf_clc18_urb_intCLC$IDpol == 778] <- "Mali Zvornik"
-sf_clc18_urb_intCLC$Broj_domacinstva_OHS[sf_clc18_urb_intCLC$IDpol == 778] <- sf_clc18_urb_intCLC$Broj_domacinstva_OHS[sf_clc18_urb_intCLC$IDpol == 777]
 
 #sf_clc18_urb_intCLC %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol))
 sf_clc18_urb_intCLC %<>% 
@@ -583,8 +584,27 @@ sf_clc18_urb_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_clc18_urb_intGrid$
 sf_clc18_urb_intGrid %<>% 
   dplyr::mutate(OHS_by_grid = (OHS_by_polygon/Area_by_grid)*Area_by_poly)
 
-# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
 
+
+
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid") + mapview(sf_opstine, zcol = "Br_domacinstva_SDG") + mapview(sf.grid.5km)
+# 
+# sf_opstine_pa <- sf_opstine %>% dplyr::filter(NAME_2 == "Pančevo")
+# sf_opstine_pa %<>% st_transform(4326)
+# grid_cells_pa <- sf.grid.5km[sf_opstine_pa, ]
+# cent_pa <- sf_clc18_urb_intCLC_cent[sf_opstine_pa, ]
+# cent_pa %<>% st_transform(4326)
+# sf_clc18_urb_intGrid_pa <- sf_clc18_urb_intGrid[cent_pa, ]
+# 
+# mapview(sf_opstine_pa) + mapview(sf_clc18_urb_intGrid_pa) + mapview(grid_cells_pa, color = "red", fill = NA, lwd = 2)
+
+#sf_clc18_urb_intCLC %>% dplyr::filter(Opstina == "Pancevo") %>% dplyr::mutate(suma =  sum(Area_pol), ohssum = sum(OHS_by_polygon))
+
+#sf_opstine_pa <- sf_opstine %>% dplyr::filter(NAME_2 == "Pančevo")
+#cc <- sf_clc18_urb_intCLC[sf_opstine_pa, ]
+
+#sum(cc$OHS_by_polygon)
 
 sf_clc18_urb_intGrid %<>% 
   dplyr::select(OHS_by_grid)
@@ -593,6 +613,9 @@ sf_clc18_urb_intGrid[,vars] <- NA
 
 source.1A4bi$sources$polygon <- sf_clc18_urb_intGrid
 
+
+
+mapview(cc) + mapview(sf_opstine_pa)
 # STARO
 #sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
 #sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva_SDG, NAME_2)

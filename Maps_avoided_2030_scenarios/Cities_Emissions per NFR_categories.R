@@ -36,6 +36,9 @@ sf_opstine_va <- sf_opstine %>% dplyr::filter(NAME_2 == "Valjevo")
 sf_opstine_kg <- sf_opstine %>% dplyr::filter(NAME_2 == "Kragujevac")
 sf_opstine_ni <- sf_opstine %>% dplyr::filter(NAME_2 == "Niš")
 
+sf_opstine_bg <- sf_opstine %>% dplyr::filter(NAME_1 == "Grad Beograd")
+sf_opstine_ns <- sf_opstine %>% dplyr::filter(NAME_2 == "Novi Sad")
+
 
 
 # 2015
