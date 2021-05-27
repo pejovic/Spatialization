@@ -584,9 +584,44 @@ sf_clc18_urb_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_clc18_urb_intGrid$
 sf_clc18_urb_intGrid %<>% 
   dplyr::mutate(OHS_by_grid = (OHS_by_polygon/Area_by_grid)*Area_by_poly)
 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Kontrola
 
+sf_opstine_pa <- sf_opstine %>% dplyr::filter(NAME_2 == "Pančevo")
+cenntsss <- st_centroid(sf_clc18_urb_intGrid) %>% st_transform(32634) 
+cent_pa <- cenntsss[sf_opstine_pa, ] %>% st_transform(4326)
+sum(cent_pa$OHS_by_grid)
+sf_opstine_pa$Br_domacinstva_SDG
 
+# Gustina
 
+sf_clc18_urb_intCLC # onaj nakon aa i sledece linije koda 
+gustina <- sf_clc18_urb_intCLC %>%
+  dplyr::group_by(Opstina) %>%
+  dplyr::summarise(Area_urban_municipality = sum(Area_by_opstina)/n(), Number_of_house_OHS =sum(Broj_domacinstva_OHS)/n())
+
+mapview(gustina) + mapview(sf_opstine)
+gustina %<>% dplyr::mutate(Density_house_per_urban_area = Number_of_house_OHS/Area_urban_municipality)
+
+gustina %<>% dplyr::mutate(Area_urban_municipality = Area_urban_municipality/1000000,
+                           Density_house_per_urban_area = Number_of_house_OHS/Area_urban_municipality)
+writexl::write_xlsx(gustina %>% st_drop_geometry(), path = "D:/Density_house_per_urban_areaa.xlsx")
+
+mapview(gustina, zcol = "Density_house_per_urban_area")
+
+opstinee_sf <- sf_opstine %>% dplyr::select(NAME_2, NAME_1, Br_domacinstva_SDG)
+opstinee_sf$Number_of_house_OHS <- gustina$Number_of_house_OHS[match(opstinee_sf$NAME_2, gustina$Opstina)]
+opstinee_sf$Area_urban_municipality <- gustina$Area_urban_municipality[match(opstinee_sf$NAME_2, gustina$Opstina)]
+opstinee_sf$Density_house_per_urban_area <- gustina$Density_house_per_urban_area[match(opstinee_sf$NAME_2, gustina$Opstina)]
+opstinee_sf
+
+#writexl::write_xlsx(opstinee_sf %>% st_drop_geometry(), path = "D:/Density_house_per_urban_area_mun.xlsx")
+opstinee_sf %<>% mutate(across(where(is.numeric), tidyr::replace_na, 0))
+opstinee_sf %<>% dplyr::mutate(Area_urban_municipality = Area_urban_municipality/1000000,
+                               Density_house_per_urban_area = Number_of_house_OHS/Area_urban_municipality)
+mapview(opstinee_sf, zcol = "Density_house_per_urban_area") + mapview(gustina, zcol = "Density_house_per_urban_area")
+ 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid") + mapview(sf_opstine, zcol = "Br_domacinstva_SDG") + mapview(sf.grid.5km)
 # 
@@ -615,7 +650,7 @@ source.1A4bi$sources$polygon <- sf_clc18_urb_intGrid
 
 
 
-mapview(cc) + mapview(sf_opstine_pa)
+
 # STARO
 #sf_clc18_urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
 #sf_clc18_urb %<>% dplyr::select(.,Br_domacinstva_SDG, NAME_2)

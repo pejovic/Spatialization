@@ -538,18 +538,104 @@ sf_opstine$Br_stanovnistvo <- stanovnistvo$Stanovništvo[match(sf_opstine$NAME_2
 
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634")
-sf_final <- st_join(sf.final, sf_opstine, largest = TRUE) 
 
-sf_final %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
-sf_final[,vars] <- NA
-sf_final %<>% sf::st_transform(4326)
+# presek sa poligonima opstina kako bi se dobili manji poligoni
+sf_rur_intOps <- st_intersection(sf.final, sf_opstine)
 
-sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>%
-  filter(!is.na(Br_stanovnistvo))
+sf_rur_intOps %<>% 
+  dplyr::mutate(Area_pol = sf::st_area(.)) %>% 
+  units::drop_units(.) %>% 
+  dplyr::select(Area_pol) %>%
+  dplyr::mutate(IDpol = row_number())
+
+
+# join atributa tako da manji urban poligoni dobiju odgovorajuce atribute opstine u kojoj se nalaze u celosti
+sf_rur_intOps_cent <- st_centroid(sf_rur_intOps)
+sf_rur_intOps_1 <-  st_join(sf_rur_intOps_cent, 
+                            sf_opstine, 
+                            join = st_within) 
+
+sf_rur_intOps$Br_stanovnistvo <- sf_rur_intOps_1$Br_stanovnistvo[match(sf_rur_intOps$IDpol, sf_rur_intOps_1$IDpol)]
+sf_rur_intOps$Opstina <- sf_rur_intOps_1$NAME_2[match(sf_rur_intOps$IDpol, sf_rur_intOps_1$IDpol)]
+
+sf_rur_intOps  %<>% dplyr::filter(!is.na(Br_stanovnistvo))
+#mapview(sf_rur_intOps  %>% dplyr::filter(is.na(Br_traktori)))
+
+#sf_rur_intOps  %>% dplyr::filter(is.na(Br_traktori))
+
+aa <- sf_rur_intOps  %>% 
+  dplyr::group_by(Opstina) %>%
+  dplyr::summarize(Area_by_opstina = sum(Area_pol)) 
+
+
+sf_rur_intOps$Area_by_opstina <- aa$Area_by_opstina[match(sf_rur_intOps$Opstina, aa$Opstina)]
+
+#sf_rur_intOps %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol))
+sf_rur_intOps %<>% 
+  dplyr::mutate(Br_stanovnistvo_by_polygon = (Br_stanovnistvo/Area_by_opstina)*Area_pol)
+
+# Kontrola
+#sf_rur_intOps %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol), ohssum = sum(Br_zivina_by_polygon))
+#sf_rur_intOps  %>% dplyr::filter(is.na(Br_zivina_by_polygon))
+
+sf_rur_intOps %<>% 
+  dplyr::select(Br_stanovnistvo_by_polygon, Area_pol, IDpol)
+
+
+
+# presek sa poligonima grida
+
+sf_rur_intOps_wgs <- sf_rur_intOps %>% sf::st_transform(4326)
+
+sf_rur_intGrid <- st_intersection(sf_rur_intOps_wgs, sf.grid.5km)
+
+sf_rur_intGrid %<>% 
+  dplyr::rename(ID_grid = ID) %>%
+  dplyr::select(Br_stanovnistvo_by_polygon, IDpol, ID_grid) 
+
+# Kontrola   
+#sf_rur_intGrid  %>% 
+#  dplyr::filter(is.na(ID_grid)) 
+
+sf_rur_intGrid %<>% 
+  dplyr::mutate(Area_by_poly = sf::st_area(.)) %>%
+  units::drop_units(.)
+
+bb <- sf_rur_intGrid %>% 
+  dplyr::group_by(IDpol) %>%
+  dplyr::summarize(Area_by_grid = sum(Area_by_poly))
+
+sf_rur_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_rur_intGrid$IDpol, bb$IDpol)]
+sf_rur_intGrid %<>% 
+  dplyr::mutate(Br_stanovnistvo_by_grid = (Br_stanovnistvo_by_polygon/Area_by_grid)*Area_by_poly)
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
+
+sf_rur_intGrid %<>% 
+  dplyr::select(Br_stanovnistvo_by_grid)
+sf_rur_intGrid[,vars] <- NA
+sf_final.int <- sf_rur_intGrid
+
+
+
+
+
+
+
+
+
+# sf_final <- st_join(sf.final, sf_opstine, largest = TRUE) 
+# 
+# sf_final %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
+# sf_final[,vars] <- NA
+# sf_final %<>% sf::st_transform(4326)
+# 
+# sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>%
+#   filter(!is.na(Br_stanovnistvo))
 source.2A5b$sources$polygon <- sf_final.int
 
 sf.2A5b <- corsum2sf_polygon(source.2A5b, distribute = FALSE) #%>%
-  #st_transform(crs = "+init=epsg:32634")
+#st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -595,15 +681,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2A5b, total.2A5b, d
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.2A5b$Br_stanovnistvo)
+sum_s <- sum(sf.2A5b$Br_stanovnistvo_by_grid)
 diff.2A5b <- data.frame(total.2A5b - sum.2A5b)
 sf.2A5b <- sf.2A5b %>%
-  mutate(NOx = ((diff.2A5b$NOx/sum_s)*Br_stanovnistvo),
-         SO2 = ((diff.2A5b$SO2/sum_s)*Br_stanovnistvo),
-         PM10 = ((diff.2A5b$PM10/sum_s)*Br_stanovnistvo),
-         PM2.5 = ((diff.2A5b$PM2.5/sum_s)*Br_stanovnistvo),
-         NMVOC = ((diff.2A5b$NMVOC/sum_s)*Br_stanovnistvo),
-         NH3 = ((diff.2A5b$NH3/sum_s)*Br_stanovnistvo))
+  mutate(NOx = ((diff.2A5b$NOx/sum_s)*Br_stanovnistvo_by_grid),
+         SO2 = ((diff.2A5b$SO2/sum_s)*Br_stanovnistvo_by_grid),
+         PM10 = ((diff.2A5b$PM10/sum_s)*Br_stanovnistvo_by_grid),
+         PM2.5 = ((diff.2A5b$PM2.5/sum_s)*Br_stanovnistvo_by_grid),
+         NMVOC = ((diff.2A5b$NMVOC/sum_s)*Br_stanovnistvo_by_grid),
+         NH3 = ((diff.2A5b$NH3/sum_s)*Br_stanovnistvo_by_grid))
 sf.2A5b %<>% dplyr::select(vars)
 #'
 #'
@@ -971,15 +1057,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3c, total.2D3c, d
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.2D3c$Br_stanovnistvo)
+sum_s <- sum(sf.2D3c$Br_stanovnistvo_by_grid)
 diff.2D3c <- data.frame(total.2D3c - sum.2D3c)
 sf.2D3c <- sf.2D3c %>%
-  mutate(NOx = ((diff.2D3c$NOx/sum_s)*Br_stanovnistvo),
-         SO2 = ((diff.2D3c$SO2/sum_s)*Br_stanovnistvo),
-         PM10 = ((diff.2D3c$PM10/sum_s)*Br_stanovnistvo),
-         PM2.5 = ((diff.2D3c$PM2.5/sum_s)*Br_stanovnistvo),
-         NMVOC = ((diff.2D3c$NMVOC/sum_s)*Br_stanovnistvo),
-         NH3 = ((diff.2D3c$NH3/sum_s)*Br_stanovnistvo))
+  mutate(NOx = ((diff.2D3c$NOx/sum_s)*Br_stanovnistvo_by_grid),
+         SO2 = ((diff.2D3c$SO2/sum_s)*Br_stanovnistvo_by_grid),
+         PM10 = ((diff.2D3c$PM10/sum_s)*Br_stanovnistvo_by_grid),
+         PM2.5 = ((diff.2D3c$PM2.5/sum_s)*Br_stanovnistvo_by_grid),
+         NMVOC = ((diff.2D3c$NMVOC/sum_s)*Br_stanovnistvo_by_grid),
+         NH3 = ((diff.2D3c$NH3/sum_s)*Br_stanovnistvo_by_grid))
 sf.2D3c %<>% dplyr::select(vars)
 #'
 #'
@@ -2466,20 +2552,106 @@ source.2D3f <- list(sources = list(points = NA, lines = NA, polygon = NA), total
 source.2D3f$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D72:I72", sheet = source.sheet, col_names = vars)
 source.2D3f$total$inventory <- readxl::read_xlsx(path = source.file, range = "D91:I91", sheet = source.sheet, col_names = vars)
 
-sf_opstine %<>% sf::st_transform(4326)
-sf_clc18_urb %<>% sf::st_transform(4326)
-sf_final.urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
 
-sf_final.urb %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
-sf_final.urb[,vars] <- NA
+sf_clc18_urb
 
-sf_final.int.urb <- st_intersection(sf_final.urb, sf.grid.5km) %>%
-  filter(!is.na(Br_stanovnistvo))
+# presek sa poligonima opstina kako bi se dobili manji poligoni
+sf_rur_intOps <- st_intersection(sf_clc18_urb, sf_opstine)
+
+sf_rur_intOps %<>% 
+  dplyr::mutate(Area_pol = sf::st_area(.)) %>% 
+  units::drop_units(.) %>% 
+  dplyr::select(Area_pol) %>%
+  dplyr::mutate(IDpol = row_number())
+
+
+# join atributa tako da manji urban poligoni dobiju odgovorajuce atribute opstine u kojoj se nalaze u celosti
+sf_rur_intOps_cent <- st_centroid(sf_rur_intOps)
+sf_rur_intOps_1 <-  st_join(sf_rur_intOps_cent, 
+                            sf_opstine, 
+                            join = st_within) 
+
+sf_rur_intOps$Br_stanovnistvo <- sf_rur_intOps_1$Br_stanovnistvo[match(sf_rur_intOps$IDpol, sf_rur_intOps_1$IDpol)]
+sf_rur_intOps$Opstina <- sf_rur_intOps_1$NAME_2[match(sf_rur_intOps$IDpol, sf_rur_intOps_1$IDpol)]
+
+sf_rur_intOps  %<>% dplyr::filter(!is.na(Br_stanovnistvo))
+#mapview(sf_rur_intOps  %>% dplyr::filter(is.na(Br_traktori)))
+
+#sf_rur_intOps  %>% dplyr::filter(is.na(Br_traktori))
+
+aa <- sf_rur_intOps  %>% 
+  dplyr::group_by(Opstina) %>%
+  dplyr::summarize(Area_by_opstina = sum(Area_pol)) 
+
+
+sf_rur_intOps$Area_by_opstina <- aa$Area_by_opstina[match(sf_rur_intOps$Opstina, aa$Opstina)]
+
+#sf_rur_intOps %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol))
+sf_rur_intOps %<>% 
+  dplyr::mutate(Br_stanovnistvo_by_polygon = (Br_stanovnistvo/Area_by_opstina)*Area_pol)
+
+# Kontrola
+#sf_rur_intOps %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol), ohssum = sum(Br_zivina_by_polygon))
+#sf_rur_intOps  %>% dplyr::filter(is.na(Br_zivina_by_polygon))
+
+sf_rur_intOps %<>% 
+  dplyr::select(Br_stanovnistvo_by_polygon, Area_pol, IDpol)
+
+
+
+# presek sa poligonima grida
+
+sf_rur_intOps_wgs <- sf_rur_intOps %>% sf::st_transform(4326)
+
+sf_rur_intGrid <- st_intersection(sf_rur_intOps_wgs, sf.grid.5km)
+
+sf_rur_intGrid %<>% 
+  dplyr::rename(ID_grid = ID) %>%
+  dplyr::select(Br_stanovnistvo_by_polygon, IDpol, ID_grid) 
+
+# Kontrola   
+#sf_rur_intGrid  %>% 
+#  dplyr::filter(is.na(ID_grid)) 
+
+sf_rur_intGrid %<>% 
+  dplyr::mutate(Area_by_poly = sf::st_area(.)) %>%
+  units::drop_units(.)
+
+bb <- sf_rur_intGrid %>% 
+  dplyr::group_by(IDpol) %>%
+  dplyr::summarize(Area_by_grid = sum(Area_by_poly))
+
+sf_rur_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_rur_intGrid$IDpol, bb$IDpol)]
+sf_rur_intGrid %<>% 
+  dplyr::mutate(Br_stanovnistvo_by_grid = (Br_stanovnistvo_by_polygon/Area_by_grid)*Area_by_poly)
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
+
+sf_rur_intGrid %<>% 
+  dplyr::select(Br_stanovnistvo_by_grid)
+sf_rur_intGrid[,vars] <- NA
+sf_final.int.urb <- sf_rur_intGrid
+
+
+
+
+
+
+
+
+
+# sf_final.urb <- st_join(sf_clc18_urb, sf_opstine, largest = TRUE) 
+# 
+# sf_final.urb %<>% dplyr::select(.,Br_stanovnistvo, NAME_2)
+# sf_final.urb[,vars] <- NA
+# 
+# sf_final.int.urb <- st_intersection(sf_final.urb, sf.grid.5km) %>%
+#   filter(!is.na(Br_stanovnistvo))
 
 source.2D3f$sources$polygon <- sf_final.int.urb
 
 sf.2D3f <- corsum2sf_polygon(source.2D3f, distribute = FALSE) #%>%
-  #st_transform(crs = "+init=epsg:32634")
+#st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2525,15 +2697,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2D3f, total.2D3f, d
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sum_s <- sum(sf.2D3f$Br_stanovnistvo)
+sum_s <- sum(sf.2D3f$Br_stanovnistvo_by_grid)
 diff.2D3f <- data.frame(total.2D3f - sum.2D3f)
 sf.2D3f <- sf.2D3f %>%
-  mutate(NOx = ((diff.2D3f$NOx/sum_s)*Br_stanovnistvo),
-         SO2 = ((diff.2D3f$SO2/sum_s)*Br_stanovnistvo),
-         PM10 = ((diff.2D3f$PM10/sum_s)*Br_stanovnistvo),
-         PM2.5 = ((diff.2D3f$PM2.5/sum_s)*Br_stanovnistvo),
-         NMVOC = ((diff.2D3f$NMVOC/sum_s)*Br_stanovnistvo),
-         NH3 = ((diff.2D3f$NH3/sum_s)*Br_stanovnistvo))
+  mutate(NOx = ((diff.2D3f$NOx/sum_s)*Br_stanovnistvo_by_grid),
+         SO2 = ((diff.2D3f$SO2/sum_s)*Br_stanovnistvo_by_grid),
+         PM10 = ((diff.2D3f$PM10/sum_s)*Br_stanovnistvo_by_grid),
+         PM2.5 = ((diff.2D3f$PM2.5/sum_s)*Br_stanovnistvo_by_grid),
+         NMVOC = ((diff.2D3f$NMVOC/sum_s)*Br_stanovnistvo_by_grid),
+         NH3 = ((diff.2D3f$NH3/sum_s)*Br_stanovnistvo_by_grid))
 sf.2D3f %<>% dplyr::select(vars)
 #'
 #'
@@ -2685,6 +2857,7 @@ source.2I$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D11
 source.2I$total$inventory <- readxl::read_xlsx(path = source.file, range = "D111:I111", sheet = source.sheet, col_names = vars)
 
 
+
 #+ include = FALSE
 # Including rural areas, industrial sites
 
@@ -2733,18 +2906,102 @@ sf_opstine$tcp <- wood$`Tehničko_četinara_procenat`[match(sf_opstine$NAME_2, w
 
 sf_opstine %<>% 
   st_transform(crs = "+init=epsg:32634")
-sf_final <- st_join(sf.final, sf_opstine, largest = TRUE) 
 
-sf_final %<>% dplyr::select(.,pl, pc, tlp, tcp)
-sf_final[,vars] <- NA
-sf_final %<>% sf::st_transform(4326)
-sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>%
-  filter(!is.na(pl) & !is.na(pc) & !is.na(tlp) & !is.na(tcp))
+sf_opstine %<>%
+  mutate(pd = ((pl/100)*tlp) + ((pc/100)*tcp))
+
+
+
+# presek sa poligonima opstina kako bi se dobili manji poligoni
+sf_rur_intOps <- st_intersection(sf.final, sf_opstine)
+
+sf_rur_intOps %<>% 
+  dplyr::mutate(Area_pol = sf::st_area(.)) %>% 
+  units::drop_units(.) %>% 
+  dplyr::select(Area_pol) %>%
+  dplyr::mutate(IDpol = row_number())
+
+
+# join atributa tako da manji urban poligoni dobiju odgovorajuce atribute opstine u kojoj se nalaze u celosti
+sf_rur_intOps_cent <- st_centroid(sf_rur_intOps)
+sf_rur_intOps_1 <-  st_join(sf_rur_intOps_cent, 
+                            sf_opstine, 
+                            join = st_within) 
+
+sf_rur_intOps$pd <- sf_rur_intOps_1$pd[match(sf_rur_intOps$IDpol, sf_rur_intOps_1$IDpol)]
+sf_rur_intOps$Opstina <- sf_rur_intOps_1$NAME_2[match(sf_rur_intOps$IDpol, sf_rur_intOps_1$IDpol)]
+
+sf_rur_intOps  %<>% dplyr::filter(!is.na(pd))
+#mapview(sf_rur_intOps  %>% dplyr::filter(is.na(Br_traktori)))
+
+#sf_rur_intOps  %>% dplyr::filter(is.na(Br_traktori))
+
+aa <- sf_rur_intOps  %>% 
+  dplyr::group_by(Opstina) %>%
+  dplyr::summarize(Area_by_opstina = sum(Area_pol)) 
+
+
+sf_rur_intOps$Area_by_opstina <- aa$Area_by_opstina[match(sf_rur_intOps$Opstina, aa$Opstina)]
+
+#sf_rur_intOps %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol))
+sf_rur_intOps %<>% 
+  dplyr::mutate(pd_by_polygon = (pd/Area_by_opstina)*Area_pol)
+
+# Kontrola
+#sf_rur_intOps %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol), ohssum = sum(Br_zivina_by_polygon))
+#sf_rur_intOps  %>% dplyr::filter(is.na(Br_zivina_by_polygon))
+
+sf_rur_intOps %<>% 
+  dplyr::select(pd_by_polygon, Area_pol, IDpol)
+
+
+
+# presek sa poligonima grida
+
+sf_rur_intOps_wgs <- sf_rur_intOps %>% sf::st_transform(4326)
+
+sf_rur_intGrid <- st_intersection(sf_rur_intOps_wgs, sf.grid.5km)
+
+sf_rur_intGrid %<>% 
+  dplyr::rename(ID_grid = ID) %>%
+  dplyr::select(pd_by_polygon, IDpol, ID_grid) 
+
+# Kontrola   
+#sf_rur_intGrid  %>% 
+#  dplyr::filter(is.na(ID_grid)) 
+
+sf_rur_intGrid %<>% 
+  dplyr::mutate(Area_by_poly = sf::st_area(.)) %>%
+  units::drop_units(.)
+
+bb <- sf_rur_intGrid %>% 
+  dplyr::group_by(IDpol) %>%
+  dplyr::summarize(Area_by_grid = sum(Area_by_poly))
+
+sf_rur_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_rur_intGrid$IDpol, bb$IDpol)]
+sf_rur_intGrid %<>% 
+  dplyr::mutate(pd_by_grid = (pd_by_polygon/Area_by_grid)*Area_by_poly)
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
+
+sf_rur_intGrid %<>% 
+  dplyr::select(pd_by_grid)
+sf_rur_intGrid[,vars] <- NA
+sf_final.int <- sf_rur_intGrid
+
+
+# sf_final <- st_join(sf.final, sf_opstine, largest = TRUE) 
+# 
+# sf_final %<>% dplyr::select(.,pl, pc, tlp, tcp)
+# sf_final[,vars] <- NA
+# sf_final %<>% sf::st_transform(4326)
+# sf_final.int <- st_intersection(sf_final, sf.grid.5km) %>%
+#   filter(!is.na(pl) & !is.na(pc) & !is.na(tlp) & !is.na(tcp))
 
 source.2I$sources$polygon <- sf_final.int
 
 sf.2I <- corsum2sf_polygon(source.2I, distribute = FALSE) #%>%
-  #st_transform(crs = "+init=epsg:32634")
+#st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -2789,18 +3046,18 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.2I, total.2I, data.
 #'
 #+ include = FALSE, echo = FALSE, result = FALSE
 
-sf.2I %<>%
-  mutate(pd = ((pl/100)*tlp) + ((pc/100)*tcp))
+#sf.2I %<>%
+#  mutate(pd = ((pl/100)*tlp) + ((pc/100)*tcp))
 
-sum_s <- sum(sf.2I$pd)
+sum_s <- sum(sf.2I$pd_by_grid)
 diff.2I <- data.frame(total.2I - sum.2I)
 sf.2I <- sf.2I %>%
-  mutate(NOx = ((diff.2I$NOx/sum_s)*pd),
-         SO2 = ((diff.2I$SO2/sum_s)*pd),
-         PM10 = ((diff.2I$PM10/sum_s)*pd),
-         PM2.5 = ((diff.2I$PM2.5/sum_s)*pd),
-         NMVOC = ((diff.2I$NMVOC/sum_s)*pd),
-         NH3 = ((diff.2I$NH3/sum_s)*pd))
+  mutate(NOx = ((diff.2I$NOx/sum_s)*pd_by_grid),
+         SO2 = ((diff.2I$SO2/sum_s)*pd_by_grid),
+         PM10 = ((diff.2I$PM10/sum_s)*pd_by_grid),
+         PM2.5 = ((diff.2I$PM2.5/sum_s)*pd_by_grid),
+         NMVOC = ((diff.2I$NMVOC/sum_s)*pd_by_grid),
+         NH3 = ((diff.2I$NH3/sum_s)*pd_by_grid))
 sf.2I %<>% dplyr::select(vars)
 #'
 #'

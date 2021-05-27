@@ -711,7 +711,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.1B2av, total.1B2
   )
 
 #+ include = FALSE
- st_write(p.1B2av, dsn="2030_WAM_B/Products_2030_WAM_B/1B - Fugitive emissions_2030_WAM_B/1B2av.gpkg", layer='1B2av')
+# st_write(p.1B2av, dsn="2030_WAM_B/Products_2030_WAM_B/1B - Fugitive emissions_2030_WAM_B/1B2av.gpkg", layer='1B2av')
 
 #'
 #'

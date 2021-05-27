@@ -437,7 +437,6 @@ source.5D1 <- list(sources = list(points = NA, lines = NA, polygon = NA), total 
 source.5D1$total$spatialize <- readxl::read_xlsx(path = source.file, range = "D46:I46", sheet = source.sheet, col_names = vars)
 source.5D1$total$inventory <- readxl::read_xlsx(path = source.file, range = "D47:I47", sheet = source.sheet, col_names = vars)
 
-#+ include = TRUE, message = FALSE, warning = FALSE
 Sys.setlocale(locale = 'Serbian (Latin)') # Reading data
 opstine <- readOGR("Data/opstine/gadm36_SRB_2.shp", 
                    use_iconv=TRUE,  
@@ -451,8 +450,9 @@ otpadne_vode <- cyr_lat(otpadne_vode)
 names(otpadne_vode) <- cyr_lat(names(otpadne_vode)) 
 
 
-#otpadne_vode <- otpadne_vode %>% 
-#  mutate_all(~replace(., is.na(.), 0))
+otpadne_vode %<>% as.data.frame() %>%
+  #dplyr::mutate_all(~replace(., is.na(.), 0))
+  mutate(across(where(is.numeric), tidyr::replace_na, 0))
 
 otpadne_vode$Opština[otpadne_vode$Opština == "Indjija"] <- "Inđija"
 otpadne_vode$Opština[otpadne_vode$Opština == "LJubovija"] <- "Ljubovija"
@@ -467,19 +467,99 @@ otpadne_vode$Opština[otpadne_vode$Opština == "Medvedja"] <- "Medveđa"
 sf_opstine$Otpadne_vode <- otpadne_vode$`Ukupne ispuštene otpadne vode`[match(sf_opstine$NAME_2, otpadne_vode$Opština)] # Matching data 
 
 sf_opstine %<>% 
-  st_transform(4326)
-sf_opstine %<>% dplyr::select(.,Otpadne_vode, NAME_2)
-sf_opstine[,vars] <- NA
+  st_transform(crs = "+init=epsg:32634")
 
-urbana <- sf::st_read("GIS_layers/Urban_areas.gpkg")
-urbana_opstine <- st_join(urbana, sf_opstine, join = st_intersects)
-urbana_opstine %<>% st_transform(4326)
-sf_opstine.int <- st_intersection(urbana_opstine, sf.grid.5km) %>%
-  filter(!is.na(Otpadne_vode))
+# urbana podrucja iz CORINE
+sf_clc18_urb <- sf::st_read("GIS_layers/Urban_areas.gpkg") %>% 
+  st_transform(crs = "+init=epsg:32634")
 
-source.5D1$sources$polygon <- sf_opstine.int
+# presek sa poligonima opstina kako bi se dobili manji poligoni
+sf_clc18_urb_intCLC <- st_intersection(sf_clc18_urb, sf_opstine)
+sf_clc18_urb_intCLC %<>% 
+  dplyr::mutate(Area_pol = sf::st_area(.)) %>% 
+  units::drop_units(.) %>% 
+  dplyr::select(Area_pol) %>%
+  dplyr::mutate(IDpol = row_number())
+
+# join atributa tako da manji urban poligoni dobiju odgovorajuce atribute opstine u kojoj se nalaze u celosti
+#mapview(sf_clc18_urb_intCLC) + mapview(sf_opstine)
+sf_clc18_urb_intCLC_cent <- st_centroid(sf_clc18_urb_intCLC)
+sf_clc18_urb_intCLC_1 <-  st_join(sf_clc18_urb_intCLC_cent, 
+                                  sf_opstine, 
+                                  join = st_within) 
+
+sf_clc18_urb_intCLC$Otpadne_vode <- sf_clc18_urb_intCLC_1$Otpadne_vode[match(sf_clc18_urb_intCLC$IDpol, sf_clc18_urb_intCLC_1$IDpol)]
+sf_clc18_urb_intCLC$Opstina <- sf_clc18_urb_intCLC_1$NAME_2[match(sf_clc18_urb_intCLC$IDpol, sf_clc18_urb_intCLC_1$IDpol)]
+
+sf_clc18_urb_intCLC %<>% dplyr::filter(!is.na(Otpadne_vode))
+
+aa <- sf_clc18_urb_intCLC  %>% 
+  dplyr::group_by(Opstina) %>%
+  dplyr::summarize(Area_by_opstina = sum(Area_pol)) %>%
+  dplyr::mutate(Area_by_opstina = Area_by_opstina) %>%  
+  dplyr::ungroup()
+
+sf_clc18_urb_intCLC$Area_by_opstina <- aa$Area_by_opstina[match(sf_clc18_urb_intCLC$Opstina, aa$Opstina)]  
+
+#sf_clc18_urb_intCLC %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol))
+sf_clc18_urb_intCLC %<>% 
+  dplyr::mutate(Otpadne_vode_by_polygon = (Otpadne_vode/Area_by_opstina)*Area_pol)
+
+# Kontrola
+# sf_clc18_urb_intCLC %>% dplyr::filter(Opstina == "Bor") %>% dplyr::mutate(suma =  sum(Area_pol), ohssum = sum(Otpadne_vode_by_polygon))
+# sf_clc18_urb_intCLC  %>% dplyr::filter(is.na(Otpadne_vode_by_polygon))
+
+sf_clc18_urb_intCLC %<>% 
+  dplyr::select(Otpadne_vode_by_polygon, Area_pol, IDpol)
+# mapview(sf_clc18_urb_intCLC, zcol = "OHS_by_polygon")
+
+# presek sa poligonima grida
+
+sf_clc18_urb_intCLC_wgs <- sf_clc18_urb_intCLC %>% sf::st_transform(4326)
+
+sf_clc18_urb_intGrid <- st_intersection(sf_clc18_urb_intCLC_wgs, sf.grid.5km)
+
+sf_clc18_urb_intGrid %<>% 
+  dplyr::rename(ID_grid = ID) %>%
+  dplyr::select(Otpadne_vode_by_polygon, IDpol, ID_grid) 
+
+# Kontrola   
+#sf_clc18_urb_intGrid  %>% 
+#  dplyr::filter(is.na(ID_grid)) 
+
+sf_clc18_urb_intGrid %<>% 
+  dplyr::mutate(Area_by_poly = sf::st_area(.)) %>%
+  units::drop_units(.)
+
+bb <- sf_clc18_urb_intGrid %>% 
+  dplyr::group_by(IDpol) %>%
+  dplyr::summarize(Area_by_grid = sum(Area_by_poly))
+
+sf_clc18_urb_intGrid$Area_by_grid <- bb$Area_by_grid[match(sf_clc18_urb_intGrid$IDpol, bb$IDpol)]
+sf_clc18_urb_intGrid %<>% 
+  dplyr::mutate(Otpadne_vode_by_grid = (Otpadne_vode_by_polygon/Area_by_grid)*Area_by_poly)
+
+# mapview(sf_clc18_urb_intGrid, zcol = "OHS_by_grid")
+
+
+sf_clc18_urb_intGrid %<>% 
+  dplyr::select(Otpadne_vode_by_grid)
+
+sf_clc18_urb_intGrid[,vars] <- NA
+
+
+# sf_opstine %<>% dplyr::select(.,Otpadne_vode, NAME_2)
+# sf_opstine[,vars] <- NA
+# 
+# urbana <- sf::st_read("GIS_layers/Urban_areas.gpkg")
+# urbana_opstine <- st_join(urbana, sf_opstine, join = st_intersects)
+# urbana_opstine %<>% st_transform(4326)
+# sf_opstine.int <- st_intersection(urbana_opstine, sf.grid.5km) %>%
+#   filter(!is.na(Otpadne_vode))
+
+source.5D1$sources$polygon <- sf_clc18_urb_intGrid
 sf.5D1 <- corsum2sf_polygon(source.5D1, distribute = FALSE) #%>% # Preparing data for final spatialization
-  #st_transform(crs = "+init=epsg:32634")
+#st_transform(crs = "+init=epsg:32634")
 
 #'
 #'
@@ -525,15 +605,15 @@ data.frame(sum = c("spatialize", "total", "diff"), rbind(sum.5D1, total.5D1, dat
 #'
 #+ include = TRUE, message = FALSE, warning = FALSE
 
-sum_s <- sum(sf.5D1$Otpadne_vode)
+sum_s <- sum(sf.5D1$Otpadne_vode_by_grid)
 diff.5D1 <- data.frame(total.5D1 - sum.5D1)
 sf.5D1 <- sf.5D1 %>% # Calculate weights and distribute data
-  mutate(NOx = ((diff.5D1$NOx/sum_s)*Otpadne_vode),
-         SO2 = ((diff.5D1$SO2/sum_s)*Otpadne_vode),
-         PM10 = ((diff.5D1$PM10/sum_s)*Otpadne_vode),
-         PM2.5 = ((diff.5D1$PM2.5/sum_s)*Otpadne_vode),
-         NMVOC = ((diff.5D1$NMVOC/sum_s)*Otpadne_vode),
-         NH3 = ((diff.5D1$NH3/sum_s)*Otpadne_vode))
+  mutate(NOx = ((diff.5D1$NOx/sum_s)*Otpadne_vode_by_grid),
+         SO2 = ((diff.5D1$SO2/sum_s)*Otpadne_vode_by_grid),
+         PM10 = ((diff.5D1$PM10/sum_s)*Otpadne_vode_by_grid),
+         PM2.5 = ((diff.5D1$PM2.5/sum_s)*Otpadne_vode_by_grid),
+         NMVOC = ((diff.5D1$NMVOC/sum_s)*Otpadne_vode_by_grid),
+         NH3 = ((diff.5D1$NH3/sum_s)*Otpadne_vode_by_grid))
 sf.5D1 %<>% dplyr::select(vars)
 #'
 #'
@@ -565,7 +645,7 @@ data.frame(sum = c("spatialized", "total", "diff"), rbind(sum.p.5D1, total.5D1, 
   )
 
 #+ include = FALSE
- st_write(p.5D1, dsn="2030_WAM_B/Products_2030_WAM_B/5 - Waste_2030_WAM_B/5D1.gpkg", layer='5D1')
+# st_write(p.5D1, dsn="2030_WAM_B/Products_2030_WAM_B/5 - Waste_2030_WAM_B/5D1.gpkg", layer='5D1')
 
 #'
 #'
