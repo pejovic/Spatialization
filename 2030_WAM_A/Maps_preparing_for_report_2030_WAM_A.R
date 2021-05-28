@@ -209,6 +209,52 @@ energy_map <- grid.arrange(a1, b1, c1, d1, e1, f1, ncol = 2, nrow = 3)
 
 
 
+# ggsave(plot = f1, 
+#        filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+
+ggsave(plot = a1, 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_NOx.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+ggsave(plot = b1, 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c1, 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030__WAM_A_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d1, 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e1, 
+       filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
 ggsave(plot = f1, 
        filename = "2030_WAM_A/Maps_2030_WAM_A/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2030_WAM_A_NH3.jpg", 
        width = 30, 
@@ -216,6 +262,10 @@ ggsave(plot = f1,
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+
+
+
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

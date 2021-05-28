@@ -1767,7 +1767,12 @@ sf_opstine_bg$NAME_1[2:17] <- NA
 library(ggspatial)
 library(ggsflabel)
 # Opstine
-sf_opstine_sel <- rbind(sf_opstine_bo, sf_opstine_ns, sf_opstine_pa, sf_opstine_sd, sf_opstine_uz)
+sf_opstine_va <- sf_opstine %>% dplyr::filter(NAME_2 == "Valjevo")
+sf_opstine_kg <- sf_opstine %>% dplyr::filter(NAME_2 == "Kragujevac")
+sf_opstine_ni <- sf_opstine %>% dplyr::filter(NAME_2 == "Niš")
+
+
+sf_opstine_sel <- rbind(sf_opstine_bo, sf_opstine_ns, sf_opstine_pa, sf_opstine_sd, sf_opstine_uz, sf_opstine_va, sf_opstine_kg, sf_opstine_ni)
 map_cities <- ggplot() +
   geom_sf(data = sf_opstine_sel, fill = "red") +
   geom_sf(data = sf_opstine_bg, fill = "red")+
@@ -1789,7 +1794,7 @@ map_cities <- ggplot() +
                          pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)+
   geom_sf_label_repel(data = sf_opstine_sel, aes(label = NAME_2), nudge_x = 0.3, nudge_y = 0.3, seed = 10)+
-  geom_sf_label_repel(data = sf_opstine_bg, aes(label = NAME_1))
+  geom_sf_label_repel(data = sf_opstine_bg, aes(label = NAME_1), nudge_x = 0.2, nudge_y = 0.1)
 map_cities
 
 ggsave(plot = map_cities, 
@@ -2203,6 +2208,7 @@ e.sd<-ggplot() +
                          pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)
 
+
 e.sd
 ggsave(plot = e.sd, 
        filename = "Maps/FINAL2015/Zoomed_maps/Kragujevac_NMVOC.jpg", 
@@ -2241,6 +2247,7 @@ ggsave(plot = f.sd,
        units = "cm", 
        device = "jpeg",
        dpi=600)
+
 sd <- grid.arrange(a.sd, b.sd, c.sd, d.sd, e.sd, f.sd, ncol = 2)
 
 ggsave(plot = sd, 
@@ -2466,6 +2473,7 @@ ggsave(plot = f.sd,
        units = "cm", 
        device = "jpeg",
        dpi=600)
+
 sd <- grid.arrange(a.sd, b.sd, c.sd, d.sd, e.sd, f.sd, ncol = 2)
 
 ggsave(plot = sd, 
@@ -2475,4 +2483,7 @@ ggsave(plot = sd,
        units = "cm", 
        device = "jpeg",
        dpi=600)
+
+
+
 

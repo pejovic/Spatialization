@@ -905,13 +905,64 @@ energy_map <- grid.arrange(a1, b1, c1, d1, e1, f1, ncol = 2, nrow = 3)
 
 
 
-ggsave(plot = e1, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_NMVOC.jpg", 
+# ggsave(plot = e1, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_NMVOC.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+ggsave(plot = a1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+ggsave(plot = b1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f1, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A1 - Energy_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+
+
+
+
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1064,14 +1115,59 @@ f2<-ggplot() +
 f2
 industry_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
-ggsave(plot = f2, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_NH3.jpg", 
+# ggsave(plot = f2, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+
+ggsave(plot = a2, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 
+ggsave(plot = b2, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c2, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d2, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e2, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f2, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A2 - Industry_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1224,13 +1320,60 @@ f3<-ggplot() +
 transport_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
-ggsave(plot = f3, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_NH3.jpg", 
+# ggsave(plot = f3, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+ggsave(plot = a3, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+ggsave(plot = b3, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c3, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d3, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e3, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f3, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A3 - Transport_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1383,13 +1526,62 @@ f4
 residential_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
-ggsave(plot = f4, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_NH3.jpg", 
+# ggsave(plot = f4, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+ggsave(plot = a4, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+ggsave(plot = b4, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c4, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d4, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e4, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f4, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1A4 - Residential-Tertiary_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+
+
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 sf_data_fugitive <- st_read(dsn = "Products/Sum-up_By_category/1B - Fugitive emissions.gpkg")
@@ -1540,13 +1732,59 @@ f5<-ggplot() +
 f5
 fugitive_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
-ggsave(plot = f5, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_NH3.jpg", 
+# ggsave(plot = f5, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+ggsave(plot = a5, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+ggsave(plot = b5, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c5, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d5, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e5, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f5, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_1B - Fugitive emissions_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1699,13 +1937,61 @@ f6
 other_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
-ggsave(plot = d6, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_PM2.5.jpg", 
+# ggsave(plot = d6, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_PM2.5.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+ggsave(plot = a6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+ggsave(plot = b6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f6, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_2 - Other processes_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 sf_data_agriculture <- st_read(dsn = "Products/Sum-up_By_category/3 - Agriculture.gpkg")
@@ -1857,13 +2143,66 @@ agriculture_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
 
 
-ggsave(plot = f7, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_NH3.jpg", 
+# ggsave(plot = f7, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
+
+
+
+ggsave(plot = a7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
+
+ggsave(plot = b7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f7, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_3 - Agriculture_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+
+
+
+
+
+
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 sf_data_waste <- st_read(dsn = "Products/Sum-up_By_category/5 - Waste.gpkg")
@@ -2014,17 +2353,59 @@ f8<-ggplot() +
 f8
 waste_map <- grid.arrange(a, b, c, d, e, f, ncol = 2, nrow = 3)
 
+# ggsave(plot = f8, 
+#        filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_NH3.jpg", 
+#        width = 30, 
+#        height = 30, 
+#        units = "cm", 
+#        device = "jpeg", 
+#        dpi = 600)
 
-ggsave(plot = f8, 
-       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_NH3.jpg", 
+
+
+ggsave(plot = a8, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_2015_NOx.jpg", 
        width = 30, 
        height = 30, 
        units = "cm", 
        device = "jpeg", 
        dpi = 600)
 
-
-
+ggsave(plot = b8, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_2015_SO2.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = c8, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_2015_PM10.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = d8, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_2015_PM2.5.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = e8, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_2015_NMVOC.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
+ggsave(plot = f8, 
+       filename = "Maps/FINAL2015/Maps_per_each_GNFR_sector/Map_5 - Waste_2015_NH3.jpg", 
+       width = 30, 
+       height = 30, 
+       units = "cm", 
+       device = "jpeg", 
+       dpi = 600)
 
 
 
